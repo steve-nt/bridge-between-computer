@@ -1,0 +1,365 @@
+================================================================================
+D7078E Lab 2: Cloud Services (Storage) - Complete Solution Package
+================================================================================
+
+SUBMISSION PACKAGE CONTENTS
+============================
+
+📖 DOCUMENTATION FILES (3 files)
+────────────────────────────────
+1. README.md (15.6 KB)
+   - Quick start guide
+   - Architecture overview
+   - Task checklist
+   - Troubleshooting guide
+   - Submission requirements
+
+2. lab-guide.md (17.0 KB)
+   - Step-by-step implementation for Task 2.1
+   - Complete Java development guide for Task 2.2
+   - Prerequisites and setup instructions
+   - Detailed troubleshooting
+   - Resource cleanup procedures
+   - Quick reference commands
+
+3. lab-report-guide.md (29.1 KB)
+   - What to write in each report section
+   - Analysis tips for reflection questions
+   - Diagram templates and examples
+   - Code explanation templates
+   - Results interpretation guide
+   - Writing structure and style guidelines
+   - Final submission checklist
+
+🔧 SHELL SCRIPTS (2 files)
+──────────────────────────
+1. task-2-1-setup.sh (11 KB, executable)
+   Features:
+   - Automated AWS infrastructure setup
+   - Creates security groups with proper rules
+   - Creates S3 bucket
+   - Creates IAM policy and role
+   - Launches EC2 instance with role
+   - Saves configuration for cleanup
+   - Color-coded output messages
+   - Error handling and validation
+   
+   Usage: ./task-2-1-setup.sh YOUR_IP_ADDRESS/32
+
+2. task-2-1-cleanup.sh (6.2 KB, executable)
+   Features:
+   - Automated resource cleanup
+   - Terminates EC2 instances
+   - Deletes security groups
+   - Removes IAM roles and policies
+   - Deletes S3 buckets
+   - Confirmation prompts for safety
+   - Detailed progress output
+   
+   Usage: ./task-2-1-cleanup.sh
+
+☕ JAVA SOURCE CODE (2 files)
+─────────────────────────────
+1. S3BucketOperations.java (11.1 KB)
+   Tasks implemented:
+   - Create S3 buckets in 3 regions
+   - List all buckets in account
+   - Upload objects to buckets
+   - Download objects from buckets
+   - List objects within bucket
+   - Delete objects from bucket
+   
+   Features:
+   - Region enumeration support
+   - Error handling with S3Exception
+   - Detailed console output
+   - Try-with-resources for proper cleanup
+   - Helper methods for bucket operations
+
+2. S3LatencyMeasurement.java (10.8 KB)
+   Tasks implemented:
+   - Test latency in multiple regions
+   - Measure upload latency (3 iterations)
+   - Measure download latency (3 iterations)
+   - Calculate averages and statistics
+   - Generate results table
+   - Identify fastest/slowest regions
+   
+   Features:
+   - Regional latency comparison
+   - 1 MB test file creation
+   - Automated bucket cleanup
+   - Formatted results output
+   - Detailed analysis commentary
+
+QUICK START
+===========
+
+1. CONFIGURE AWS CLI
+   aws configure
+   aws sts get-caller-identity
+
+2. GET YOUR IP
+   curl https://checkip.amazonaws.com
+
+3. RUN SETUP SCRIPT (Task 2.1)
+   ./task-2-1-setup.sh YOUR_IP/32
+
+4. COMPILE JAVA PROGRAMS (Task 2.2)
+   javac -cp ".:aws-sdk/*" S3BucketOperations.java
+   javac -cp ".:aws-sdk/*" S3LatencyMeasurement.java
+
+5. RUN PROGRAMS
+   java -cp ".:aws-sdk/*" S3BucketOperations
+   java -cp ".:aws-sdk/*" S3LatencyMeasurement
+
+6. REVIEW DOCUMENTATION
+   - Implementation: Read lab-guide.md
+   - Report Writing: Read lab-report-guide.md
+
+7. CLEANUP (when done)
+   ./task-2-1-cleanup.sh
+
+FILE ORGANIZATION
+=================
+
+Lab2/
+├── README.md                       (Start here!)
+├── lab-guide.md                    (Implementation steps)
+├── lab-report-guide.md             (Report writing tips)
+├── DELIVERABLES.txt                (This file)
+├── task-2-1-setup.sh              (Task 2.1 automation)
+├── task-2-1-cleanup.sh            (Resource cleanup)
+├── S3BucketOperations.java        (Task 2.2 CRUD)
+└── S3LatencyMeasurement.java      (Task 2.2 Latency testing)
+
+GENERATED FILES (after running scripts)
+────────────────────────────────────────
+After running setup script:
+- lab2-keypair.pem (EC2 key pair)
+- Lab2S3Policy.json (IAM policy definition)
+- lab2-config.txt (Infrastructure configuration)
+
+After running Java programs:
+- latency-test-*.bin (1 MB test files)
+- latency-results.csv (Results for analysis)
+
+KEY FEATURES
+============
+
+✅ COMPLETE SOLUTION
+   - Covers both Task 2.1 and Task 2.2
+   - Ready to run out of the box
+   - Comprehensive documentation
+
+✅ AUTOMATED INFRASTRUCTURE
+   - Single script for all AWS setup
+   - Automatic configuration saving
+   - One-command cleanup
+   - Error handling and recovery
+
+✅ PRACTICAL JAVA CODE
+   - Real AWS SDK usage patterns
+   - Multiple regions support
+   - Performance measurement
+   - Error handling examples
+
+✅ THOROUGH DOCUMENTATION
+   - Step-by-step guides
+   - Architecture diagrams
+   - Code explanations
+   - Lab report writing tips
+   - Troubleshooting section
+
+✅ SECURITY BEST PRACTICES
+   - Least privilege IAM policies
+   - No hardcoded credentials
+   - Defense in depth approach
+   - Temporary credentials via roles
+   - IP-restricted SSH access
+
+✅ PRODUCTION-READY CODE
+   - Proper error handling
+   - Resource cleanup
+   - Configurable parameters
+   - Clear comments
+   - Scalable design
+
+REQUIREMENTS MET
+================
+
+Task 2.1: Security Groups, IAM Policies & IAM Roles
+✅ Create and manage Security Groups using AWS CLI
+✅ Apply least privilege by designing IAM policies
+✅ Create and attach IAM roles to EC2 instances
+✅ Understand how Security Groups restrict traffic
+✅ Understand how IAM roles work without exposed keys
+✅ Complete automation with bash script
+✅ Resource cleanup automation
+
+Task 2.2: AWS SDK with Java
+✅ Setup AWS SDK for Java environment
+✅ Explain S3 client creation and dependencies
+✅ Create buckets in three regions
+✅ List buckets with Java SDK
+✅ Upload objects (at least 1 MB)
+✅ Download objects with latency measurement
+✅ Delete objects from buckets
+✅ Compare latency across regions
+
+Lab Report Support
+✅ Guide for all report sections
+✅ Analysis tips for reflection questions
+✅ Diagram templates
+✅ Code explanation examples
+✅ Results interpretation guide
+✅ Writing guidelines and structure
+
+ESTIMATED COMPLETION TIME
+==========================
+
+Task 2.1 (AWS CLI):
+- Setup: 15-20 minutes
+- Configuration: 10 minutes
+- Testing and validation: 15 minutes
+- Cleanup: 5 minutes
+TOTAL: ~45 minutes
+
+Task 2.2 (Java Development):
+- Environment setup: 20 minutes
+- Compilation: 5 minutes
+- Running S3BucketOperations: 10 minutes
+- Running LatencyMeasurement: 10-15 minutes (includes waiting time)
+- Results analysis: 10 minutes
+TOTAL: ~60 minutes
+
+Lab Report Writing:
+- Planning and research: 30 minutes
+- Writing report: 120-180 minutes
+- Screenshots and formatting: 30 minutes
+- Final review and PDF export: 30 minutes
+TOTAL: 3-5 hours
+
+TOTAL LAB COMPLETION: 4-6 hours (including report)
+
+SUPPORT RESOURCES
+=================
+
+Documentation Included:
+- README.md: Quick start and overview
+- lab-guide.md: Detailed implementation steps
+- lab-report-guide.md: Report writing guide
+- Inline code comments: Explanation of logic
+- Troubleshooting sections: Common issues and fixes
+
+External Resources:
+- AWS CLI Documentation: https://docs.aws.amazon.com/cli/
+- AWS SDK for Java: https://docs.aws.amazon.com/sdk-for-java/
+- Amazon S3 API Reference: https://docs.aws.amazon.com/AmazonS3/latest/API/
+- IAM Best Practices: https://docs.aws.amazon.com/iam/latest/userguide/best-practices.html
+
+SUBMISSION CHECKLIST
+====================
+
+Before submitting to Canvas:
+
+Code Execution:
+□ Task 2.1 setup script runs successfully
+□ EC2 instance launches and SSH works
+□ S3 bucket created and accessible
+□ Task 2.2 Java programs compile without errors
+□ S3BucketOperations runs successfully
+□ S3LatencyMeasurement completes successfully
+□ Results are collected and analyzed
+
+Lab Report:
+□ All sections completed (Introduction through Conclusions)
+□ Reflection questions answered thoroughly (2-3 paragraphs each)
+□ Diagrams and screenshots included
+□ Code appendix with comments included
+□ Group contributions documented
+□ Report is 15-25 pages
+□ PDF is properly formatted
+□ Grammar and spelling checked
+
+Submission Files:
+□ Lab2Report.pdf (main report)
+□ Lab2-Code.zip (all scripts and Java files)
+□ README.md included in zip
+□ Screenshots folder if applicable
+□ All files compressed into single zip for submission
+
+AWS Cost Considerations
+========================
+
+Estimated charges (assuming 1-2 hours usage):
+- EC2 t2.micro: ~$0.01-0.02
+- S3 storage: <$0.01 (small test files)
+- Data transfer: ~$0.01
+- IAM: Free
+- Security Groups: Free
+TOTAL ESTIMATED COST: ~$0.02-0.05 USD
+
+Cost savings:
+- Always cleanup resources after testing
+- Run script-cleanup.sh to remove all resources
+- Delete S3 buckets to avoid ongoing storage charges
+- Terminate EC2 instances promptly
+- Monitor AWS billing console regularly
+
+NOTES FOR GROUP WORK
+====================
+
+Collaboration:
+- Multiple team members can work on different tasks
+- Person A: AWS CLI setup (Task 2.1)
+- Person B: Java development (Task 2.2 - CRUD)
+- Person C: Java development (Task 2.2 - Latency)
+- All: Report writing
+
+Attribution:
+- Clearly document each member's contributions
+- Include percentage breakdown in report
+- Mention who worked on each section
+- Cite sources and acknowledge help
+
+Academic Integrity:
+- Write code individually or collaboratively for learning
+- Understand every line before submitting
+- Don't copy without understanding
+- Acknowledge any external sources
+- Follow LTU plagiarism policy
+
+VERSION INFORMATION
+===================
+
+Release: Lab2-Solution-v1.0
+Date: November 29, 2025
+AWS SDK Version: 2.20.0 (for Java)
+Java Minimum Version: 11
+AWS CLI Version: v2 (2.0+)
+
+FEEDBACK AND IMPROVEMENTS
+==========================
+
+If you find issues:
+1. Check README.md for quick fixes
+2. Review troubleshooting in lab-guide.md
+3. Check inline code comments
+4. Verify AWS credentials: aws sts get-caller-identity
+5. Review AWS CloudTrail logs for errors
+
+Suggestions for improvement:
+- Document any issues encountered
+- Note any unclear sections
+- Record time spent on each task
+- Keep notes for future reference
+- Share feedback with classmates
+
+================================================================================
+
+Questions? See lab-guide.md or lab-report-guide.md for detailed help!
+
+Good luck with your lab submission! 🚀
+
+================================================================================
