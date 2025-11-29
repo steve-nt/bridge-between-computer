@@ -1,0 +1,379 @@
+================================================================================
+D7078E Lab 2 - Complete Solution Package Summary
+================================================================================
+
+PACKAGE CREATED: November 29, 2025
+DEADLINE: November 30, 2025
+
+CONTENTS DELIVERED:
+===================
+
+📖 DOCUMENTATION & GUIDES (6 files)
+   1. 00-READ-ME-FIRST.txt (4.8 KB) - START HERE! Main entry point
+   2. INDEX.md (12 KB) - File navigation and reference guide
+   3. START_HERE.txt (12 KB) - Quick orientation for new users
+   4. README.md (18 KB) - Complete overview and quick start
+   5. QUICK_REFERENCE.md (9.1 KB) - Cheat sheet and common commands
+   6. DELIVERABLES.txt (11 KB) - Detailed file descriptions
+
+📚 IMPLEMENTATION GUIDES (2 files)
+   7. lab-guide.md (17 KB) - MAIN GUIDE: Step-by-step for both tasks
+   8. lab-report-guide.md (31 KB) - How to write your lab report
+
+🔧 AUTOMATION SCRIPTS (2 files - EXECUTABLE)
+   9. task-2-1-setup.sh (11 KB) - Creates all AWS infrastructure
+   10. task-2-1-cleanup.sh (6.2 KB) - Deletes all AWS infrastructure
+
+☕ JAVA SOURCE CODE (2 files)
+   11. S3BucketOperations.java (11 KB) - S3 CRUD operations demo
+   12. S3LatencyMeasurement.java (11 KB) - Performance testing
+
+TOTAL: 12 files, ~170 KB of content
+
+================================================================================
+WHAT TO DO NOW
+================================================================================
+
+FIRST: Read the main entry point
+   → Open: 00-READ-ME-FIRST.txt
+   → Time: 10 minutes
+   → Purpose: Understand what you have and what to do
+
+SECOND: Choose your path
+   → For beginners: Read START_HERE.txt then lab-guide.md
+   → For experienced: Skim QUICK_REFERENCE.md then execute scripts
+   → For help: Check relevant section in appropriate guide
+
+THIRD: Follow the implementation guide
+   → Read: lab-guide.md (section by section)
+   → Execute: Scripts and Java programs as instructed
+   → Time: 1.5 hours total (Task 2.1 + Task 2.2)
+
+FOURTH: Write your lab report
+   → Read: lab-report-guide.md
+   → Follow: Templates and structure provided
+   → Time: 3-5 hours
+
+FIFTH: Submit to Canvas
+   → File format: PDF + ZIP
+   → Deadline: November 30, 2025
+   → Before submission: Check all files included
+
+================================================================================
+KEY FILES EXPLAINED
+================================================================================
+
+00-READ-ME-FIRST.txt
+   Purpose: Main entry point with overview
+   When to read: First thing after opening this package
+   Contains: Package overview, quick start, checklist
+   Size: 4.8 KB
+   Read time: 10 minutes
+
+lab-guide.md
+   Purpose: Complete implementation guide for both tasks
+   When to read: When ready to implement Task 2.1 or 2.2
+   Contains: Step-by-step instructions, commands, validation
+   Size: 17 KB
+   Read time: 30 minutes (but will refer to frequently)
+
+lab-report-guide.md
+   Purpose: How to write the lab report
+   When to read: When ready to write the report
+   Contains: Section templates, writing tips, analysis guidance
+   Size: 31 KB
+   Read time: 20 minutes (reference while writing)
+
+task-2-1-setup.sh
+   Purpose: Automate AWS infrastructure creation
+   When to use: After reading lab-guide.md Task 2.1 section
+   Creates: Security Group, IAM Role, S3 Bucket, EC2 Instance
+   Time to run: 2-3 minutes
+   Command: ./task-2-1-setup.sh YOUR_IP/32
+
+S3BucketOperations.java
+   Purpose: Demonstrate S3 CRUD operations
+   When to use: After environment setup
+   Includes: Create, list, upload, download, delete operations
+   Time to run: 1-2 minutes
+   Command: java -cp ".:aws-sdk/*" S3BucketOperations
+
+S3LatencyMeasurement.java
+   Purpose: Measure and compare latency across regions
+   When to use: For Task 2.2 analysis
+   Includes: 1 MB uploads/downloads in 3 regions
+   Time to run: 5-10 minutes
+   Command: java -cp ".:aws-sdk/*" S3LatencyMeasurement
+
+================================================================================
+IMPLEMENTATION ROADMAP
+================================================================================
+
+PHASE 1: PREPARATION (15 minutes)
+   ✓ Read 00-READ-ME-FIRST.txt (10 min)
+   ✓ Verify AWS CLI and Java installed (5 min)
+   ✓ Configure AWS credentials (if needed)
+
+PHASE 2: TASK 2.1 AWS CLI (45 minutes)
+   ✓ Read lab-guide.md Task 2.1 section (15 min)
+   ✓ Run task-2-1-setup.sh YOUR_IP/32 (5 min)
+   ✓ Test SSH and S3 access (15 min)
+   ✓ Review configuration and understand what was created (10 min)
+
+PHASE 3: TASK 2.2 JAVA SDK (60 minutes)
+   ✓ Read lab-guide.md Task 2.2 section (15 min)
+   ✓ Setup AWS SDK for Java (15 min)
+   ✓ Compile S3BucketOperations.java (2 min)
+   ✓ Run and observe output (3 min)
+   ✓ Compile S3LatencyMeasurement.java (2 min)
+   ✓ Run and collect results (8 min)
+   ✓ Analyze results (15 min)
+
+PHASE 4: LAB REPORT (3-5 hours)
+   ✓ Read lab-report-guide.md completely (20 min)
+   ✓ Plan report structure (15 min)
+   ✓ Write each section using templates (2.5-3.5 hours)
+   ✓ Review, proofread, format (30 min)
+   ✓ Export as PDF (10 min)
+
+PHASE 5: CLEANUP & SUBMISSION (15 minutes)
+   ✓ Run task-2-1-cleanup.sh (5 min)
+   ✓ Organize submission files (5 min)
+   ✓ Upload to Canvas (5 min)
+
+TOTAL ESTIMATED TIME: 4.5-6.5 hours
+
+================================================================================
+WHAT EACH SCRIPT/PROGRAM DOES
+================================================================================
+
+task-2-1-setup.sh - Creates AWS Infrastructure
+   Steps:
+   1. Checks AWS CLI installation
+   2. Creates Security Group with rules
+      - SSH only from your IP
+      - HTTP from anywhere (0.0.0.0/0)
+   3. Creates S3 bucket
+   4. Creates IAM policy (Lab2S3Policy.json)
+   5. Creates IAM role (Lab2S3AccessRole)
+   6. Attaches policy to role
+   7. Creates instance profile
+   8. Creates EC2 key pair
+   9. Launches EC2 instance
+   10. Saves configuration to lab2-config.txt
+   
+   Output:
+   - lab2-keypair.pem (EC2 key)
+   - Lab2S3Policy.json (policy definition)
+   - lab2-config.txt (configuration for cleanup)
+
+task-2-1-cleanup.sh - Removes All Resources
+   Steps:
+   1. Terminates EC2 instance
+   2. Deletes security group
+   3. Detaches and deletes IAM policy
+   4. Deletes IAM role and instance profile
+   5. Deletes S3 bucket
+   6. Removes local configuration files
+   
+   Safety: Asks for confirmation before proceeding
+
+S3BucketOperations.java - S3 CRUD Operations Demo
+   Tasks:
+   1. Creates buckets in 3 regions (us-east-1, eu-west-1, ap-southeast-1)
+   2. Lists all buckets
+   3. Uploads objects to buckets
+   4. Downloads objects from buckets
+   5. Lists objects within bucket
+   6. Deletes objects
+   
+   Output: Console messages showing each operation
+
+S3LatencyMeasurement.java - Performance Testing
+   Tasks:
+   1. Tests latency in each of 3 regions
+   2. Creates 1 MB test files
+   3. Uploads and measures latency (3 iterations)
+   4. Downloads and measures latency (3 iterations)
+   5. Calculates averages
+   6. Displays results table
+   7. Cleans up test buckets
+   
+   Output: Formatted latency results table
+
+================================================================================
+EXPECTED RESULTS
+================================================================================
+
+After Task 2.1 Setup:
+   ✓ lab2-config.txt created with all IDs and IP addresses
+   ✓ EC2 instance running and accessible via SSH
+   ✓ S3 bucket created and accessible
+   ✓ IAM role working (no hardcoded credentials needed)
+
+After Task 2.2 Programs:
+   ✓ S3 buckets created in 3 regions
+   ✓ CRUD operations working (create, read, update, delete)
+   ✓ Latency results showing:
+      - us-east-1: ~300-400 ms total
+      - eu-west-1: ~700-900 ms total
+      - ap-southeast-1: ~900-1100 ms total
+   ✓ Clear trend: closer regions are faster
+
+After Lab Report:
+   ✓ 15-25 page PDF document
+   ✓ All sections completed
+   ✓ Screenshots included
+   ✓ Code appendix included
+   ✓ Analysis and graphs included
+   ✓ Reflection questions answered
+
+================================================================================
+SUPPORT RESOURCES
+================================================================================
+
+IN THIS PACKAGE:
+   • 00-READ-ME-FIRST.txt - Main overview
+   • lab-guide.md - Implementation steps with troubleshooting
+   • lab-report-guide.md - Report writing template and guidance
+   • QUICK_REFERENCE.md - Common commands and issues
+   • Code comments - Inline explanation of logic
+
+EXTERNAL RESOURCES:
+   • AWS CLI Documentation: https://docs.aws.amazon.com/cli/
+   • AWS SDK for Java: https://docs.aws.amazon.com/sdk-for-java/
+   • S3 API Reference: https://docs.aws.amazon.com/AmazonS3/latest/API/
+   • IAM User Guide: https://docs.aws.amazon.com/iam/
+   • AWS Well-Architected Framework: https://aws.amazon.com/architecture/well-architected/
+
+FROM INSTRUCTOR:
+   • Canvas discussion board
+   • Course email
+   • Office hours
+
+================================================================================
+COMMON QUESTIONS
+================================================================================
+
+Q: Do I need prior AWS experience?
+A: No! This package teaches everything from scratch.
+
+Q: Do I need to know Java?
+A: Basic knowledge helps, but sample code is provided.
+
+Q: What if something goes wrong?
+A: Check lab-guide.md troubleshooting section first.
+
+Q: Will this cost a lot?
+A: No, estimated ~$0.05-0.10. Always run cleanup when done.
+
+Q: Can I work with a group?
+A: Yes! Document each person's contributions in the report.
+
+Q: What if I can't complete it in one session?
+A: All progress is saved in lab2-config.txt. You can resume later.
+
+Q: Do I have to use these scripts?
+A: Recommended, but you can create resources manually if preferred.
+
+Q: What if I delete something accidentally?
+A: Run task-2-1-cleanup.sh to remove everything, then start over.
+
+Q: How long will this take?
+A: 4-6 hours total (45 min Task 2.1 + 1 hour Task 2.2 + 3-5 hours report)
+
+Q: What's the deadline?
+A: November 30, 2025 (submit to Canvas LAB 2 folder)
+
+================================================================================
+QUALITY CHECKLIST
+================================================================================
+
+Code Quality:
+   ✓ Scripts have error handling
+   ✓ Java code has proper exception handling
+   ✓ All code has comments explaining logic
+   ✓ Code follows security best practices
+
+Documentation Quality:
+   ✓ 6 different guides for different needs
+   ✓ Step-by-step instructions provided
+   ✓ Examples and expected outputs shown
+   ✓ Troubleshooting section included
+   ✓ Quick reference for common commands
+   ✓ Lab report template with examples
+
+Security Quality:
+   ✓ Least privilege IAM policies
+   ✓ No hardcoded credentials
+   ✓ Security group restrictions
+   ✓ Temporary credentials via IAM roles
+   ✓ Defense in depth approach
+
+Testing Quality:
+   ✓ Scripts tested for functionality
+   ✓ Java programs compile without errors
+   ✓ Expected outputs documented
+   ✓ Error scenarios addressed
+
+================================================================================
+VERSION INFORMATION
+================================================================================
+
+Package Version: 1.0
+Release Date: November 29, 2025
+AWS SDK Version: 2.20.0 (for Java)
+Java Minimum: JDK 11
+AWS CLI: v2 or later
+
+Files: 12 total
+Lines of Code: ~4,900
+Documentation: ~3,500 lines
+Code: ~1,400 lines
+
+Total Size: ~170 KB (without generated files)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+RIGHT NOW:
+   1. Open 00-READ-ME-FIRST.txt
+   2. Follow instructions in that file
+   3. Don't skip reading the guides!
+
+SOON (Next 45 min):
+   1. Read lab-guide.md Task 2.1 section
+   2. Run task-2-1-setup.sh
+   3. Verify everything works
+
+LATER (Next 1 hour):
+   1. Read lab-guide.md Task 2.2 section
+   2. Compile and run Java programs
+   3. Analyze results
+
+FINALLY (Next 3-5 hours):
+   1. Read lab-report-guide.md
+   2. Write your lab report
+   3. Include screenshots and code
+   4. Proofread and format
+
+SUBMISSION (By Nov 30):
+   1. Export report as PDF
+   2. Create zip with code
+   3. Upload to Canvas LAB 2 folder
+
+================================================================================
+
+This package was created with care to provide:
+   ✓ Complete solution
+   ✓ Clear instructions
+   ✓ Best practices
+   ✓ Troubleshooting help
+   ✓ Professional guidance
+
+Good luck with your lab! 🎓
+
+For questions, contact your course instructor.
+
+================================================================================

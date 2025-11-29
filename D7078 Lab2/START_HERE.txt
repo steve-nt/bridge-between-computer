@@ -1,0 +1,361 @@
+================================================================================
+D7078E Lab 2: Cloud Services (Storage)
+START HERE - FIRST TIME? READ THIS FIRST!
+================================================================================
+
+Welcome! This package contains everything you need for Lab 2.
+
+FILES IN THIS PACKAGE:
+======================
+
+�� DOCUMENTATION (Start with these!)
+   1. START_HERE.txt (you are here!)
+   2. README.md - Full overview and quick start
+   3. QUICK_REFERENCE.md - Cheat sheet and common commands
+   4. DELIVERABLES.txt - List of all files and features
+
+📚 DETAILED GUIDES (Read when implementing)
+   1. lab-guide.md - Step-by-step for both tasks (MOST IMPORTANT)
+   2. lab-report-guide.md - How to write the lab report
+
+🔧 AUTOMATION SCRIPTS (Ready to run!)
+   1. task-2-1-setup.sh - Creates all AWS infrastructure
+   2. task-2-1-cleanup.sh - Deletes all AWS resources
+
+☕ JAVA PROGRAMS (For Task 2.2)
+   1. S3BucketOperations.java - S3 CRUD operations
+   2. S3LatencyMeasurement.java - Performance testing
+
+================================================================================
+YOUR FIRST 5 MINUTES
+================================================================================
+
+STEP 1: Read this entire file (5 minutes)
+
+STEP 2: Understand what the lab wants
+   - Task 2.1: Create AWS infrastructure using CLI (45 min)
+   - Task 2.2: Use Java SDK to test S3 operations (1 hour)
+   - Report: Write analysis (3-5 hours)
+   - TOTAL TIME: 4-6 hours
+
+STEP 3: Check you have everything
+   [ ] aws command works: aws --version
+   [ ] java command works: java -version
+   [ ] Scripts are executable: ls -x task*.sh
+
+STEP 4: Read the right guide
+   - For implementation: READ lab-guide.md (Section 2 for Task 2.1, Section 4 for Task 2.2)
+   - For report writing: READ lab-report-guide.md
+   - For quick help: READ QUICK_REFERENCE.md
+
+STEP 5: Follow the steps in lab-guide.md carefully
+
+================================================================================
+WHAT IS THIS LAB ABOUT?
+================================================================================
+
+CLOUD SECURITY:
+   You will learn to secure cloud resources using:
+   - Security Groups (firewall rules)
+   - IAM Policies (permission management)
+   - IAM Roles (identity and access)
+
+CLOUD STORAGE:
+   You will learn to use AWS S3 (cloud storage) by:
+   - Writing Java code to upload/download files
+   - Measuring performance across regions
+   - Analyzing latency and optimization
+
+PRACTICAL SKILLS:
+   After this lab you can:
+   - Create secure cloud infrastructure
+   - Write cloud applications in Java
+   - Optimize cloud services for performance
+   - Document cloud solutions professionally
+
+================================================================================
+QUICK START (5 SECONDS)
+================================================================================
+
+Ready to start? Just follow this:
+
+1. Get your IP:
+   curl https://checkip.amazonaws.com
+
+2. Run Task 2.1 setup:
+   ./task-2-1-setup.sh YOUR_IP/32
+
+3. Run Task 2.2 programs:
+   javac -cp ".:aws-sdk/*" S3BucketOperations.java
+   java -cp ".:aws-sdk/*" S3BucketOperations
+
+4. Clean up when done:
+   ./task-2-1-cleanup.sh
+
+5. Write lab report (3-5 hours)
+
+That's it! Full details in lab-guide.md
+
+================================================================================
+FILE READING ORDER
+================================================================================
+
+For First Time:
+   1. This file (START_HERE.txt) ← YOU ARE HERE
+   2. README.md (overview)
+   3. QUICK_REFERENCE.md (cheat sheet)
+
+For Implementation:
+   1. lab-guide.md (Task 2.1 section)
+   2. lab-guide.md (Task 2.2 section)
+   3. Run scripts and Java programs
+
+For Lab Report:
+   1. lab-report-guide.md (read all sections)
+   2. Write your report
+   3. Include screenshots and code
+
+For Troubleshooting:
+   1. QUICK_REFERENCE.md (common issues)
+   2. lab-guide.md (Troubleshooting section)
+   3. lab-report-guide.md (might have solutions)
+
+For Help:
+   1. DELIVERABLES.txt (file descriptions)
+   2. Check inline code comments
+   3. AWS documentation
+   4. Ask instructor
+
+================================================================================
+DO I NEED TO KNOW...?
+================================================================================
+
+AWS (Amazon Web Services)?
+   → You don't need to know AWS before starting
+   → This lab teaches you the basics
+   → All commands are provided
+   → Just follow the steps!
+
+Java Programming?
+   → Basic Java knowledge helps
+   → Sample code is provided
+   → Understanding the flow is more important than mastery
+   → Just follow the examples!
+
+Linux/Command Line?
+   → You need basic shell commands
+   → All needed commands are shown
+   → Just copy and paste if unsure!
+
+Cloud Security?
+   → You don't need prior knowledge
+   → This lab teaches the concepts
+   → Key concepts explained in lab-guide.md
+   → Read the reflection questions section!
+
+================================================================================
+WHAT WILL HAPPEN?
+================================================================================
+
+When you run task-2-1-setup.sh:
+   ✓ Creates a security group (firewall)
+   ✓ Creates an IAM policy (permissions)
+   ✓ Creates an IAM role (identity)
+   ✓ Creates an S3 bucket (cloud storage)
+   ✓ Launches an EC2 instance (virtual computer)
+   ✓ You can SSH into it
+   ✓ Saves configuration to lab2-config.txt
+
+When you run Java programs:
+   ✓ Creates S3 buckets in 3 regions
+   ✓ Uploads test files
+   ✓ Downloads test files
+   ✓ Measures latency (speed)
+   ✓ Shows results in a table
+
+When you write the lab report:
+   ✓ Describe what you did
+   ✓ Answer reflection questions
+   ✓ Include screenshots
+   ✓ Include code listings
+   ✓ Analyze results
+   ✓ Discuss security concepts
+   ✓ 15-25 pages total
+
+================================================================================
+IMPORTANT BEFORE YOU START
+================================================================================
+
+AWS ACCOUNT:
+   ✓ You MUST have a valid AWS account
+   ✓ You MUST have AWS credentials configured
+   ✓ This lab will incur small costs (~$0.05-0.10)
+   ✓ You MUST clean up resources when done
+
+AWS CREDENTIALS:
+   ✓ Run: aws configure
+   ✓ Enter your Access Key ID
+   ✓ Enter your Secret Access Key
+   ✓ Verify: aws sts get-caller-identity
+   ✓ Keep credentials SAFE and SECRET
+   ✓ Never commit credentials to Git!
+
+SAFETY:
+   ✓ Cleanup script will delete all resources
+   ✓ Make sure to run cleanup when done
+   ✓ This avoids unwanted AWS charges
+   ✓ The script will ask for confirmation
+
+TIMING:
+   ✓ Total lab time: 4-6 hours
+   ✓ Task 2.1: 45 minutes
+   ✓ Task 2.2: 1 hour
+   ✓ Report: 3-5 hours
+
+================================================================================
+COMMON MISTAKES TO AVOID
+================================================================================
+
+❌ DON'T:
+   - Run scripts without understanding them
+   - Use the same AWS resources for multiple runs
+   - Commit credentials to Git
+   - Forget to clean up resources
+   - Skip the reflection questions
+   - Copy code without understanding it
+   - Ignore errors and keep going
+
+✅ DO:
+   - Read lab-guide.md before running scripts
+   - Use unique bucket names (script handles this)
+   - Keep credentials secure
+   - Run cleanup when done
+   - Answer questions thoroughly
+   - Understand what each command does
+   - Fix errors before proceeding
+
+================================================================================
+SUCCESS INDICATORS
+================================================================================
+
+Task 2.1 Successful If:
+   ✓ EC2 instance launches
+   ✓ Can SSH to instance
+   ✓ Can run S3 commands on instance
+   ✓ lab2-config.txt contains all values
+   ✓ Cleanup script removes all resources
+
+Task 2.2 Successful If:
+   ✓ Java programs compile without errors
+   ✓ Create buckets in 3 regions
+   ✓ Upload/download/delete operations work
+   ✓ Latency measurements complete
+   ✓ Results table shows all 3 regions
+
+Report Successful If:
+   ✓ 15-25 pages long
+   ✓ All sections completed
+   ✓ Reflection questions answered (2-3 paragraphs each)
+   ✓ Screenshots included
+   ✓ Code appendix included
+   ✓ PDF properly formatted
+   ✓ Group contributions documented
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+Right now:
+   1. Read README.md for overview
+   2. Read QUICK_REFERENCE.md for quick help
+   3. Verify you have AWS account and credentials
+
+When you're ready to implement:
+   1. Open lab-guide.md
+   2. Follow Task 2.1 section (30-45 min)
+   3. Follow Task 2.2 section (60 min)
+   4. Take screenshots as you go
+
+When writing report:
+   1. Open lab-report-guide.md
+   2. Use it as a template for each section
+   3. Include all screenshots and code
+   4. Follow the structure provided
+   5. Answer reflection questions thoroughly
+
+When submitting:
+   1. Export report as PDF
+   2. Create zip file with all code
+   3. Include README.md in zip
+   4. Upload to Canvas
+   5. Before deadline: November 30, 2025
+
+================================================================================
+QUICK HELP
+================================================================================
+
+Setup Issues?
+   → Check: aws sts get-caller-identity
+   → Read: QUICK_REFERENCE.md "Common Issues"
+   → Read: lab-guide.md "Troubleshooting"
+
+Java Issues?
+   → Check: Java installed and PATH set
+   → Check: AWS SDK in classpath
+   → Read: lab-guide.md "Task 2.2" section
+
+Permission Issues?
+   → Check: IAM policy attached (aws iam list-attached-role-policies)
+   → Check: Security group allows your IP
+   → Read: lab-guide.md "Validation" section
+
+Cost Concerns?
+   → This lab costs <$0.10
+   → Run cleanup: ./task-2-1-cleanup.sh
+   → Monitor: AWS Billing console
+
+Still Stuck?
+   → Read the relevant section in lab-guide.md
+   → Check QUICK_REFERENCE.md for your issue
+   → Ask instructor via Canvas or email
+
+================================================================================
+FINAL CHECKLIST BEFORE YOU START
+================================================================================
+
+System Check:
+   [ ] aws command works
+   [ ] java command works (version 11+)
+   [ ] Scripts are executable (chmod +x *.sh)
+   [ ] All files present (ls -la shows all files)
+
+AWS Setup:
+   [ ] AWS account created and active
+   [ ] AWS credentials configured (aws configure)
+   [ ] Can access AWS: aws sts get-caller-identity
+   [ ] Know your public IP: curl https://checkip.amazonaws.com
+
+Knowledge Check:
+   [ ] You know what Task 2.1 requires
+   [ ] You know what Task 2.2 requires
+   [ ] You know how long each task takes
+   [ ] You understand cleanup is important
+   [ ] You know where to get help
+
+Ready to Go:
+   [ ] Read START_HERE.txt (this file) ← DONE!
+   [ ] Read README.md for overview
+   [ ] Read QUICK_REFERENCE.md for quick help
+   [ ] Open lab-guide.md and start Task 2.1
+
+================================================================================
+
+YOU ARE NOW READY TO BEGIN THE LAB!
+
+Open lab-guide.md and follow the "Task 2.1" section.
+
+Questions? Check the relevant guide or QUICK_REFERENCE.md
+
+Good luck! 🚀
+
+================================================================================
