@@ -1,0 +1,114 @@
+D7078E Lab 2: Programming Cloud Services (Storage)
+
+Submission: Deadline is November 30, 2025
+
+Welcome to the second lab of the D7078E: Cloud Security course. In this lab, First, we will
+use AWS CLI to interact with AWS cloud resources through SSH. We will then use the
+application programming interfaces (APIs) provided by the Amazon Web services to program
+Cloud services that require storage, such as the Amazon S3 blob storage service.
+
+Prerequisites:
+* Valid AWS Account with access to the AWS Management Console.
+* Access to your school email address (@stud.ltu.se).
+
+Important Note:
+Complete this lab with group collaborations and clearly mentioning each member’s
+contributions (More than one individual can work on similar tasks).
+
+Task 2.1: Security Groups, IAM Policies & IAM Roles (with AWS CLI)
+Objectives:
+a) Create and manage Security Groups using AWS CLI.
+b) Apply least privilege by designing and attaching IAM policies.
+c) Create and attach an IAM Role (Instance Profile) to an EC2 instance.
+d) Understand how Security Groups restrict inbound/outbound traffic.
+e) Understand how IAM roles give permission to AWS resources without exposing access
+keys.
+
+
+Exercises:
+Configure AWS CLI in your machine. Using AWS CLI bash script:
+a) Create the security group
+b) Add inbound rules
+c) Allow SSH only from your IP
+d) Allow HTTP from anywhere
+e) Create an S3 bucket
+f) Create a custom IAM Policy (Labs3Policy.json)
+g) Create role
+h) Attach Policy to role
+i) Launch a EC2 instance with role and security group
+j) Validate iam role acess
+
+Reflection & Analysis Questions
+1. Why is it more secure to use IAM roles instead of embedding AWS access keys?
+2. What principle of cloud security is applied when restricting SSH access to a single IP?
+3. What happens if you remove the S3 actions from the IAM policy and try the upload
+again?
+4. How would you modify the Security Group to restrict HTTP access to an internal
+network only?
+5. What challenges did you face when designing least-privilege policies?
+
+Clean up resources to avoid charges
+a) Terminate AWS instance
+b) Delete key-pair
+c) Delete security group
+d) Delete IAM roles
+e) Delete S3 Bucket
+
+Ref: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
+https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html
+
+
+Task 2.2: Using AWS SDK with Java IDE to create and use AWS storage services
+
+Objective:
+1. The objective of this lab is to setup a programming environment for building (using
+programming tools and languages) Cloud services for a major Cloud provider, for
+example, Amazon Web services (AWS).
+2. Develop Cloud services for file storage, listing and retrieval using the APIs provided
+by the AWS.
+
+Part I: Configuration of Environment
+In this exercise, you will learn how to setup the programming environment to create Cloud
+services using the APIs provided by AWS. Setup the AWS SDK for Java and download and
+setup Java IDE (Netbeans/Eclipse/IntelliJor).
+https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/get-started.html
+AWS SDK for Java 2.x (Pdf in Canvas)
+
+
+Part II: Using Storage Service
+a) Identify ways of creating the Amazon S3 service clients. Explain in detail how the
+Amazon S3 service clients are created by providing details of the packages and classes
+involved. Create a diagram of the dependencies involved.
+b) Create a Java program to create a bucket in three regions of your choice.
+c) Explain in detail the steps involved, and explain the output.
+d) Create a Java program that lists your buckets in the region of your choice.
+e) Create a Java program to upload objects in your newly created bucket.
+f) Create a Java program to delete a particular objects from your newly created bucket.
+g) Create a Java program to upload and download objects (at least 1 MB) from the three
+regions used in the above exercise. Measure the object upload and download latency
+from these regions. Plot and explain the results in your report.
+
+Reflection & Analysis Questions
+1. What is the major difference between AWS CLI and AWS SDK?
+
+Lab Report Submission
+The report should be written in the lab report format template file. This can be found here [2]
+(Do not edit this template file, make a copy in your own Overleaf account to edit!) using LaTeX
+in Overleaf. Download the PDF file after you finish writing and submit the PDF along with
+your zipped code files to Canvas. You must document your code properly so its readable.
+
+I. Submit a lab report to the designated LAB 2 folder in Canvas.
+II. Submit as a zip file (report, codes).
+III. Follow the template instructions.
+IV. The report *must* be well-formatted and easy to read.
+V. Mention each group member’s contribution in a section.
+VI. Screenshots: Consider including screenshots for all steps to aid you in the grading.
+VII. Submit the code files as well.
+
+
+References
+[1] “LTU Plagiarism Policy.” https://www.ltu.se/en/student-web/your-studies/students-rights-
+and-obligations/cheating-and-plagiarism
+[2] “A7078E Lab Report Format on Overleaf.”
+https://www.overleaf.com/latex/templates/lulea-university-of-technology-english-report-
+template-tvm-department/tfhyswbgngsr4
