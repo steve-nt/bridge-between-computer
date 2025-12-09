@@ -1,0 +1,151 @@
+===========================================================================
+TASK 2.2: Using AWS SDK with Java to Create and Use AWS Storage Services
+===========================================================================
+
+Objectives:
+a) Identify ways of creating Amazon S3 service clients
+b) Create Java program to create buckets in three regions
+c) Create Java program to list buckets
+d) Create Java program to upload objects
+e) Create Java program to delete objects
+f) Create Java program to upload/download objects (1+ MB) and measure latency
+
+Part I: Configuration of Environment
+===========================================================================
+
+STEP 1: Check Java Installation
+===========================================================================
+
+First, verify Java is installed on your system:
+
+java -version
+javac -version
+
+Expected Output:
+- Java version 11 or higher (e.g., openjdk 11.0.x or later)
+- Javac version matching Java version
+
+If not installed, install OpenJDK:
+sudo apt update
+sudo apt install openjdk-11-jdk
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ java -version
+openjdk version "21.0.8" 2025-07-15
+OpenJDK Runtime Environment (build 21.0.8+9-Debian-1)
+OpenJDK 64-Bit Server VM (build 21.0.8+9-Debian-1, mixed mode, sharing)
+                                                                                                                        
+┌──(steven㉿kali)-[~]
+└─$ javac -version
+javac 11.0.25-ea
+
+
+===========================================================================
+STEP 2: Choose an IDE
+===========================================================================
+
+You can use one of these IDEs:
+1. Eclipse - Free, powerful, widely used
+2. IntelliJ IDEA - Professional, has free community edition
+3. NetBeans - Free, lightweight
+4. VS Code with Java extensions - Lightweight option
+
+For this guide, we'll provide both Maven-based (command line) and IDE options.
+
+Recommendation: Use a Maven-based approach first (easier for learning), 
+then integrate into an IDE if desired.
+
+===========================================================================
+STEP 3: Install Maven (for dependency management)
+===========================================================================
+
+Check if Maven is installed:
+
+mvn -version
+
+If not installed:
+sudo apt update
+sudo apt install maven
+
+Expected Output:
+- Apache Maven 3.6.3 or higher
+- Java version 11 or higher
+
+===========================================================================
+STEP 4: Create Maven Project Structure
+===========================================================================
+
+Create a new Maven project for AWS S3 operations:
+
+mvn archetype:generate \
+  -DgroupId=com.group35.d7078 \
+  -DartifactId=aws-s3-java-lab \
+  -DarchetypeArtifactId=maven-archetype-quickstart \
+  -DinteractiveMode=false
+
+This creates a project structure:
+aws-s3-java-lab/
+├── pom.xml
+├── src/
+│   ├── main/java/com/group35/d7078/
+│   │   └── App.java
+│   └── test/java/com/group35/d7078/
+│       └── AppTest.java
+
+===========================================================================
+STEP 5: Add AWS SDK Dependencies to pom.xml
+===========================================================================
+
+Open pom.xml and add the AWS SDK for Java 2.x dependency to the <dependencies> section:
+
+<dependency>
+    <groupId>software.amazon.awssdk</groupId>
+    <artifactId>s3</artifactId>
+    <version>2.20.0</version>
+</dependency>
+
+Also add SLF4J for logging:
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-simple</artifactId>
+    <version>1.7.36</version>
+</dependency>
+
+===========================================================================
+ACTION:
+1. Check Java and Maven installation
+2. Create Maven project
+3. Update pom.xml with AWS SDK dependencies
+4. Run: mvn clean install
+5. Share confirmation when complete
+===========================================================================
+Update pom.xml with AWS SDK dependencies
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.group35.d7078</groupId>
+  <artifactId>aws-s3-java-lab</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>aws-s3-java-lab</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+     <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>2.20.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+  </dependencies>
+</project>

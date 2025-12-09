@@ -1,0 +1,191 @@
+================================================================================
+AWS S3 JAVA LAB - EXECUTION INSTRUCTIONS
+================================================================================
+
+BEFORE YOU START:
+1. Ensure AWS SDK for Java 2.x is installed and configured
+2. Verify AWS CLI credentials are set up (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+3. Have AWS Management Console open in your browser to verify results
+4. Build the project: mvn clean install
+
+================================================================================
+STEP 1: CREATE BUCKETS IN 3 REGIONS
+================================================================================
+Program: CreateS3Buckets.java
+
+What it does:
+- Creates 3 S3 buckets in different regions (Stockholm, Ireland, Frankfurt)
+- Bucket names: group35-d7078-bucket-eu-north-1, eu-west-1, eu-central-1
+
+How to run:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+
+What to look for in output:
+✓ "Bucket created successfully!" (3 times, one for each region)
+✓ Location: shows S3 bucket URL
+✓ Response Code: 200 (success)
+
+Verify in AWS Console:
+→ S3 service → Buckets → Should see 3 new buckets
+→ Click each bucket → Note the region in "AWS Region" field
+
+================================================================================
+STEP 2: LIST ALL BUCKETS
+================================================================================
+Program: ListS3Buckets.java
+
+What it does:
+- Lists all S3 buckets in your account
+- Shows bucket creation date
+- Shows region for each bucket
+
+How to run:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+
+What to look for in output:
+✓ "Bucket:" with bucket names listed
+✓ "Created:" with timestamps
+✓ "Region:" showing eu-north-1, eu-west-1, eu-central-1
+
+Verify in AWS Console:
+→ S3 service → Buckets → Compare list with Java output
+→ Should match exactly
+
+================================================================================
+STEP 3: UPLOAD FILES TO BUCKET
+================================================================================
+Program: UploadS3Objects.java
+
+What it does:
+- Creates 3 sample text files in /tmp/
+- Uploads them to group35-d7078-bucket-eu-north-1
+- Shows upload status and ETag (unique file hash)
+
+How to run:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+
+What to look for in output:
+✓ "Sample files created/verified in /tmp/"
+✓ "Uploading: test.txt" / "sample-document.txt" / "data-file.txt"
+✓ "Upload successful!" (3 times)
+✓ "ETag:" (unique identifier for each file)
+
+Verify in AWS Console:
+→ S3 → Buckets → group35-d7078-bucket-eu-north-1
+→ Objects tab → Should see 3 files listed
+→ Click file → Shows size, upload time, ETag
+
+Screenshot now! (BEFORE deletion)
+
+================================================================================
+STEP 4: DELETE FILES FROM BUCKET
+================================================================================
+Program: DeleteS3Objects.java
+
+What it does:
+- Lists all objects BEFORE deletion
+- Deletes test.txt and sample-document.txt
+- Lists all objects AFTER deletion
+- Shows what's left in bucket
+
+How to run:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+
+What to look for in output:
+✓ "Objects in bucket BEFORE deletion:" (should show 3 files)
+✓ "Deleting: test.txt" / "sample-document.txt"
+✓ "Deletion successful!" (2 times)
+✓ "Objects in bucket AFTER deletion:" (should show 1 file remaining)
+
+Verify in AWS Console:
+→ S3 → Buckets → group35-d7078-bucket-eu-north-1
+→ Objects tab → Should now show only "data-file.txt"
+→ test.txt and sample-document.txt should be gone
+
+Screenshot now! (AFTER deletion)
+
+================================================================================
+STEP 5: MEASURE LATENCY ACROSS REGIONS (Optional for extra credit)
+================================================================================
+Program: LatencyMeasurementS3.java
+
+What it does:
+- Uploads a 1MB+ test file to all 3 buckets
+- Measures upload and download time for each region
+- Calculates latency
+- Helps show which region is fastest
+
+How to run:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.LatencyMeasurementS3"
+
+What to look for in output:
+✓ "Upload time:" in milliseconds for each region
+✓ "Download time:" in milliseconds for each region
+✓ Latency results table
+✓ Which region was fastest/slowest
+
+Use this data for your lab report graphs!
+
+================================================================================
+EVIDENCE COLLECTION CHECKLIST
+================================================================================
+
+While running, collect these screenshots for your report:
+
+□ Java IDE showing the code being compiled
+□ Console output from CreateS3Buckets (successful creation messages)
+□ AWS Console → S3 → All 3 buckets created
+□ Console output from ListS3Buckets (all buckets listed)
+□ Console output from UploadS3Objects (files uploaded, ETags shown)
+□ AWS Console → S3 → Bucket objects (3 files visible)
+□ Console output from DeleteS3Objects (BEFORE: 3 files, AFTER: 1 file)
+□ AWS Console → S3 → Bucket objects (only data-file.txt remains)
+□ Console output from LatencyMeasurementS3 (if running)
+□ Latency results table or graph
+
+================================================================================
+RERUN TEST (OPTIONAL)
+================================================================================
+
+To demonstrate idempotent behavior:
+
+1. Run CreateS3Buckets again
+   → Should show "Bucket already exists (owned by you)" - NO CRASH!
+
+2. Run UploadS3Objects again
+   → Files get overwritten with same names (timestamp updates)
+   → Check AWS Console - files show new "Last Modified" time
+
+3. Run DeleteS3Objects again
+   → Attempts to delete already-deleted files
+   → Shows successful deletion (S3 is idempotent)
+
+This proves your code handles errors gracefully!
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: "Could not find or load main class"
+→ Ensure you compiled: mvn clean install
+
+Problem: "NoCredentialsProvider" error
+→ Configure AWS CLI: aws configure
+→ Check ~/.aws/credentials file exists
+
+Problem: "BucketAlreadyExists" error on first run
+→ Bucket names might already exist globally (bucket names must be unique)
+→ Edit CreateS3Buckets.java, change bucket names to include timestamp
+
+Problem: "Access Denied" error
+→ Check IAM permissions include s3:*
+→ Verify AWS credentials in ~/.aws/credentials
+
+Problem: Files not visible in AWS Console
+→ Refresh the browser (F5)
+→ Verify you're in correct region (eu-north-1, eu-west-1, or eu-central-1)
+→ Check bucket is correct: group35-d7078-bucket-eu-north-1
+
+================================================================================
+END OF INSTRUCTIONS
+================================================================================

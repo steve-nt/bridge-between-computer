@@ -1,0 +1,93 @@
+===========================================================================
+STEP 3: Add Inbound Rules to Security Group
+===========================================================================
+
+You have: GroupId = sg-0cf4b63253b8a5ad6
+
+Add SSH inbound rule (port 22 from your IP only):
+
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp \
+  --port 22 \
+  --cidr 79.167.66.242/32 \
+  --region eu-north-1
+
+===========================================================================
+
+Add HTTP inbound rule (port 80 from anywhere):
+
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp \
+  --port 80 \
+  --cidr 0.0.0.0/0 \
+  --region eu-north-1
+
+===========================================================================
+Expected Output:
+- Both commands should return a response with "Return": true
+- This means the rules were successfully added
+- Example response:
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "GroupId": "sg-0cf4b63253b8a5ad6",
+            "GroupOwnerId": "793891462342",
+            ...
+        }
+    ]
+}
+
+===========================================================================
+ACTION: Run both commands and confirm both return "Return": true
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws ec2 authorize-security-group-ingress \
+  --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp \
+  --port 22 \
+  --cidr 79.167.66.242/32 \
+  --region eu-north-1
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-064c77b1ef4fb3966",
+            "GroupId": "sg-0cf4b63253b8a5ad6",
+            "GroupOwnerId": "793891462342",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIpv4": "79.167.66.242/32",
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:793891462342:security-group-rule/sgr-064c77b1ef4fb3966"
+        }
+    ]
+}
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ aws ec2 authorize-security-group-ingress \
+  --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp \
+  --port 80 \
+  --cidr 0.0.0.0/0 \
+  --region eu-north-1
+{
+    "Return": true,
+    "SecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-08a2b5a8cf928e3dc",
+            "GroupId": "sg-0cf4b63253b8a5ad6",
+            "GroupOwnerId": "793891462342",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 80,
+            "ToPort": 80,
+            "CidrIpv4": "0.0.0.0/0",
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-north-1:793891462342:security-group-rule/sgr-08a2b5a8cf928e3dc"
+        }
+    ]
+}
+          

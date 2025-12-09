@@ -1,0 +1,165 @@
+===========================================================================
+CLEANUP: Terminate AWS Resources to Avoid Charges
+===========================================================================
+
+IMPORTANT: Complete ALL cleanup steps to avoid unexpected AWS charges.
+
+Your Resources to Clean Up:
+- EC2 Instance: i-0c32227bfffc472e0
+- Key Pair: Group35-D7078-Lab2-KeyPair
+- Security Group: sg-0cf4b63253b8a5ad6
+- IAM Role: Group35-D7078-Lab2-Role
+- IAM Instance Profile: Group35-D7078-Lab2-Profile
+- S3 Bucket: group35-d7078-lab2-bucket-sg-170191
+
+===========================================================================
+STEP 1: Terminate the EC2 Instance
+===========================================================================
+
+aws ec2 terminate-instances \
+  --instance-ids i-0c32227bfffc472e0 \
+  --region eu-north-1
+
+Expected Output:
+{
+    "TerminatingInstances": [
+        {
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "InstanceId": "i-0c32227bfffc472e0",
+            ...
+        }
+    ]
+}
+
+Wait 2-3 minutes for the instance to fully terminate.
+
+===========================================================================
+STEP 2: Verify Instance is Terminated
+===========================================================================
+
+aws ec2 describe-instances \
+  --instance-ids i-0c32227bfffc472e0 \
+  --region eu-north-1 \
+  --query 'Reservations[0].Instances[0].[InstanceId,State.Name]' \
+  --output table
+
+Expected Output shows State: "terminated"
+
+===========================================================================
+STEP 3: Delete the Key Pair
+===========================================================================
+
+aws ec2 delete-key-pair \
+  --key-name Group35-D7078-Lab2-KeyPair \
+  --region eu-north-1
+
+Expected Output: (no output means success)
+
+Also delete the local key file:
+
+rm Group35-D7078-Lab2-KeyPair.pem
+
+===========================================================================
+STEP 4: Delete the Security Group (wait 2 minutes after instance termination)
+===========================================================================
+
+aws ec2 delete-security-group \
+  --group-id sg-0cf4b63253b8a5ad6 \
+  --region eu-north-1
+
+Expected Output: (no output means success)
+
+===========================================================================
+STEP 5: Remove the Role from Instance Profile
+===========================================================================
+
+aws iam remove-role-from-instance-profile \
+  --instance-profile-name Group35-D7078-Lab2-Profile \
+  --role-name Group35-D7078-Lab2-Role
+
+Expected Output: (no output means success)
+
+===========================================================================
+STEP 6: Delete the Instance Profile
+===========================================================================
+
+aws iam delete-instance-profile \
+  --instance-profile-name Group35-D7078-Lab2-Profile
+
+Expected Output: (no output means success)
+
+===========================================================================
+STEP 7: Delete the IAM Role Policy
+===========================================================================
+
+aws iam delete-role-policy \
+  --role-name Group35-D7078-Lab2-Role \
+  --policy-name Group35-D7078-S3-Policy
+
+Expected Output: (no output means success)
+
+===========================================================================
+STEP 8: Delete the IAM Role
+===========================================================================
+
+aws iam delete-role \
+  --role-name Group35-D7078-Lab2-Role
+
+Expected Output: (no output means success)
+
+===========================================================================
+STEP 9: Empty the S3 Bucket (delete all objects)
+===========================================================================
+
+aws s3api delete-objects \
+  --bucket group35-d7078-lab2-bucket-sg-170191 \
+  --delete 'Objects=[{Key=test-local.txt}]'
+
+Expected Output:
+{
+    "Deleted": [
+        {
+            "Key": "test-local.txt"
+        }
+    ]
+}
+
+===========================================================================
+STEP 10: Delete the S3 Bucket
+===========================================================================
+
+aws s3api delete-bucket \
+  --bucket group35-d7078-lab2-bucket-sg-170191 \
+  --region eu-north-1
+
+Expected Output: (no output means success)
+
+===========================================================================
+CLEANUP VERIFICATION
+===========================================================================
+
+Verify all resources are deleted:
+
+# Check EC2 instance (should show "terminated")
+aws ec2 describe-instances \
+  --instance-ids i-0c32227bfffc472e0 \
+  --region eu-north-1
+
+# Check security groups (should fail or show no results)
+aws ec2 describe-security-groups \
+  --group-ids sg-0cf4b63253b8a5ad6 \
+  --region eu-north-1
+
+# Check S3 buckets (your bucket should not appear)
+aws s3 ls
+
+===========================================================================
+ACTION:
+1. Follow all 10 cleanup steps in order
+2. Wait appropriate time between steps (especially after instance termination)
+3. Verify resources are deleted
+4. Share confirmation of successful cleanup
+===========================================================================

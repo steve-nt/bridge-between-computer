@@ -1,0 +1,83 @@
+===========================================================================
+STEP 7: Attach IAM Policy to the Role
+===========================================================================
+
+We need to create the policy first, then attach it to the role.
+
+Step 1: Create the inline policy from Labs3Policy.json
+
+aws iam put-role-policy \
+  --role-name Group35-D7078-Lab2-Role \
+  --policy-name Group35-D7078-S3-Policy \
+  --policy-document file:///home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3Policy.json
+
+===========================================================================
+Expected Output:
+- No output means success (AWS returns no response for successful policy attachment)
+
+Step 2: Verify the policy was attached
+
+aws iam get-role-policy \
+  --role-name Group35-D7078-Lab2-Role \
+  --policy-name Group35-D7078-S3-Policy
+
+===========================================================================
+Expected Output for verification:
+{
+    "RoleName": "Group35-D7078-Lab2-Role",
+    "PolicyName": "Group35-D7078-S3-Policy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            ...policy details...
+        ]
+    }
+}
+
+===========================================================================
+ACTION:
+1. Run the put-role-policy command
+2. Run the get-role-policy verification command
+3. Share the verification output with me
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws iam put-role-policy \
+  --role-name Group35-D7078-Lab2-Role \
+  --policy-name Group35-D7078-S3-Policy \
+  --policy-document file:///home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3Policy.json
+                                                                                                                        
+┌──(steven㉿kali)-[~]
+└─$ aws iam get-role-policy \
+  --role-name Group35-D7078-Lab2-Role \
+  --policy-name Group35-D7078-S3-Policy
+{
+    "RoleName": "Group35-D7078-Lab2-Role",
+    "PolicyName": "Group35-D7078-S3-Policy",
+    "PolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Sid": "S3BucketAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation"
+                ],
+                "Resource": "arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191"
+            },
+            {
+                "Sid": "S3ObjectAccess",
+                "Effect": "Allow",
+                "Action": [
+                    "s3:GetObject",
+                    "s3:PutObject",
+                    "s3:DeleteObject"
+                ],
+                "Resource": "arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191/*"
+            }
+        ]
+    }
+}
+                                                                                                                        
+┌──(steven㉿kali)-[~]
+└─$ 

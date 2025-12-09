@@ -1,0 +1,54 @@
+===========================================================================
+STEP 13: List and Verify S3 Bucket Contents
+===========================================================================
+
+List all objects in the bucket:
+
+aws s3api list-objects-v2 \
+  --bucket group35-d7078-lab2-bucket-sg-170191
+
+===========================================================================
+Expected Output:
+{
+    "Contents": [
+        {
+            "Key": "test-local.txt",
+            "LastModified": "2025-11-30T10:03:20+00:00",
+            "ETag": "\"220973ac612c945bfce3503f6e81ab11\"",
+            "Size": 30,
+            "StorageClass": "STANDARD"
+        }
+    ],
+    "Name": "group35-d7078-lab2-bucket-sg-170191",
+    "Prefix": "",
+    "MaxKeys": 1000,
+    "IsTruncated": false,
+    "KeyCount": 1
+}
+
+===========================================================================
+ACTION:
+1. Run the list-objects-v2 command
+2. Verify test-local.txt appears in the output
+3. Share the output with me
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws s3api list-objects-v2 \                         
+  --bucket group35-d7078-lab2-bucket-sg-170191
+{
+    "Contents": [
+        {
+            "Key": "test-local.txt",
+            "LastModified": "2025-11-30T10:01:43+00:00",
+            "ETag": "\"220973ac612c945bfce3503f6e81ab11\"",
+            "ChecksumAlgorithm": [
+                "CRC64NVME"
+            ],
+            "ChecksumType": "FULL_OBJECT",
+            "Size": 29,
+            "StorageClass": "STANDARD"
+        }
+    ],
+    "RequestCharged": null,
+    "Prefix": ""
+}
