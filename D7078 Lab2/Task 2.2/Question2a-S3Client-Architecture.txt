@@ -1,0 +1,422 @@
+===========================================================================
+TASK 2.2 - QUESTION 2.a
+===========================================================================
+
+Identify ways of creating the Amazon S3 service clients. Explain in detail 
+how the Amazon S3 service clients are created by providing details of the 
+packages and classes involved. Create a diagram of the dependencies involved.
+
+===========================================================================
+ANSWER PART 1: S3CLIENT CREATION OVERVIEW
+===========================================================================
+
+The Amazon S3 service client (S3Client) is created using the Builder Pattern,
+which provides a flexible and readable way to instantiate complex objects.
+
+===========================================================================
+WAYS TO CREATE S3CLIENT
+===========================================================================
+
+METHOD 1: Basic Creation (Default credentials)
+---------------------------------------------
+S3Client s3Client = S3Client.builder()
+    .region(Region.US_EAST_1)
+    .build();
+
+METHOD 2: Specify Custom Region
+-----------------------------
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .build();
+
+METHOD 3: Custom Endpoint
+------------------------
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .endpointOverride(URI.create("https://s3.eu-north-1.amazonaws.com"))
+    .build();
+
+METHOD 4: With Credentials Provider
+----------------------------------
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .credentialsProvider(DefaultCredentialsProvider.create())
+    .build();
+
+METHOD 5: With Custom Configuration
+---------------------------------
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .httpClient(ApacheHttpClient.builder().build())
+    .overrideConfiguration(ClientOverrideConfiguration.builder()
+        .retryPolicy(RetryPolicy.builder().numRetries(3).build())
+        .build())
+    .build();
+
+===========================================================================
+PACKAGES AND CLASSES INVOLVED
+===========================================================================
+
+PACKAGE: software.amazon.awssdk.services.s3
+CLASS: S3Client
+- Main service client for S3 operations
+- Interface for all S3 API operations
+- Implements AutoCloseable for resource management
+- Created through S3Client.builder() static method
+
+PACKAGE: software.amazon.awssdk.regions
+CLASS: Region
+- Enum representing AWS regions
+- Examples: Region.EU_NORTH_1, Region.US_EAST_1
+- Used to specify where S3 operations occur
+- Translates region string to Region enum
+
+PACKAGE: software.amazon.awssdk.services.s3
+CLASS: S3ClientBuilder
+- Builder class for creating S3Client instances
+- Implements Builder design pattern
+- Methods: region(), build(), credentialsProvider(), etc.
+- Returned by S3Client.builder()
+
+PACKAGE: software.amazon.awssdk.auth.credentials
+CLASS: DefaultCredentialsProvider
+- Provides AWS credentials from multiple sources
+- Checks: Environment variables, system properties, config files
+- Implements CredentialsProvider interface
+- Automatic credential loading
+
+PACKAGE: software.amazon.awssdk.http.apache
+CLASS: ApacheHttpClient
+- HTTP client for making requests to S3
+- Configurable connection pooling
+- SSL/TLS support
+- Optional dependency (default: built-in client)
+
+PACKAGE: software.amazon.awssdk.core
+CLASS: ClientOverrideConfiguration
+- Configuration for client-level settings
+- Retry policies, timeout settings, metrics
+- Used to fine-tune client behavior
+
+PACKAGE: software.amazon.awssdk.services.s3.model
+CLASSES: CreateBucketRequest, ListBucketsRequest, PutObjectRequest, etc.
+- Request objects for each S3 operation
+- Builder pattern for constructing requests
+- Used with corresponding S3Client methods
+
+PACKAGE: software.amazon.awssdk.core.sync
+CLASS: RequestBody
+- Represents request body for operations like PutObject
+- Factory methods: fromFile(), fromString(), fromBytes()
+- Handles file streaming efficiently
+
+===========================================================================
+DETAILED S3CLIENT CREATION PROCESS
+===========================================================================
+
+Step 1: Obtain Builder Instance
+    S3Client.builder() → Returns S3ClientBuilder instance
+
+Step 2: Configure Builder (Optional/Required)
+    .region(Region region)           - Specify AWS region
+    .credentialsProvider(...)        - Provide AWS credentials
+    .endpointOverride(URI)           - Custom S3 endpoint
+    .httpClient(...)                 - Custom HTTP client
+    .overrideConfiguration(...)      - Client-level settings
+
+Step 3: Build Client
+    .build() → Returns configured S3Client instance
+
+Step 4: Use Client
+    s3Client.listBuckets()
+    s3Client.putObject()
+    s3Client.getObject()
+    s3Client.deleteObject()
+
+Step 5: Close Client (Important!)
+    s3Client.close()  or use try-with-resources
+
+===========================================================================
+ARCHITECTURE DIAGRAM - ASCII VERSION
+===========================================================================
+
+┌─────────────────────────────────────────────────────────────────────┐
+│                        S3CLIENT CREATION                            │
+└─────────────────────────────────────────────────────────────────────┘
+
+                            ┌──────────────────┐
+                            │  S3Client.builder()│
+                            └──────────┬───────┘
+                                       │
+                                       ▼
+                        ┌──────────────────────────────┐
+                        │   S3ClientBuilder            │
+                        │  (Builder Pattern)           │
+                        └──────────┬───────────────────┘
+                                   │
+                ┌──────────────────┼──────────────────┐
+                │                  │                  │
+                ▼                  ▼                  ▼
+         ┌────────────┐     ┌────────────┐    ┌──────────────┐
+         │Region Enum │     │Credentials │    │HttpClient    │
+         │            │     │Provider    │    │              │
+         │EU_NORTH_1  │     │            │    │ApacheHttp    │
+         │EU_WEST_1   │     │Default     │    │Built-in      │
+         │EU_CENTRAL_1│     │Provider    │    │Custom        │
+         └────────────┘     └────────────┘    └──────────────┘
+                │                  │                  │
+                └──────────────────┼──────────────────┘
+                                   │
+                        ┌──────────▼───────────┐
+                        │ ClientOverride       │
+                        │ Configuration        │
+                        │                      │
+                        │ - Retry Policy       │
+                        │ - Timeout            │
+                        │ - Metrics            │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │  S3Client Instance   │
+                        │                      │
+                        │ Methods:             │
+                        │ - createBucket()     │
+                        │ - listBuckets()      │
+                        │ - putObject()        │
+                        │ - getObject()        │
+                        │ - deleteObject()     │
+                        │ - close()            │
+                        └──────────────────────┘
+
+===========================================================================
+DEPENDENCY HIERARCHY
+===========================================================================
+
+AWS SDK for Java 2.x (software.amazon.awssdk)
+│
+├── aws-core (Core functionality)
+│   ├── Auth & Credentials
+│   │   ├── DefaultCredentialsProvider
+│   │   └── CredentialsProvider interface
+│   │
+│   └── HTTP Client
+│       ├── ApacheHttpClient
+│       └── Built-in client
+│
+├── services-s3 (S3 Service)
+│   ├── S3Client
+│   ├── S3ClientBuilder
+│   ├── S3Operations interface
+│   │
+│   └── model (Request/Response objects)
+│       ├── CreateBucketRequest
+│       ├── ListBucketsRequest
+│       ├── PutObjectRequest
+│       ├── GetObjectRequest
+│       └── DeleteObjectRequest
+│
+└── core (Request/Response handling)
+    ├── RequestBody (File uploads)
+    ├── ClientOverrideConfiguration
+    └── Response objects
+
+===========================================================================
+CLASS DIAGRAM - S3CLIENT CREATION
+===========================================================================
+
+┌─────────────────────────────────────────────────────────────────┐
+│                  S3Client Creation Architecture                 │
+└─────────────────────────────────────────────────────────────────┘
+
+S3Client Interface
+├── Implements: AutoCloseable
+├── Methods:
+│   ├── createBucket(CreateBucketRequest): CreateBucketResponse
+│   ├── listBuckets(ListBucketsRequest): ListBucketsResponse
+│   ├── putObject(PutObjectRequest, RequestBody): PutObjectResponse
+│   ├── getObject(GetObjectRequest): InputStream
+│   ├── deleteObject(DeleteObjectRequest): DeleteObjectResponse
+│   └── close(): void
+└── Created by: S3Client.builder()
+
+
+S3ClientBuilder Class
+├── Builder Pattern Implementation
+├── Methods:
+│   ├── region(Region): S3ClientBuilder
+│   ├── credentialsProvider(CredentialsProvider): S3ClientBuilder
+│   ├── httpClient(HttpClient): S3ClientBuilder
+│   ├── endpointOverride(URI): S3ClientBuilder
+│   ├── overrideConfiguration(ClientOverrideConfiguration): S3ClientBuilder
+│   └── build(): S3Client
+└── Returns: S3Client
+
+
+Region Enum
+├── Values:
+│   ├── EU_NORTH_1 (Stockholm)
+│   ├── EU_WEST_1 (Ireland)
+│   ├── EU_CENTRAL_1 (Frankfurt)
+│   ├── US_EAST_1 (N. Virginia)
+│   └── ... (other regions)
+└── Used by: S3ClientBuilder.region()
+
+
+DefaultCredentialsProvider
+├── Implements: CredentialsProvider
+├── Credential Sources (in order):
+│   ├── Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+│   ├── System properties (aws.accessKeyId, aws.secretAccessKey)
+│   ├── ~/.aws/credentials file
+│   ├── ~/.aws/config file
+│   ├── EC2 Instance Profile (via metadata service)
+│   └── ECS Task Role
+└── Returns: AwsCredentials
+
+
+RequestBody Class
+├── Factory Methods:
+│   ├── fromFile(File): RequestBody
+│   ├── fromString(String): RequestBody
+│   ├── fromBytes(byte[]): RequestBody
+│   └── fromInputStream(InputStream): RequestBody
+└── Used by: S3Client.putObject()
+
+===========================================================================
+IMPLEMENTATION EXAMPLE WITH ANNOTATIONS
+===========================================================================
+
+// (1) Get builder instance - returns S3ClientBuilder
+S3Client s3Client = S3Client.builder()
+    // (2) Configure region - specifies which AWS region
+    .region(Region.EU_NORTH_1)
+    // (3) Configure credentials - loads AWS credentials
+    .credentialsProvider(DefaultCredentialsProvider.create())
+    // (4) Build client - creates S3Client with all configurations
+    .build();
+
+try {
+    // (5) Use client - call S3 operations
+    // Each operation requires corresponding Request object
+    
+    // Example: List buckets
+    ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder()
+        .build();
+    ListBucketsResponse response = s3Client.listBuckets(listBucketsRequest);
+    
+    // Example: Upload object
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .bucket("my-bucket")
+        .key("my-object")
+        .build();
+    s3Client.putObject(putObjectRequest, 
+        RequestBody.fromFile(new File("local-file.txt")));
+    
+} finally {
+    // (6) Close client - releases resources
+    s3Client.close();
+}
+
+===========================================================================
+PACKAGES QUICK REFERENCE
+===========================================================================
+
+software.amazon.awssdk.regions
+├── Region (enum for AWS regions)
+└── Region.of(String) (convert string to region)
+
+software.amazon.awssdk.services.s3
+├── S3Client (main service client)
+├── S3ClientBuilder (builder class)
+└── Endpoint (S3 endpoint configuration)
+
+software.amazon.awssdk.services.s3.model
+├── CreateBucketRequest/Response
+├── ListBucketsRequest/Response
+├── PutObjectRequest/Response
+├── GetObjectRequest
+├── DeleteObjectRequest/Response
+├── Bucket (bucket metadata)
+└── S3Object (object metadata)
+
+software.amazon.awssdk.auth.credentials
+├── CredentialsProvider (interface)
+├── DefaultCredentialsProvider (default implementation)
+├── AwsCredentials (credential data)
+└── AwsSessionCredentials (temporary credentials)
+
+software.amazon.awssdk.core.sync
+├── RequestBody (request payload)
+└── ResponseInputStream (response data)
+
+software.amazon.awssdk.http
+├── HttpClient (HTTP implementation)
+├── ApacheHttpClient (Apache implementation)
+└── SdkHttpClient (interface)
+
+software.amazon.awssdk.core
+├── ClientOverrideConfiguration (client configuration)
+├── RetryPolicy (retry configuration)
+└── AwsRequest/AwsResponse (base request/response)
+
+===========================================================================
+KEY DESIGN PATTERNS
+===========================================================================
+
+1. BUILDER PATTERN
+   - S3Client.builder() creates S3ClientBuilder
+   - Fluent API: builder.region(...).credentialsProvider(...)
+   - Flexibility to configure only what's needed
+   - Immutable S3Client after build()
+
+2. PROVIDER PATTERN
+   - CredentialsProvider abstracts credential sources
+   - DefaultCredentialsProvider implements standard chain
+   - Allows custom implementations
+
+3. FACTORY PATTERN
+   - S3Client.builder() is factory method
+   - RequestBody.fromFile() is factory method
+   - Creates appropriate objects based on input
+
+4. STRATEGY PATTERN
+   - Different HttpClient implementations
+   - Different CredentialsProvider implementations
+   - Pluggable retry policies
+
+5. RESOURCE MANAGEMENT PATTERN
+   - S3Client implements AutoCloseable
+   - Can use try-with-resources
+   - Ensures proper cleanup
+
+===========================================================================
+SUMMARY
+===========================================================================
+
+The Amazon S3 service client is created using:
+
+1. BUILDER PATTERN
+   - S3Client.builder() returns S3ClientBuilder
+   - Configuration methods return the builder for chaining
+   - .build() creates the final S3Client
+
+2. KEY COMPONENTS
+   - Region: Specifies AWS region
+   - Credentials: AWS access credentials
+   - HttpClient: HTTP transport layer
+   - Configuration: Client-level settings
+
+3. PACKAGES
+   - software.amazon.awssdk.services.s3 (main S3 service)
+   - software.amazon.awssdk.auth.credentials (authentication)
+   - software.amazon.awssdk.regions (region management)
+   - software.amazon.awssdk.core (core functionality)
+
+4. REQUEST/RESPONSE MODEL
+   - Each operation has corresponding Request object
+   - Request objects created with builder pattern
+   - S3Client methods accept Request objects
+   - Response objects contain operation results
+
+===========================================================================

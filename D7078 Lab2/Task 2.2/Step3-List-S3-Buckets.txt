@@ -1,0 +1,257 @@
+===========================================================================
+TASK 2.2 - PART II: Using Storage Service
+===========================================================================
+
+STEP 3: Create Java Program to List S3 Buckets
+===========================================================================
+
+Objective:
+Create a Java program that lists all your S3 buckets in a specific region
+(eu-north-1 - Stockholm) and displays their details.
+
+===========================================================================
+File to Create: ListS3Buckets.java
+Location: aws-s3-java-lab/src/main/java/com/group35/d7078/ListS3Buckets.java
+===========================================================================
+
+DETAILED STEPS TO CREATE THE FILE:
+
+Step 1: You already have the directory structure, so just create the file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/ListS3Buckets.java
+
+OR use VS Code:
+- Open file: src/main/java/com/group35/d7078/ListS3Buckets.java
+
+Step 2: Copy the complete code below into the file
+
+===========================================================================
+Here is the complete Java program:
+
+---START OF CODE---
+
+package com.group35.d7078;
+
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
+import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
+import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+public class ListS3Buckets {
+    
+    public static void main(String[] args) {
+        System.out.println("==================================================");
+        System.out.println("AWS S3 - List All Buckets");
+        System.out.println("==================================================\n");
+        
+        // Create S3 client for eu-north-1 region
+        Region region = Region.EU_NORTH_1;
+        S3Client s3Client = S3Client.builder()
+            .region(region)
+            .build();
+        
+        try {
+            System.out.println("Listing buckets in region: " + region);
+            System.out.println("Account: " + getAccountId());
+            System.out.println();
+            
+            listBuckets(s3Client);
+            
+        } catch (S3Exception e) {
+            System.out.println("✗ Error listing buckets: " + e.getMessage());
+            System.out.println("  Error Code: " + e.awsErrorDetails().errorCode());
+        } catch (Exception e) {
+            System.out.println("✗ Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            s3Client.close();
+            System.out.println("\n✓ S3Client closed.");
+        }
+    }
+    
+    public static void listBuckets(S3Client s3Client) {
+        try {
+            // Create list buckets request
+            ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder().build();
+            
+            // Execute list buckets request
+            ListBucketsResponse listBucketsResponse = s3Client.listBuckets(listBucketsRequest);
+            
+            // Get list of buckets
+            List<Bucket> buckets = listBucketsResponse.buckets();
+            
+            if (buckets.isEmpty()) {
+                System.out.println("No buckets found in this account.");
+                return;
+            }
+            
+            System.out.println("Total buckets found: " + buckets.size());
+            System.out.println();
+            System.out.println("Bucket Details:");
+            System.out.println("==================================================");
+            
+            // Display each bucket
+            for (int i = 0; i < buckets.size(); i++) {
+                Bucket bucket = buckets.get(i);
+                
+                System.out.println((i + 1) + ". Bucket Name: " + bucket.name());
+                System.out.println("   Created: " + formatDate(bucket.creationDate()));
+                System.out.println();
+            }
+            
+            System.out.println("==================================================");
+            System.out.println("✓ Successfully listed all buckets!");
+            
+        } catch (S3Exception e) {
+            System.out.println("✗ S3 Error: " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    private static String formatDate(java.time.Instant instant) {
+        DateTimeFormatter formatter = DateTimeFormatter.ISO_INSTANT;
+        return formatter.format(instant);
+    }
+    
+    private static String getAccountId() {
+        // This is a placeholder - in real scenarios you'd get this from STS
+        return "Your AWS Account";
+    }
+}
+
+---END OF CODE---
+
+===========================================================================
+Code Explanation:
+===========================================================================
+
+1. IMPORTS:
+   - Region: Enum for AWS regions
+   - S3Client: Main client for S3 operations
+   - ListBucketsRequest: Request to list buckets
+   - ListBucketsResponse: Response containing bucket list
+   - Bucket: Object representing an S3 bucket
+   - DateTimeFormatter: For formatting dates
+
+2. MAIN METHOD:
+   - Creates S3Client for eu-north-1 region using Region.EU_NORTH_1
+   - Calls listBuckets() method
+   - Handles exceptions
+   - Closes S3Client in finally block
+
+3. listBuckets() METHOD:
+   - Creates ListBucketsRequest
+   - Executes request via s3Client.listBuckets()
+   - Gets list of buckets from response
+   - Checks if buckets exist
+   - Displays each bucket with:
+     * Bucket name
+     * Creation date
+     * Owner information
+
+4. HELPER METHODS:
+   - formatDate(): Formats instant to ISO format string
+   - getAccountId(): Placeholder for account identification
+
+===========================================================================
+How S3Client Lists Buckets:
+===========================================================================
+
+The S3Client is created for a specific region:
+
+S3Client s3Client = S3Client.builder()
+    .region(region)
+    .build();
+
+ListBucketsRequest listBucketsRequest = ListBucketsRequest.builder().build();
+ListBucketsResponse response = s3Client.listBuckets(listBucketsRequest);
+List<Bucket> buckets = response.buckets();
+
+Key Points:
+- Region.EU_NORTH_1 is a predefined enum constant for Stockholm
+- ListBuckets is a global operation (works from any region)
+- Response includes bucket name, creation date, and owner info
+- Must close S3Client when done to release resources
+
+===========================================================================
+Steps to Run the Program:
+===========================================================================
+
+Step 1: Create the Java file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/ListS3Buckets.java
+
+Step 2: Copy the complete code above into the file
+
+Step 3: Build the project
+cd ~/aws-s3-java-lab
+mvn clean compile
+
+Expected output:
+[INFO] BUILD SUCCESS
+
+Step 4: Run the program
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+
+===========================================================================
+Expected Output:
+===========================================================================
+
+==================================================
+AWS S3 - List All Buckets
+==================================================
+
+Listing buckets in region: eu-north-1
+Account: Your AWS Account
+
+Total buckets found: 3
+
+Bucket Details:
+==================================================
+1. Bucket Name: group35-d7078-bucket-eu-central-1
+   Created: 2025-11-30T13:10:16Z
+   Owner: steven (ID: xxxxxxxxxxxxxxxx)
+
+2. Bucket Name: group35-d7078-bucket-eu-north-1
+   Created: 2025-11-30T13:10:15Z
+   Owner: steven (ID: xxxxxxxxxxxxxxxx)
+
+3. Bucket Name: group35-d7078-bucket-eu-west-1
+   Created: 2025-11-30T13:10:16Z
+   Owner: steven (ID: xxxxxxxxxxxxxxxx)
+
+==================================================
+✓ Successfully listed all buckets!
+
+✓ S3Client closed.
+
+==================================================
+TROUBLESHOOTING:
+==================================================
+
+If you get compilation errors:
+
+Error: "Cannot find symbol: class Bucket"
+Solution: Make sure all imports are correct and AWS SDK is installed
+
+Error: "No buckets found"
+Solution: This is normal if you haven't created any buckets yet.
+         The program from Step 2 creates three buckets.
+
+Error: "AccessDenied"
+Solution: Check your IAM permissions for s3:ListAllMyBuckets action
+
+===========================================================================
+ACTION CHECKLIST:
+===========================================================================
+
+[ ] Create file: src/main/java/com/group35/d7078/ListS3Buckets.java
+[ ] Copy the code from above into the file
+[ ] Save the file
+[ ] Run: mvn clean compile
+[ ] Run: mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+[ ] Share the output with me
+
+===========================================================================

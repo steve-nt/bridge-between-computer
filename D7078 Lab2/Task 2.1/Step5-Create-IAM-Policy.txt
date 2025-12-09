@@ -1,0 +1,50 @@
+===========================================================================
+STEP 5: Create a Custom IAM Policy
+===========================================================================
+
+The policy file "Labs3Policy.json" has been created for you.
+
+This policy allows:
+- ListBucket: List contents of your S3 bucket
+- GetBucketLocation: Get bucket location
+- GetObject: Download objects from S3
+- PutObject: Upload objects to S3
+- DeleteObject: Delete objects from S3
+
+All permissions are scoped to: group35-d7078-lab2-bucket-sg-170191
+
+The file is located at:
+/home/steven/Desktop/bridge-between-computer/D7078 Lab2/Labs3Policy.json
+
+===========================================================================
+ACTION: Verify the Labs3Policy.json file exists in your working directory
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ cat /home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3Policy.json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "S3BucketAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetBucketLocation"
+            ],
+            "Resource": "arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191"
+        },
+        {
+            "Sid": "S3ObjectAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191/*"
+        }
+    ]
+}
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ 

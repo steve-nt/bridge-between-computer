@@ -1,0 +1,85 @@
+===========================================================================
+STEP 12: Validate IAM Role Access from EC2 Instance
+===========================================================================
+
+Your instance details:
+- Public IP: 16.170.224.197
+- Key Pair: Group35-D7078-Lab2-KeyPair.pem
+- Username: ubuntu (for Ubuntu AMI)
+
+Step 1: SSH into the EC2 instance
+
+ssh -i Group35-D7078-Lab2-KeyPair.pem ubuntu@16.170.224.197
+
+===========================================================================
+When prompted "Are you sure you want to continue connecting?", type: yes
+
+Expected Output:
+- Welcome to Ubuntu 22.04 LTS
+- You should see a command prompt like: ubuntu@ip-172-31-35-231:~$
+
+===========================================================================
+Step 2: Once connected, test S3 access using the IAM role
+
+Run this command to list your S3 buckets:
+
+aws s3 ls
+
+===========================================================================
+Expected Output:
+- Your bucket should appear in the list
+- Example:
+  2025-11-30 09:46:29 group35-d7078-lab2-bucket-sg-170191
+
+This proves the IAM role is working! The EC2 instance has temporary 
+credentials from the role and can access S3 without explicit keys.
+
+===========================================================================
+Step 3: Test uploading a file to S3
+
+Create a test file:
+
+echo "Test file from local machine" > /tmp/test-local.txt
+
+Upload it to S3 using s3api:
+
+aws s3api put-object \
+  --bucket group35-d7078-lab2-bucket-sg-170191 \
+  --key test-local.txt \
+  --body file:///tmp/test.txt
+
+===========================================================================
+Expected Output:
+{
+    "ETag": "\"abc123...\""
+}
+
+===========================================================================
+Step 4: List objects in the bucket
+
+aws s3api list-objects-v2 \
+  --bucket group35-d7078-lab2-bucket-sg-170191
+
+===========================================================================
+Expected Output:
+{
+    "Contents": [
+        {
+            "Key": "test-local.txt",
+            "Size": 30,
+            ...
+        }
+    ]
+}
+
+===========================================================================
+Step 5: Exit the SSH session
+
+exit
+
+===========================================================================
+ACTION:
+1. Create and upload a test file to S3
+2. List the bucket contents
+3. Share the outputs with me
+===========================================================================

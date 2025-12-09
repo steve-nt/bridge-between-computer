@@ -1,0 +1,194 @@
+===========================================================================
+TASK 2.1 REFLECTION & ANALYSIS QUESTIONS
+===========================================================================
+
+Based on the lab exercises you just completed, answer the following questions:
+
+===========================================================================
+Question 1: Why is it more secure to use IAM roles instead of embedding 
+            AWS access keys?
+===========================================================================
+
+Think about:
+- How IAM roles provide temporary credentials vs permanent access keys
+- What happens if credentials are exposed
+- How roles can be revoked or updated without changing code
+- Principle of least privilege
+
+Your Answer:
+
+IAM roles are more secure than embedding access keys because they provide 
+temporary, auto-rotating credentials instead of permanent keys. With roles, 
+no credentials need to be stored on the instance or in code. If one instance 
+is compromised, only temporary credentials are exposed (which expire), not 
+permanent keys that could be used indefinitely. Additionally, roles can be 
+updated or revoked instantly for all instances using them, without requiring 
+code changes. This follows the principle of least privilege - instances get 
+only the permissions they need, for only as long as they need them.
+
+In this lab, we demonstrated this by attaching an IAM role to the EC2 instance 
+without embedding any AWS credentials. The instance automatically obtained 
+temporary credentials from the AWS metadata service, allowing it to access 
+S3 securely.
+
+===========================================================================
+Question 2: What principle of cloud security is applied when restricting 
+            SSH access to a single IP?
+===========================================================================
+
+Think about:
+- The security principle being applied (hint: think about "least privilege")
+- What would happen if SSH was open to 0.0.0.0/0
+- How this prevents unauthorized access
+- Other attack vectors that are mitigated
+
+Your Answer:
+
+This applies the "Principle of Least Privilege" in cloud security. By 
+restricting SSH (port 22) to only your IP address (79.167.66.242/32), 
+we minimize the attack surface. If SSH were open to 0.0.0.0/0 (anywhere), 
+attackers could attempt:
+- Brute force attacks to guess credentials
+- Port scanning to identify the service
+- Zero-day exploits against SSH software
+- Unauthorized remote access from anywhere in the world
+
+By restricting to a single IP, we ensure only authorized personnel can 
+attempt SSH connections. This reduces the risk of unauthorized access 
+while still allowing necessary management of the instance. The /32 CIDR 
+notation means only that single IP address can access SSH, providing 
+maximum security for administrative access.
+
+===========================================================================
+Question 3: What happens if you remove the S3 actions from the IAM policy 
+            and try the upload again?
+===========================================================================
+
+Think about:
+- The error message you would receive
+- How IAM denies access
+- The principle of explicit deny vs implicit deny
+- What would need to be in the policy for S3 access
+
+Your Answer:
+
+If the S3 actions were removed from the IAM policy, the upload would fail 
+with an "AccessDenied" error. AWS IAM follows an explicit allow model - by 
+default, all actions are implicitly denied unless explicitly allowed in a 
+policy. The error message would resemble:
+
+"User: arn:aws:iam::793891462342:user/... is not authorized to perform: 
+s3:PutObject on resource: arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191/test.txt"
+
+This demonstrates the importance of least privilege - we only included the 
+specific S3 actions needed (ListBucket, GetObject, PutObject, DeleteObject) 
+and scoped them to our specific bucket. Without the PutObject action, the 
+instance cannot upload files regardless of other permissions. Similarly:
+
+- If GetObject were removed, downloads would fail
+- If ListBucket were removed, listing bucket contents would fail
+- If we granted s3:* (all actions), it would work but violate least privilege
+
+This is a key security feature: AWS denies everything by default, and you must 
+explicitly grant only the permissions actually needed.
+
+===========================================================================
+Question 4: How would you modify the Security Group to restrict HTTP 
+            access to an internal network only?
+===========================================================================
+
+Think about:
+- CIDR notation for private networks
+- Common private IP ranges (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16)
+- How to modify the inbound rule from 0.0.0.0/0
+- Use case for restricting to internal networks
+
+Your Answer:
+
+To restrict HTTP to an internal network only, we would modify the inbound rule 
+from 0.0.0.0/0 (anywhere) to a specific private IP range. The three RFC 1918 
+private ranges are:
+- 10.0.0.0/8 (10.0.0.0 to 10.255.255.255) - large organizations
+- 172.16.0.0/12 (172.16.0.0 to 172.31.255.255) - medium networks
+- 192.168.0.0/16 (192.168.0.0 to 192.168.255.255) - small networks/home
+
+For our lab, if HTTP should only be accessible from the corporate network 
+(example: 10.0.0.0/8), the AWS CLI command would be:
+
+First, remove the current rule:
+aws ec2 revoke-security-group-ingress --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp --port 80 --cidr 0.0.0.0/0 --region eu-north-1
+
+Then, add the restricted rule:
+aws ec2 authorize-security-group-ingress --group-id sg-0cf4b63253b8a5ad6 \
+  --protocol tcp --port 80 --cidr 10.0.0.0/8 --region eu-north-1
+
+This approach is useful for:
+- Internal-only web services (backend APIs, admin dashboards)
+- Services accessed only within a VPC
+- Services accessed only from a corporate network
+- Preventing public internet access while allowing internal access
+
+The principle is the same as SSH restriction: minimize the attack surface 
+by limiting access to only those who need it.
+
+===========================================================================
+Question 5: What challenges did you face when designing least-privilege 
+            policies?
+===========================================================================
+
+Think about:
+- Balancing security with functionality
+- Difficulty in determining minimum permissions needed
+- Testing and verification challenges
+- Managing multiple resources with different permission requirements
+
+Your Answer:
+
+Designing least-privilege policies presented several challenges:
+
+1. Determining Minimum Permissions: It's not always obvious exactly which 
+   S3 actions are needed. For our lab, we included:
+   - ListBucket: to list objects in the bucket
+   - GetBucketLocation: to determine bucket region
+   - GetObject: to download/read objects
+   - PutObject: to upload/write objects
+   - DeleteObject: to delete objects
+   Understanding what operations the application would perform required 
+   careful analysis.
+
+2. Resource-Level Scoping: We had to use specific ARN (Amazon Resource Name) 
+   formats:
+   - arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191 for bucket operations
+   - arn:aws:s3:::group35-d7078-lab2-bucket-sg-170191/* for object operations
+   Different resources require different ARN formats, and mistakes here can 
+   grant unintended permissions.
+
+3. Testing & Validation: We had to test the policy by attempting file uploads 
+   to ensure we included all necessary permissions without granting too many. 
+   This required iterative testing - "try, fail, check error, update policy, 
+   retry."
+
+4. Maintenance & Future Changes: If the application needs additional 
+   permissions later (e.g., to copy objects with s3:GetObjectCopy), the policy 
+   must be updated. This requires tracking what permissions are actually used 
+   versus what's theoretically available.
+
+5. Avoiding Over-Permissioning: It's tempting to grant broad permissions like 
+   s3:* (all S3 actions on all resources) or Resource: "*" (all resources). 
+   This is easy but violates least privilege and increases risk if credentials 
+   are compromised. A compromised instance with full S3 access could delete all 
+   data, not just what it needs.
+
+6. Understanding AWS Permissions Model: AWS has three types of denials:
+   - Explicit Deny (always wins)
+   - Explicit Allow (if no explicit deny)
+   - Implicit Deny (default)
+   Understanding this model is crucial for designing effective policies.
+
+The key learning: Least privilege requires understanding your application's 
+actual needs, careful ARN design, and thorough testing. While it takes more 
+effort upfront, it significantly improves security by limiting blast radius 
+if credentials are compromised.
+
+===========================================================================

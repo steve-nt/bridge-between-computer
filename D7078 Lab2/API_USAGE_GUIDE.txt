@@ -1,0 +1,1014 @@
+===========================================================================
+AWS S3 JAVA APPLICATION - API USAGE GUIDE
+D7078 Lab 2: Programming Cloud Services
+===========================================================================
+
+Complete guide for using the 5 Java programs for AWS S3 operations.
+
+===========================================================================
+TABLE OF CONTENTS
+===========================================================================
+
+1. Environment Setup
+2. Program 1: CreateS3Buckets
+3. Program 2: ListS3Buckets
+4. Program 3: UploadS3Objects
+5. Program 4: DeleteS3Objects
+6. Program 5: LatencyMeasurementS3
+7. Maven Commands Reference
+8. Credential Configuration
+9. Region Reference
+10. Troubleshooting
+
+===========================================================================
+1. ENVIRONMENT SETUP
+===========================================================================
+
+PREREQUISITES:
+- Java 11+ (tested with Java 21)
+- Maven 3.6+ (tested with Maven 3.9.9)
+- AWS credentials configured
+- pom.xml with AWS SDK 2.20.0 dependency
+
+CHECK YOUR ENVIRONMENT:
+
+```bash
+# Check Java version
+java -version
+# Expected: Java 21.0.8 (or newer)
+
+# Check Maven version
+mvn -version
+# Expected: Maven 3.9.9+ (or newer)
+
+# Check AWS credentials are configured
+aws configure list
+# Should show: access_key and region
+```
+
+MAVEN BUILD:
+
+```bash
+# Build the project
+cd ~/aws-s3-java-lab
+mvn clean install
+
+# Expected output:
+# [INFO] BUILD SUCCESS
+# [INFO] Total time: 20+ seconds
+
+# Verify compilation
+mvn clean compile
+# Should complete without errors
+```
+
+===========================================================================
+2. PROGRAM 1: CreateS3Buckets
+===========================================================================
+
+CLASS: com.group35.d7078.CreateS3Buckets
+FILE: src/main/java/com/group35/d7078/CreateS3Buckets.java
+PURPOSE: Create S3 buckets in multiple regions
+
+EXECUTION:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+```
+
+WHAT IT DOES:
+
+1. Creates 3 S3 buckets in different regions:
+   - eu-north-1 (Stockholm)
+   - eu-west-1 (Ireland)
+   - eu-central-1 (Frankfurt)
+
+2. For each bucket:
+   - Creates CreateBucketRequest
+   - Sets LocationConstraint for non-US regions
+   - Executes createBucket() operation
+   - Displays location URI
+
+3. Handles errors:
+   - BucketAlreadyOwnedByYou: bucket exists
+   - InvalidBucketName: invalid name
+   - Other S3Exceptions
+
+EXPECTED OUTPUT:
+
+```
+==================================================
+AWS S3 Bucket Creation - Multiple Regions
+==================================================
+
+Creating bucket in: Stockholm (eu-north-1)
+S3Client created for region: eu-north-1
+Bucket Name: group35-d7078-bucket-eu-north-1
+✓ Bucket created successfully!
+  Location: http://group35-d7078-bucket-eu-north-1.s3.amazonaws.com/
+  Response Code: 200
+  S3Client closed.
+
+Creating bucket in: Ireland (eu-west-1)
+...
+Creating bucket in: Frankfurt (eu-central-1)
+...
+
+==================================================
+All buckets created successfully!
+==================================================
+```
+
+CUSTOMIZATION:
+
+To create buckets in different regions, edit the code:
+
+```java
+regionNames.put("eu-north-1", "your-bucket-name-eu-north-1");
+regionNames.put("eu-west-1", "your-bucket-name-eu-west-1");
+regionNames.put("eu-central-1", "your-bucket-name-eu-central-1");
+```
+
+BUCKET NAMING RULES:
+- 3-63 characters
+- Lowercase letters, numbers, and hyphens only
+- Must start and end with letter or number
+- Cannot contain consecutive hyphens
+- Must be globally unique across all AWS accounts
+
+ERROR HANDLING:
+
+If bucket already exists:
+```
+✗ Error creating bucket: The requested bucket name is not available
+```
+Solution: Use a different bucket name (add timestamp, etc.)
+
+If region is incorrect:
+```
+✗ Error creating bucket: Region mismatch
+```
+Solution: Ensure LocationConstraint matches region
+
+===========================================================================
+3. PROGRAM 2: ListS3Buckets
+===========================================================================
+
+CLASS: com.group35.d7078.ListS3Buckets
+FILE: src/main/java/com/group35/d7078/ListS3Buckets.java
+PURPOSE: List all S3 buckets in your AWS account
+
+EXECUTION:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+```
+
+WHAT IT DOES:
+
+1. Creates S3Client for specified region
+2. Executes ListBucketsRequest (no parameters)
+3. Iterates through response bucket list
+4. Displays for each bucket:
+   - Bucket name
+   - Creation date
+   - Owner information (ID and DisplayName)
+
+5. Returns total bucket count
+
+EXPECTED OUTPUT:
+
+```
+==================================================
+AWS S3 - List All Buckets
+==================================================
+
+Listing buckets in region: eu-north-1
+
+Total buckets found: 4
+
+Bucket Details:
+==================================================
+1. Bucket Name: group35-d7078-bucket-eu-central-1
+   Created: 2025-11-30T11:10:24Z
+   Owner ID: 793891462342
+   Owner Name: owner-info
+
+2. Bucket Name: group35-d7078-bucket-eu-north-1
+   Created: 2025-11-30T11:10:22Z
+   ...
+
+==================================================
+✓ Successfully listed all buckets!
+✓ S3Client closed.
+```
+
+WHAT TO LOOK FOR:
+
+- Total bucket count matches expected (3 from this lab)
+- All buckets created previously are listed
+- Creation dates match when buckets were created
+- Owner ID matches your AWS account ID (793891462342)
+
+CODE STRUCTURE:
+
+```java
+// 1. Create S3Client
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .build();
+
+// 2. Create request
+ListBucketsRequest request = ListBucketsRequest.builder().build();
+
+// 3. Execute
+ListBucketsResponse response = s3Client.listBuckets(request);
+
+// 4. Process response
+List<Bucket> buckets = response.buckets();
+for (Bucket bucket : buckets) {
+    System.out.println("Bucket: " + bucket.name());
+    System.out.println("Created: " + bucket.creationDate());
+}
+
+// 5. Close client
+s3Client.close();
+```
+
+COMMON ISSUES:
+
+No buckets listed?
+- May be in different region
+- May have just created them (AWS eventual consistency)
+- Check credentials are correct
+
+Error: "Unable to load credentials"?
+- Run: aws configure
+- Or set environment variables
+- Or use IAM role (EC2 instance)
+
+===========================================================================
+4. PROGRAM 3: UploadS3Objects
+===========================================================================
+
+CLASS: com.group35.d7078.UploadS3Objects
+FILE: src/main/java/com/group35/d7078/UploadS3Objects.java
+PURPOSE: Upload files to S3 bucket
+
+EXECUTION:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+```
+
+WHAT IT DOES:
+
+1. Creates 3 test files automatically:
+   - test.txt (29 bytes)
+   - sample-document.txt (81 bytes)
+   - data-file.txt (4 KB)
+
+2. Uploads to: group35-d7078-bucket-eu-north-1
+
+3. For each upload:
+   - Creates PutObjectRequest with bucket and key
+   - Reads file using RequestBody.fromFile()
+   - Executes putObject()
+   - Displays ETag and response code
+
+4. Reports upload status
+
+EXPECTED OUTPUT:
+
+```
+==================================================
+AWS S3 - Upload Objects
+==================================================
+
+Uploading objects to bucket: group35-d7078-bucket-eu-north-1
+Region: eu-north-1
+
+Sample files created/verified in /tmp/
+
+Uploading: test.txt
+  File size: 29.00 B
+  File path: /tmp/test.txt
+  ✓ Upload successful!
+    ETag: "220973ac612c945bfce3503f6e81ab11"
+    Response Code: 200
+
+Uploading: sample-document.txt
+  File size: 81.00 B
+  ...
+
+Uploading: data-file.txt
+  File size: 4.00 KB
+  ...
+
+==================================================
+✓ All files uploaded successfully!
+==================================================
+```
+
+WHAT TO LOOK FOR:
+
+- ETag: Unique identifier for uploaded file
+- Response Code: 200 indicates success
+- File sizes: Match expected sizes
+
+CUSTOMIZATION:
+
+To upload different files:
+
+```java
+// Modify file paths
+String testFile1 = "/path/to/your/file1.txt";
+String testFile2 = "/path/to/your/file2.txt";
+
+// Or modify file creation
+createTestFile("/tmp/test.txt", 1024);  // 1 KB instead of 29 B
+```
+
+To upload to different bucket:
+
+```java
+String bucketName = "your-bucket-name";
+```
+
+CODE STRUCTURE:
+
+```java
+// 1. Create S3Client
+S3Client s3Client = S3Client.builder()
+    .region(Region.EU_NORTH_1)
+    .build();
+
+// 2. Create request
+PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+    .bucket(bucketName)
+    .key(fileName)
+    .build();
+
+// 3. Upload with RequestBody
+s3Client.putObject(putObjectRequest, RequestBody.fromFile(file));
+
+// 4. Handle response
+System.out.println("Upload successful!");
+```
+
+IMPORTANT:
+
+- RequestBody.fromFile() handles streaming
+- Good for files of any size
+- No need to load entire file into memory
+- Automatically calculates size and ETag
+
+COMMON ISSUES:
+
+File not found?
+```
+✗ Error uploading file: /path/does/not/exist.txt
+```
+Solution: Verify file path and create test files first
+
+Permission denied?
+```
+✗ S3 Error: User is not authorized
+```
+Solution: Check IAM policy has s3:PutObject permission
+
+Bucket doesn't exist?
+```
+✗ S3 Error: The specified bucket does not exist
+```
+Solution: Run CreateS3Buckets first
+
+===========================================================================
+5. PROGRAM 4: DeleteS3Objects
+===========================================================================
+
+CLASS: com.group35.d7078.DeleteS3Objects
+FILE: src/main/java/com/group35/d7078/DeleteS3Objects.java
+PURPOSE: Delete objects from S3 bucket with before/after listing
+
+EXECUTION:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+```
+
+WHAT IT DOES:
+
+1. Lists all objects BEFORE deletion
+2. Deletes specified objects:
+   - test.txt
+   - sample-document.txt
+3. Lists all objects AFTER deletion
+4. Shows deletion impact
+
+EXPECTED OUTPUT:
+
+```
+==================================================
+AWS S3 - Delete Objects
+==================================================
+
+Deleting objects from bucket: group35-d7078-bucket-eu-north-1
+Region: eu-north-1
+
+Objects in bucket BEFORE deletion:
+Total objects in bucket: 3
+
+1. Object Key: test.txt
+   Size: 29.00 B
+   Last Modified: 2025-11-30T13:26:26Z
+   ETag: "220973ac612c945bfce3503f6e81ab11"
+
+2. Object Key: sample-document.txt
+   ...
+
+3. Object Key: data-file.txt
+   ...
+
+==================================================
+Deleting specific objects...
+==================================================
+
+Deleting: test.txt
+  ✓ Deletion successful!
+    Response Code: 204
+    Delete Marker: false
+
+Deleting: sample-document.txt
+  ✓ Deletion successful!
+    Response Code: 204
+    Delete Marker: false
+
+==================================================
+Objects in bucket AFTER deletion:
+Total objects in bucket: 1
+
+1. Object Key: data-file.txt
+   Size: 4.00 KB
+   ...
+
+==================================================
+✓ All deletions completed!
+==================================================
+```
+
+WHAT TO LOOK FOR:
+
+- Before count (3) > After count (1)
+- Response Code: 204 (No Content) = successful deletion
+- Delete Marker: false (non-versioned bucket)
+- Remaining objects correct (data-file.txt)
+
+KEY CONCEPTS:
+
+Response Code 204:
+- Object was deleted successfully
+
+Response Code 200:
+- Object didn't exist (still returns success)
+
+Delete Marker:
+- Only relevant for versioned buckets
+- false = object permanently deleted
+
+IDEMPOTENCY:
+
+Delete operation is idempotent - safe to run multiple times:
+
+```bash
+# First run: deletes objects
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+# Output: 2 deletions successful
+
+# Second run: no objects to delete
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+# Output: 2 deletions successful (even though already deleted)
+```
+
+This is intentional design - delete is safe for cleanup operations.
+
+CUSTOMIZATION:
+
+To delete different objects:
+
+```java
+// Modify objects to delete
+String[] objectsToDelete = {
+    "my-file-1.txt",
+    "my-file-2.txt",
+    "another-file.pdf"
+};
+```
+
+CODE STRUCTURE:
+
+```java
+// 1. List before deletion
+listObjects(s3Client, bucketName);
+
+// 2. Create delete request
+DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+    .bucket(bucketName)
+    .key(objectKey)
+    .build();
+
+// 3. Execute deletion
+DeleteObjectResponse response = s3Client.deleteObject(deleteRequest);
+
+// 4. Check status
+System.out.println("Status: " + response.sdkHttpResponse().statusCode());
+
+// 5. List after deletion
+listObjects(s3Client, bucketName);
+```
+
+COMMON ISSUES:
+
+Object not found?
+```
+Deleting: nonexistent.txt
+  ✓ Deletion successful!
+    Response Code: 200
+```
+This is normal - S3 returns success even if doesn't exist
+
+Bucket not found?
+```
+✗ S3 Error listing objects: The specified bucket does not exist
+```
+Solution: Create bucket first
+
+Permission denied?
+```
+✗ S3 Error: User is not authorized
+```
+Solution: Check s3:DeleteObject permission
+
+===========================================================================
+6. PROGRAM 5: LatencyMeasurementS3
+===========================================================================
+
+CLASS: com.group35.d7078.LatencyMeasurementS3
+FILE: src/main/java/com/group35/d7078/LatencyMeasurementS3.java
+PURPOSE: Measure and compare upload/download latency across regions
+
+EXECUTION:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.LatencyMeasurementS3"
+```
+
+RUNTIME:
+Expect ~30-60 seconds for testing 3 regions
+
+WHAT IT DOES:
+
+1. Creates 1 MB test file
+2. For each region (eu-north-1, eu-west-1, eu-central-1):
+   - Uploads 1 MB file
+   - Measures upload time
+   - Downloads same file
+   - Measures download time
+3. Calculates statistics
+4. Compares regions
+5. Generates throughput analysis
+
+EXPECTED OUTPUT:
+
+```
+==================================================
+AWS S3 - Upload/Download Latency Measurement
+==================================================
+
+Creating large test file (1.00 MB)...
+✓ Test file created successfully
+
+Test file: /tmp/latency-test-1mb.txt
+File size: 1.00 MB
+
+Testing across 3 regions...
+==================================================
+
+Testing region: eu-north-1 (Bucket: group35-d7078-bucket-eu-north-1)
+  Upload time: 1174 ms
+  Download time: 414 ms
+
+Testing region: eu-west-1 (Bucket: group35-d7078-bucket-eu-west-1)
+  Upload time: 830 ms
+  Download time: 433 ms
+
+Testing region: eu-central-1 (Bucket: group35-d7078-bucket-eu-central-1)
+  Upload time: 561 ms
+  Download time: 344 ms
+
+==================================================
+LATENCY COMPARISON RESULTS
+==================================================
+
+Detailed Results:
+Region: eu-central-1        | Upload:    561 ms | Download:    344 ms | Total:    905 ms
+Region: eu-west-1          | Upload:    830 ms | Download:    433 ms | Total:   1263 ms
+Region: eu-north-1         | Upload:   1174 ms | Download:    414 ms | Total:   1588 ms
+
+==================================================
+ANALYSIS:
+==================================================
+Fastest region: eu-central-1 (905 ms)
+Slowest region: eu-north-1 (1588 ms)
+Difference: 683 ms (75.47%)
+
+Throughput Analysis:
+eu-north-1: Upload: 872.23 KB/s | Download: 2473.43 KB/s
+eu-west-1: Upload: 1233.73 KB/s | Download: 2364.90 KB/s
+eu-central-1: Upload: 1825.31 KB/s | Download: 2976.74 KB/s
+```
+
+WHAT TO LOOK FOR:
+
+- Upload times vary significantly by region (561-1174 ms)
+- Download times more consistent (344-433 ms)
+- Throughput: Frankfurt > Ireland > Stockholm
+- Total time: Combined upload + download
+
+INTERPRETATION:
+
+Frankfurt (eu-central-1) - Fastest:
+- 561 ms upload (2.1x faster than Stockholm)
+- 344 ms download
+- Best throughput (1825 KB/s upload)
+- Recommendation: Use for latency-sensitive operations
+
+Stockholm (eu-north-1) - Slowest:
+- 1174 ms upload (2.1x slower than Frankfurt)
+- 414 ms download
+- Lowest throughput (872 KB/s upload)
+- Why: Geographic distance, network path
+
+Ireland (eu-west-1) - Middle:
+- 830 ms upload
+- 433 ms download
+- Middle throughput
+
+IMPORTANT CAVEATS:
+
+Single Run Limitations:
+- Only 1 measurement per region (should do 10+)
+- Network variability not captured
+- Connection pooling affects first run
+- Statistical significance not determined
+
+For Production Use:
+- Run 10+ iterations
+- Calculate median, not average
+- Measure at different times
+- Include warm-up runs
+- Test different file sizes
+
+CODE STRUCTURE:
+
+```java
+// 1. Create test file
+createLargeTestFile("/tmp/latency-test-1mb.txt", 1024 * 1024);
+
+// 2. For each region
+for (String region : regions) {
+    S3Client s3Client = S3Client.builder()
+        .region(Region.of(region))
+        .build();
+    
+    // 3. Measure upload
+    long uploadStart = System.currentTimeMillis();
+    s3Client.putObject(request, RequestBody.fromFile(file));
+    long uploadTime = System.currentTimeMillis() - uploadStart;
+    
+    // 4. Measure download
+    long downloadStart = System.currentTimeMillis();
+    InputStream stream = s3Client.getObject(request);
+    // Write to file...
+    long downloadTime = System.currentTimeMillis() - downloadStart;
+    
+    // 5. Store results
+    results.put(region, new LatencyResult(uploadTime, downloadTime));
+}
+
+// 6. Analyze and report
+```
+
+CUSTOMIZATION:
+
+Change file size:
+
+```java
+createLargeTestFile(testFile, 10 * 1024 * 1024);  // 10 MB
+createLargeTestFile(testFile, 100 * 1024);        // 100 KB
+```
+
+Test different regions:
+
+```java
+regionBuckets.put("us-east-1", "your-bucket-us-east-1");
+regionBuckets.put("ap-southeast-1", "your-bucket-ap-southeast-1");
+```
+
+RECOMMENDATIONS:
+
+For accurate measurement:
+1. Use 100 KB for fast, small-file latency
+2. Use 1-10 MB for typical file operations
+3. Use 100+ MB for bandwidth testing
+
+Run optimizations:
+1. Warm up connections first
+2. Run 10-20 iterations per region
+3. Calculate median of results
+4. Ignore first (warmup) iteration
+5. Check standard deviation
+
+===========================================================================
+7. MAVEN COMMANDS REFERENCE
+===========================================================================
+
+BUILD COMMANDS:
+
+```bash
+# Clean and build
+mvn clean install
+
+# Just compile
+mvn clean compile
+
+# Skip tests
+mvn clean compile -DskipTests
+
+# Verbose output
+mvn -X clean compile
+
+# Offline mode (no internet)
+mvn -o compile
+```
+
+EXECUTION COMMANDS:
+
+```bash
+# Run CreateS3Buckets
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+
+# Run ListS3Buckets
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+
+# Run UploadS3Objects
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+
+# Run DeleteS3Objects
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+
+# Run LatencyMeasurementS3
+mvn exec:java -Dexec.mainClass="com.group35.d7078.LatencyMeasurementS3"
+```
+
+DEPENDENCY MANAGEMENT:
+
+```bash
+# Show dependency tree
+mvn dependency:tree
+
+# Check for updates
+mvn versions:display-dependency-updates
+
+# Download all dependencies
+mvn dependency:resolve
+```
+
+OTHER COMMANDS:
+
+```bash
+# Generate project documentation
+mvn site
+
+# View project information
+mvn help:describe -Dplugin=exec
+
+# Check for build errors before building
+mvn clean validate
+```
+
+===========================================================================
+8. CREDENTIAL CONFIGURATION
+===========================================================================
+
+AWS CREDENTIALS REQUIRED:
+
+All programs require valid AWS credentials with:
+- Account ID: 793891462342
+- Access Key ID: (from AWS)
+- Secret Access Key: (from AWS)
+
+METHODS TO PROVIDE CREDENTIALS (in order of precedence):
+
+METHOD 1: AWS CLI Configuration (Recommended)
+
+```bash
+# Configure credentials
+aws configure
+
+# Enter:
+# AWS Access Key ID: [your-access-key]
+# AWS Secret Access Key: [your-secret-key]
+# Default region: eu-north-1
+# Default output format: json
+
+# Verify configuration
+aws sts get-caller-identity
+```
+
+Configuration stored in: ~/.aws/credentials and ~/.aws/config
+
+METHOD 2: Environment Variables
+
+```bash
+export AWS_ACCESS_KEY_ID=your-access-key
+export AWS_SECRET_ACCESS_KEY=your-secret-key
+export AWS_DEFAULT_REGION=eu-north-1
+
+# Verify
+aws sts get-caller-identity
+```
+
+METHOD 3: IAM Role (Best for EC2)
+
+If running on EC2 instance:
+- Attach IAM role to instance
+- No credentials needed in code or config
+- Temporary credentials auto-refreshed
+
+METHOD 4: Java System Properties
+
+```bash
+java -Daws.accessKeyId=your-key \
+     -Daws.secretKey=your-secret \
+     -cp target/classes com.group35.d7078.CreateS3Buckets
+```
+
+CHECKING CREDENTIALS:
+
+```bash
+# Verify credentials are loaded
+aws configure list
+
+# Should show:
+# NAME       VALUE                    TYPE             LOCATION
+# profile    <not set>                None             None
+# access_key ****************XXXX     shared-credentials-file
+# secret_key ****************YYYY     shared-credentials-file
+# region     eu-north-1               config-file      ~/.aws/config
+```
+
+TROUBLESHOOTING:
+
+Error: "Unable to load credentials"
+- Run: aws configure
+- Or set environment variables
+- Check ~/.aws/credentials file exists
+
+Error: "The security token included in the request is invalid"
+- Credentials may have expired
+- Re-run: aws configure
+- Or refresh environment variables
+
+Error: "User is not authorized"
+- User doesn't have required permissions
+- Add s3:* permissions to IAM user
+- Or use different AWS account
+
+===========================================================================
+9. REGION REFERENCE
+===========================================================================
+
+AVAILABLE REGIONS (AWS S3):
+
+EU Regions (for this lab):
+- eu-north-1      Stockholm
+- eu-west-1       Ireland
+- eu-west-2       London
+- eu-west-3       Paris
+- eu-central-1    Frankfurt
+- eu-central-2    Zurich
+- eu-south-1      Milan
+- eu-south-2      Spain
+
+US Regions:
+- us-east-1       N. Virginia (default)
+- us-east-2       Ohio
+- us-west-1       N. California
+- us-west-2       Oregon
+
+Asia-Pacific Regions:
+- ap-southeast-1  Singapore
+- ap-southeast-2  Sydney
+- ap-northeast-1  Tokyo
+- ap-south-1      Mumbai
+
+Other Regions:
+- ca-central-1    Canada
+- me-south-1      Bahrain
+- af-south-1      Cape Town
+- sa-east-1       São Paulo
+
+JAVA ENUM USAGE:
+
+```java
+Region.EU_NORTH_1      // Stockholm
+Region.EU_WEST_1       // Ireland
+Region.EU_CENTRAL_1    // Frankfurt
+
+// Or use string
+Region.of("eu-north-1")
+Region.of("eu-west-1")
+Region.of("eu-central-1")
+```
+
+REGION LATENCY (from Europe):
+- eu-central-1: ~10-20 ms (Frankfurt - closest)
+- eu-west-1:    ~20-30 ms (Ireland)
+- eu-north-1:   ~30-40 ms (Stockholm)
+
+For our lab:
+- Create buckets in all 3 EU regions
+- Primary access from: eu-north-1 (Stockholm)
+- Testing across regions for latency comparison
+
+===========================================================================
+10. TROUBLESHOOTING
+===========================================================================
+
+See TROUBLESHOOTING_GUIDE.txt for detailed problem solutions:
+
+COMMON PROBLEMS:
+
+1. Maven Build Fails
+   - Check Java version (11+)
+   - Check Maven version (3.6+)
+   - Delete ~/.m2 and rebuild
+   - Check pom.xml XML syntax
+
+2. AWS Credentials Not Found
+   - Run: aws configure
+   - Check ~/.aws/credentials file
+   - Check environment variables
+   - Check IAM user has permissions
+
+3. Bucket Operations Fail
+   - Verify bucket exists (run ListS3Buckets)
+   - Check IAM permissions
+   - Check bucket is accessible from region
+   - Check bucket name is correct
+
+4. Network Errors
+   - Check internet connection
+   - Check AWS service status
+   - Check firewall/security group
+   - Try different region
+
+5. Performance Issues
+   - Check network speed
+   - Reduce file size for testing
+   - Check AWS infrastructure load
+   - Try at different time of day
+
+For detailed troubleshooting, see:
+TROUBLESHOOTING_GUIDE.txt
+
+===========================================================================
+
+QUICK START GUIDE:
+
+1. Setup:
+   mvn clean install
+
+2. Create buckets:
+   mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+
+3. List buckets:
+   mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+
+4. Upload files:
+   mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+
+5. Measure latency:
+   mvn exec:java -Dexec.mainClass="com.group35.d7078.LatencyMeasurementS3"
+
+6. Delete objects:
+   mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+
+===========================================================================
+For more information, see:
+- LAB_REPORT_OUTLINE.md (main report)
+- API_USAGE_GUIDE.txt (this file)
+- TROUBLESHOOTING_GUIDE.txt (problem solutions)
+- Question2a-S3Client-Architecture.txt (architecture details)
+===========================================================================

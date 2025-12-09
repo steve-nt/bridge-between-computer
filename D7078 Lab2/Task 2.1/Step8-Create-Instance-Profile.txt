@@ -1,0 +1,66 @@
+===========================================================================
+STEP 8: Create an EC2 Instance Profile
+===========================================================================
+
+An Instance Profile is a container for the IAM role. EC2 instances use 
+instance profiles to get temporary credentials for the role.
+
+Step 1: Create the instance profile
+
+aws iam create-instance-profile \
+  --instance-profile-name Group35-D7078-Lab2-Profile
+
+===========================================================================
+Expected Output:
+{
+    "InstanceProfile": {
+        "Path": "/",
+        "InstanceProfileName": "Group35-D7078-Lab2-Profile",
+        "InstanceProfileId": "AIPA...",
+        "Arn": "arn:aws:iam::793891462342:instance-profile/Group35-D7078-Lab2-Profile",
+        "CreateDate": "...",
+        "Roles": []
+    }
+}
+
+Step 2: Add the role to the instance profile
+
+aws iam add-role-to-instance-profile \
+  --instance-profile-name Group35-D7078-Lab2-Profile \
+  --role-name Group35-D7078-Lab2-Role
+
+===========================================================================
+Expected Output:
+- No output means success
+
+Step 3: Verify the instance profile
+
+aws iam get-instance-profile \
+  --instance-profile-name Group35-D7078-Lab2-Profile
+
+===========================================================================
+Expected Output:
+{
+    "InstanceProfile": {
+        "Path": "/",
+        "InstanceProfileName": "Group35-D7078-Lab2-Profile",
+        "InstanceProfileId": "...",
+        "Arn": "arn:aws:iam::793891462342:instance-profile/Group35-D7078-Lab2-Profile",
+        "CreateDate": "...",
+        "Roles": [
+            {
+                "Path": "/",
+                "RoleName": "Group35-D7078-Lab2-Role",
+                "RoleId": "...",
+                "Arn": "arn:aws:iam::793891462342:role/Group35-D7078-Lab2-Role",
+                "CreateDate": "..."
+            }
+        ]
+    }
+}
+
+===========================================================================
+ACTION:
+1. Run all three commands
+2. Share the verification output with me
+===========================================================================

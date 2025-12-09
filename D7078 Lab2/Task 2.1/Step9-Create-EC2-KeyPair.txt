@@ -1,0 +1,38 @@
+===========================================================================
+STEP 9: Create an EC2 Key Pair
+===========================================================================
+
+Create a key pair for SSH access to the EC2 instance:
+
+aws ec2 create-key-pair \
+  --key-name Group35-D7078-Lab2-KeyPair \
+  --region eu-north-1 \
+  --query 'KeyMaterial' \
+  --output text > Group35-D7078-Lab2-KeyPair.pem
+
+===========================================================================
+After creating the key pair, set proper permissions:
+
+chmod 400 Group35-D7078-Lab2-KeyPair.pem
+
+===========================================================================
+Expected Output:
+- The command creates Group35-D7078-Lab2-KeyPair.pem file in your current directory
+- This file contains your private key (KEEP IT SAFE!)
+- The file should be readable only by you (chmod 400)
+
+Verify the key was created:
+
+ls -la Group35-D7078-Lab2-KeyPair.pem
+
+===========================================================================
+Expected verification output:
+-r--------  1 steven  staff  1679 Nov 30 09:36 Group35-D7078-Lab2-KeyPair.pem
+
+===========================================================================
+ACTION:
+1. Run the create-key-pair command
+2. Set permissions with chmod 400
+3. Verify the file was created
+4. Share the verification output with me
+===========================================================================

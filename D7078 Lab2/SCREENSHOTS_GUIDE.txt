@@ -1,0 +1,611 @@
+===========================================================================
+SCREENSHOTS & DOCUMENTATION GUIDE
+D7078 Lab 2: Programming Cloud Services
+===========================================================================
+
+Complete guide for taking screenshots and organizing evidence of work.
+
+===========================================================================
+PART 1: WHY SCREENSHOTS ARE IMPORTANT
+===========================================================================
+
+Screenshots provide:
+✅ Evidence of successful execution
+✅ Proof of understanding (you ran the code)
+✅ Documentation of outputs for reference
+✅ Visual confirmation of results
+✅ Help for grading and feedback
+
+Organization shows:
+✅ Attention to detail
+✅ Professional presentation
+✅ Easy navigation for graders
+✅ Complete documentation
+
+===========================================================================
+PART 2: WHAT SCREENSHOTS TO TAKE
+===========================================================================
+
+TASK 2.1: AWS INFRASTRUCTURE (5 screenshots minimum)
+
+1. Security Group Creation
+   What: AWS CLI command output showing security group creation
+   When: After running: aws ec2 create-security-group ...
+   Content: Should show:
+     - Command executed
+     - GroupId output (sg-xxxxx)
+     - Success message
+   Filename: 01-Security-Group-Creation.png
+
+2. IAM Role Creation
+   What: AWS CLI output showing IAM role created
+   When: After running: aws iam create-role ...
+   Content: Should show:
+     - Role name: Group35-D7078-Lab2-Role
+     - Role ID (AROA...)
+     - ARN of role
+   Filename: 02-IAM-Role-Creation.png
+
+3. EC2 Instance Launch
+   What: AWS CLI output showing instance created
+   When: After running: aws ec2 run-instances ...
+   Content: Should show:
+     - Instance ID (i-xxxxx)
+     - Instance Type (t3.micro)
+     - State (pending)
+     - Public IP assigned
+   Filename: 03-EC2-Instance-Launch.png
+
+4. S3 Buckets Created
+   What: AWS CLI output showing all buckets
+   When: After running: aws s3 ls OR aws s3api list-buckets
+   Content: Should show:
+     - group35-d7078-bucket-eu-north-1
+     - group35-d7078-bucket-eu-west-1
+     - group35-d7078-bucket-eu-central-1
+     - Creation dates
+   Filename: 04-S3-Buckets-Created.png
+
+5. Resource Summary
+   What: AWS Console screenshot showing all resources
+   When: After all resources created
+   Content: Should show:
+     - EC2 running instance
+     - Security groups list
+     - IAM role created
+     - S3 buckets in S3 console
+   Filename: 05-AWS-Resource-Summary.png
+
+---
+
+TASK 2.2: JAVA EXECUTION (7 screenshots minimum)
+
+1. Maven Build Success
+   What: Maven compilation output
+   When: After running: mvn clean compile
+   Content: Should show:
+     - [INFO] Compiling X source files
+     - [INFO] BUILD SUCCESS
+     - Total time
+   Filename: 06-Maven-Build-Success.png
+
+2. CreateS3Buckets Program Output
+   What: Java program execution showing buckets created
+   When: After running: mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+   Content: Should show:
+     - Program header
+     - 3 regions tested
+     - ✓ Bucket created for each
+     - All regions completed successfully
+   Filename: 07-CreateS3Buckets-Output.png
+
+3. ListS3Buckets Program Output
+   What: Java program showing all buckets listed
+   When: After running ListS3Buckets program
+   Content: Should show:
+     - Total buckets found: 4
+     - Bucket names listed
+     - Creation dates
+     - Successfully listed message
+   Filename: 08-ListS3Buckets-Output.png
+
+4. UploadS3Objects Program Output
+   What: Java program showing files uploaded
+   When: After running UploadS3Objects program
+   Content: Should show:
+     - 3 files uploaded
+     - File names (test.txt, sample-document.txt, data-file.txt)
+     - File sizes
+     - ETags
+     - Response codes (200)
+     - All files uploaded successfully message
+   Filename: 09-UploadS3Objects-Output.png
+
+5. DeleteS3Objects Program Output
+   What: Java program showing before/after deletion
+   When: After running DeleteS3Objects program
+   Content: Should show:
+     - Objects BEFORE deletion (3 objects)
+     - Deletion process (2 objects deleted)
+     - Response codes (204)
+     - Objects AFTER deletion (1 object remaining)
+     - Successfully deleted message
+   Filename: 10-DeleteS3Objects-Output.png
+
+6. LatencyMeasurementS3 Program Output
+   What: Java program showing latency test results
+   When: After running LatencyMeasurementS3 program
+   Content: Should show:
+     - Test setup (1.00 MB file)
+     - All 3 regions tested
+     - Upload times for each region
+     - Download times for each region
+     - Latency comparison table
+     - Analysis section
+     - Throughput analysis
+     - Fastest/slowest regions identified
+   Filename: 11-LatencyMeasurement-Output.png
+
+7. All Programs Compiled
+   What: Directory listing showing all 5 Java files
+   When: After successful compilation
+   Content: Should show:
+     - src/main/java/com/group35/d7078/ directory
+     - CreateS3Buckets.java
+     - ListS3Buckets.java
+     - UploadS3Objects.java
+     - DeleteS3Objects.java
+     - LatencyMeasurementS3.java
+   Filename: 12-All-Programs-Compiled.png
+
+===========================================================================
+PART 3: HOW TO TAKE SCREENSHOTS
+===========================================================================
+
+METHOD 1: Linux (Gnome/KDE)
+
+Using Print Screen:
+```bash
+# Take full screen:
+Print key
+
+# Take area:
+Shift + Print
+
+# Take window:
+Alt + Print
+
+# Delay screenshot:
+print-screen-app --delay=5
+```
+
+Using gnome-screenshot:
+```bash
+# Full screen:
+gnome-screenshot
+
+# Specific window:
+gnome-screenshot -w
+
+# Delay:
+gnome-screenshot --delay=5
+```
+
+Using screengrab:
+```bash
+# Install:
+sudo apt-get install screengrab
+
+# Run:
+screengrab
+```
+
+---
+
+METHOD 2: Windows/Mac
+
+Windows (Build-in):
+- Print Screen key (full screen)
+- Alt + Print Screen (active window)
+- Shift + Windows Key + S (region selection)
+
+Mac (Build-in):
+- Cmd + Shift + 3 (full screen)
+- Cmd + Shift + 4 (region selection)
+- Cmd + Shift + 5 (recording)
+
+---
+
+METHOD 3: Terminal Capture
+
+Using `script` command:
+```bash
+# Start recording terminal:
+script output.txt
+
+# Run your commands:
+mvn exec:java -Dexec.mainClass="..."
+
+# End recording:
+exit
+
+# View output:
+cat output.txt
+```
+
+Using `asciinema`:
+```bash
+# Install:
+pip install asciinema
+
+# Record:
+asciinema rec demo.cast
+
+# Run commands...
+
+# Stop with Ctrl+D
+
+# Convert to screenshot (with tools like ffmpeg)
+```
+
+---
+
+METHOD 4: IDE Screenshots
+
+If using VS Code:
+1. Open terminal within VS Code
+2. Run Maven command
+3. Take screenshot of entire VS Code window
+4. Should show: editor on left, terminal output on right
+
+===========================================================================
+PART 4: WHAT TO INCLUDE IN EACH SCREENSHOT
+===========================================================================
+
+MANDATORY ELEMENTS:
+
+For AWS CLI Screenshots:
+✅ Command shown (what was executed)
+✅ All output visible
+✅ No sensitive data (API keys, passwords - these should be redacted)
+✅ Success indicators visible
+✅ Timestamp visible (lower right corner of terminal)
+
+For Java Program Output:
+✅ Full program header visible
+✅ All output lines visible (scroll if needed, take multiple screenshots)
+✅ "BUILD SUCCESS" or success message visible
+✅ Program completed indicator
+✅ Terminal prompt visible
+
+For Code:
+✅ File name visible (in title bar or top of window)
+✅ All relevant code visible
+✅ Line numbers visible
+✅ Class/method being shown clear
+
+For Directory Listings:
+✅ Full path visible
+✅ All files listed
+✅ File names clear and readable
+✅ File sizes and dates visible
+
+===========================================================================
+PART 5: SCREENSHOT ORGANIZATION
+===========================================================================
+
+FOLDER STRUCTURE:
+
+Screenshots/
+├── Task2.1-AWS-Setup/
+│   ├── 01-Security-Group-Creation.png
+│   ├── 02-IAM-Role-Creation.png
+│   ├── 03-EC2-Instance-Launch.png
+│   ├── 04-S3-Buckets-Created.png
+│   └── 05-AWS-Resource-Summary.png
+│
+└── Task2.2-Java-Execution/
+    ├── 06-Maven-Build-Success.png
+    ├── 07-CreateS3Buckets-Output.png
+    ├── 08-ListS3Buckets-Output.png
+    ├── 09-UploadS3Objects-Output.png
+    ├── 10-DeleteS3Objects-Output.png
+    ├── 11-LatencyMeasurement-Output.png
+    └── 12-All-Programs-Compiled.png
+
+HOW TO CREATE FOLDERS:
+
+```bash
+# Navigate to lab directory:
+cd ~/Desktop/bridge-between-computer/D7078\ Lab2
+
+# Create directories:
+mkdir -p Screenshots/Task2.1-AWS-Setup
+mkdir -p Screenshots/Task2.2-Java-Execution
+
+# Move screenshots to appropriate folders:
+mv 01-Security-Group-Creation.png Screenshots/Task2.1-AWS-Setup/
+mv 07-CreateS3Buckets-Output.png Screenshots/Task2.2-Java-Execution/
+```
+
+NAMING CONVENTION:
+
+Format: ##-Description-Short.png
+Where:
+- ## = sequence number (01-12)
+- Description-Short = clear, hyphenated description
+- .png = image format
+
+Examples:
+✅ 01-Security-Group-Creation.png
+✅ 07-CreateS3Buckets-Output.png
+✅ 11-LatencyMeasurement-Output.png
+
+❌ screenshot.png (too vague)
+❌ Screen 1.png (bad naming)
+❌ aws-output-from-tuesday.png (unnecessary details)
+
+===========================================================================
+PART 6: CAPTURING LONG OUTPUT
+===========================================================================
+
+PROBLEM: Program output is longer than one screen
+
+SOLUTION 1: Take Multiple Screenshots
+```bash
+# Run program:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.LatencyMeasurementS3"
+
+# Take first screenshot (scroll to top first)
+Shift + Print
+
+# Scroll down
+Page Down
+
+# Take second screenshot
+Shift + Print
+
+# Continue until all output captured
+```
+
+SOLUTION 2: Redirect to File, Then Screenshot
+```bash
+# Redirect output to file:
+mvn exec:java -Dexec.mainClass="..." > output.txt 2>&1
+
+# View in editor with line numbers:
+cat -n output.txt | less
+
+# Or use text editor:
+code output.txt
+# Take screenshot of full output in editor
+```
+
+SOLUTION 3: Use Terminal Recording
+```bash
+# Record terminal session:
+script terminal-session.txt
+
+# Run your commands...
+# Stop with: exit
+
+# View full output:
+cat terminal-session.txt
+
+# Take final screenshot showing complete output
+```
+
+===========================================================================
+PART 7: WHAT NOT TO INCLUDE
+===========================================================================
+
+❌ NEVER INCLUDE:
+- AWS secret keys or access keys
+- API keys or tokens
+- Passwords or credentials
+- Personal information (phone, email, address)
+- System paths that reveal personal info
+- IP addresses (if static/identifying)
+- AWS account numbers (if you want to hide identity)
+
+IF ACCIDENTAL INCLUSION:
+1. Redact using image editor (black rectangle over sensitive data)
+2. Take screenshot again
+3. Make sure no sensitive data visible in final version
+
+BEFORE SUBMITTING:
+
+```bash
+# Check for sensitive data:
+grep -r "AKIA" Screenshots/
+# Should return nothing (no AWS keys)
+
+grep -r "secret" Screenshots/
+# Should return nothing
+
+grep -r "password" Screenshots/
+# Should return nothing
+```
+
+===========================================================================
+PART 8: IMAGE OPTIMIZATION
+===========================================================================
+
+FILE SIZE CONSIDERATION:
+
+PNG files can be large. To optimize:
+
+Using ImageMagick:
+```bash
+# Convert and compress:
+convert input.png -resize 1920x1080 -quality 85 output.png
+
+# Or:
+mogrify -quality 85 *.png
+```
+
+Using pngquant:
+```bash
+# Install:
+sudo apt-get install pngquant
+
+# Compress:
+pngquant 256 input.png --output output.png
+```
+
+Using optipng:
+```bash
+# Install:
+sudo apt-get install optipng
+
+# Optimize:
+optipng -o7 input.png
+```
+
+QUALITY BALANCE:
+- For terminal output: PNG at quality 85-90 is fine
+- Readable text maintained: minimum font size 10pt
+- File size: typically 100-500 KB per screenshot
+- Total for 12 screenshots: 1-5 MB
+
+===========================================================================
+PART 9: VERIFICATION CHECKLIST
+===========================================================================
+
+BEFORE SUBMITTING SCREENSHOTS:
+
+☐ All 12 screenshots captured
+☐ Organized in proper folders
+☐ Named correctly (##-Description.png)
+☐ All output visible and readable
+☐ No sensitive data exposed
+☐ File format is PNG
+☐ Image quality good (text readable)
+☐ File sizes reasonable (<500KB each)
+☐ Total size <10 MB
+☐ Can extract and view all screenshots
+☐ Print clearly when printed (if grader prints)
+☐ Text is black on light background (readable)
+
+===========================================================================
+PART 10: BONUS DOCUMENTATION
+===========================================================================
+
+OPTIONAL: Create additional screenshots for:
+
+1. IDE with code open
+   - VS Code showing Java file
+   - Color syntax highlighting visible
+   - Line numbers visible
+
+2. AWS Console screenshots
+   - EC2 Instances dashboard
+   - S3 Buckets list
+   - IAM Roles view
+
+3. Directory structure
+   - File explorer showing project structure
+   - Showing Maven project layout
+
+4. Workflow diagram
+   - Screenshot showing manual workflow steps
+   - Tools used (terminal, VS Code, AWS Console)
+
+5. Error handling demonstration
+   - Screenshot showing error message
+   - Screenshot showing how error was fixed
+
+These optional screenshots strengthen documentation but are not required.
+
+===========================================================================
+PART 11: FINAL CHECKLIST FOR SUBMISSION
+===========================================================================
+
+DOCUMENTATION COMPLETE:
+
+📋 LAB_REPORT_OUTLINE.md           ✅ (22 KB)
+📋 API_USAGE_GUIDE.txt              ✅
+📋 TROUBLESHOOTING_GUIDE.txt        ✅
+📋 SCREENSHOTS_GUIDE.txt            ✅ (this file)
+
+SOURCE CODE:
+
+📁 aws-s3-java-lab/
+   📄 pom.xml                       ✅
+   📄 CreateS3Buckets.java         ✅
+   📄 ListS3Buckets.java           ✅
+   📄 UploadS3Objects.java         ✅
+   📄 DeleteS3Objects.java         ✅
+   📄 LatencyMeasurementS3.java    ✅
+
+EVIDENCE:
+
+📁 Screenshots/
+   📁 Task2.1-AWS-Setup/
+      📷 5 screenshots              ✅
+   📁 Task2.2-Java-Execution/
+      📷 7 screenshots              ✅
+
+REFLECTION QUESTIONS:
+
+📝 Task 2.1 Reflection Q&A         ✅
+📝 Task 2.2 Reflection Q&A         ✅
+📝 Architecture Diagram (Q2.a)     ✅
+
+===========================================================================
+PART 12: SUBMISSION FORMAT
+===========================================================================
+
+When uploading to Canvas:
+
+1. Create folder structure:
+```
+Group35_D7078_Lab2_Complete/
+├── LAB_REPORT_OUTLINE.md
+├── API_USAGE_GUIDE.txt
+├── TROUBLESHOOTING_GUIDE.txt
+├── SCREENSHOTS_GUIDE.txt
+├── aws-s3-java-lab/
+│   ├── pom.xml
+│   ├── src/main/java/com/group35/d7078/
+│   │   ├── CreateS3Buckets.java
+│   │   ├── ListS3Buckets.java
+│   │   ├── UploadS3Objects.java
+│   │   ├── DeleteS3Objects.java
+│   │   └── LatencyMeasurementS3.java
+├── Task\ 2.1/
+│   └── (documentation files)
+├── Task\ 2.2/
+│   └── (documentation files)
+└── Screenshots/
+    ├── Task2.1-AWS-Setup/
+    │   └── (5 PNG files)
+    └── Task2.2-Java-Execution/
+        └── (7 PNG files)
+```
+
+2. Create ZIP file:
+```bash
+cd ~/Desktop/bridge-between-computer/
+zip -r Group35_D7078_Lab2_Complete.zip "D7078 Lab2/"
+```
+
+3. Upload ZIP to Canvas assignment
+
+4. Include submission note with:
+   - Group name: Group 35
+   - Course: D7078
+   - Lab: Lab 2
+   - Submission date: Nov 30, 2025
+   - Status: Complete
+
+===========================================================================
+
+For questions about screenshots, see:
+- This file (SCREENSHOTS_GUIDE.txt)
+- LAB_REPORT_OUTLINE.md (shows what outputs to expect)
+- API_USAGE_GUIDE.txt (shows actual program outputs)
+
+Questions? Check TROUBLESHOOTING_GUIDE.txt first!
+
+===========================================================================

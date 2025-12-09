@@ -1,0 +1,425 @@
+===========================================================================
+TASK 2.2 - PART II: Using Storage Service
+===========================================================================
+
+STEP 5: Create Java Program to Delete Objects from S3
+===========================================================================
+
+Objective:
+Create a Java program that deletes objects from your S3 bucket.
+This program will:
+- Delete specific objects from S3
+- Display deletion status and details
+- Handle errors appropriately
+- Offer options to delete all or specific objects
+
+===========================================================================
+File to Create: DeleteS3Objects.java
+Location: aws-s3-java-lab/src/main/java/com/group35/d7078/DeleteS3Objects.java
+===========================================================================
+
+DETAILED STEPS TO CREATE THE FILE:
+
+Step 1: Create the Java file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/DeleteS3Objects.java
+
+OR use VS Code:
+- Open file: src/main/java/com/group35/d7078/DeleteS3Objects.java
+
+Step 2: Copy the complete code below into the file
+
+===========================================================================
+Here is the complete Java program:
+
+---START OF CODE---
+
+package com.group35.d7078;
+
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import java.util.List;
+
+public class DeleteS3Objects {
+    
+    public static void main(String[] args) {
+        System.out.println("==================================================");
+        System.out.println("AWS S3 - Delete Objects");
+        System.out.println("==================================================\n");
+        
+        // S3 bucket and region
+        String bucketName = "group35-d7078-bucket-eu-north-1";
+        Region region = Region.EU_NORTH_1;
+        
+        // Objects to delete
+        String[] objectsToDelete = {
+            "test.txt",
+            "sample-document.txt"
+        };
+        
+        // Create S3 client
+        S3Client s3Client = S3Client.builder()
+            .region(region)
+            .build();
+        
+        try {
+            System.out.println("Deleting objects from bucket: " + bucketName);
+            System.out.println("Region: " + region);
+            System.out.println();
+            
+            // List objects before deletion
+            System.out.println("Objects in bucket BEFORE deletion:");
+            listObjects(s3Client, bucketName);
+            
+            System.out.println();
+            System.out.println("==================================================");
+            System.out.println("Deleting specific objects...");
+            System.out.println("==================================================\n");
+            
+            // Delete each object
+            for (String objectKey : objectsToDelete) {
+                deleteObjectFromS3(s3Client, bucketName, objectKey);
+            }
+            
+            System.out.println();
+            System.out.println("==================================================");
+            System.out.println("Objects in bucket AFTER deletion:");
+            System.out.println("==================================================");
+            listObjects(s3Client, bucketName);
+            
+            System.out.println();
+            System.out.println("==================================================");
+            System.out.println("✓ All deletions completed!");
+            System.out.println("==================================================");
+            
+        } catch (S3Exception e) {
+            System.out.println("✗ S3 Error during deletion: " + e.getMessage());
+            System.out.println("  Error Code: " + e.awsErrorDetails().errorCode());
+        } catch (Exception e) {
+            System.out.println("✗ Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            s3Client.close();
+            System.out.println("\n✓ S3Client closed.");
+        }
+    }
+    
+    public static void deleteObjectFromS3(S3Client s3Client, String bucketName, String objectKey) {
+        try {
+            System.out.println("Deleting: " + objectKey);
+            
+            // Create DeleteObjectRequest
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(objectKey)
+                .build();
+            
+            // Delete the object
+            DeleteObjectResponse response = s3Client.deleteObject(deleteObjectRequest);
+            
+            System.out.println("  ✓ Deletion successful!");
+            System.out.println("    Response Code: " + response.sdkHttpResponse().statusCode());
+            System.out.println("    Delete Marker: " + response.deleteMarker());
+            System.out.println();
+            
+        } catch (S3Exception e) {
+            System.out.println("  ✗ S3 Error: " + e.getMessage());
+            System.out.println("    Error Code: " + e.awsErrorDetails().errorCode());
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println("  ✗ Error deleting object: " + e.getMessage());
+            System.out.println();
+        }
+    }
+    
+    public static void listObjects(S3Client s3Client, String bucketName) {
+        try {
+            // Create ListObjectsV2Request
+            ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder()
+                .bucket(bucketName)
+                .build();
+            
+            // List objects
+            ListObjectsV2Response listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
+            
+            // Get list of objects
+            List<S3Object> objects = listObjectsResponse.contents();
+            
+            if (objects == null || objects.isEmpty()) {
+                System.out.println("No objects found in bucket: " + bucketName);
+                return;
+            }
+            
+            System.out.println("Total objects in bucket: " + objects.size());
+            System.out.println();
+            
+            // Display each object
+            for (int i = 0; i < objects.size(); i++) {
+                S3Object s3Object = objects.get(i);
+                
+                System.out.println((i + 1) + ". Object Key: " + s3Object.key());
+                System.out.println("   Size: " + formatFileSize(s3Object.size()));
+                System.out.println("   Last Modified: " + s3Object.lastModified());
+                System.out.println("   ETag: " + s3Object.eTag());
+                System.out.println();
+            }
+            
+        } catch (S3Exception e) {
+            System.out.println("✗ S3 Error listing objects: " + e.getMessage());
+            throw e;
+        }
+    }
+    
+    private static String formatFileSize(long bytes) {
+        if (bytes <= 0) return "0 B";
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+        return String.format("%.2f %s", bytes / Math.pow(1024, digitGroups), units[digitGroups]);
+    }
+}
+
+---END OF CODE---
+
+===========================================================================
+Code Explanation:
+===========================================================================
+
+1. IMPORTS:
+   - Region: AWS region enum
+   - S3Client: S3 operations client
+   - DeleteObjectRequest: Request to delete objects
+   - DeleteObjectResponse: Response from deletion
+   - ListObjectsV2Request/Response: For listing objects
+   - S3Object: Represents an S3 object
+   - S3Exception: S3-specific exceptions
+
+2. MAIN METHOD:
+   - Specifies bucket name and region
+   - Lists objects to delete
+   - Creates S3Client
+   - Lists objects BEFORE deletion
+   - Deletes each object
+   - Lists objects AFTER deletion
+   - Closes resources
+
+3. deleteObjectFromS3() METHOD:
+   - Creates DeleteObjectRequest with bucket and key
+   - Executes deletion via s3Client.deleteObject()
+   - Displays deletion status and response code
+   - Handles errors gracefully
+
+4. listObjects() METHOD:
+   - Lists all objects in bucket using ListObjectsV2Request
+   - Displays object details:
+     * Key (object name)
+     * Size (in human-readable format)
+     * Last Modified (timestamp)
+     * ETag (unique identifier)
+   - Shows before/after deletion state
+
+5. Helper Methods:
+   - formatFileSize(): Converts bytes to B, KB, MB, etc.
+
+===========================================================================
+How S3 Delete Works:
+===========================================================================
+
+Step 1: Create DeleteObjectRequest
+DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+    .bucket(bucketName)
+    .key(objectKey)
+    .build();
+
+Step 2: Delete the object
+DeleteObjectResponse response = s3Client.deleteObject(deleteObjectRequest);
+
+Step 3: Check response
+int statusCode = response.sdkHttpResponse().statusCode();
+boolean deleteMarker = response.deleteMarker();
+
+Key Points:
+- Deletion is permanent - no undo available
+- DeleteMarker indicates versioned bucket deletion
+- HTTP 204 No Content = successful deletion
+- HTTP 200 OK = successful deletion (object didn't exist)
+- ListObjectsV2 is preferred over ListObjects (pagination support)
+
+===========================================================================
+Steps to Run the Program:
+===========================================================================
+
+Step 1: Create the Java file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/DeleteS3Objects.java
+
+Step 2: Copy the complete code above into the file
+
+Step 3: Build the project
+cd ~/aws-s3-java-lab
+mvn clean compile
+
+Expected output:
+[INFO] BUILD SUCCESS
+
+Step 4: Run the program
+mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+
+===========================================================================
+Expected Output:
+===========================================================================
+
+==================================================
+AWS S3 - Delete Objects
+==================================================
+
+Deleting objects from bucket: group35-d7078-bucket-eu-north-1
+Region: eu-north-1
+
+Objects in bucket BEFORE deletion:
+Total objects in bucket: 3
+
+1. Object Key: test.txt
+   Size: 29.00 B
+   Last Modified: 2025-11-30T13:26:26Z
+   ETag: "220973ac612c945bfce3503f6e81ab11"
+
+2. Object Key: sample-document.txt
+   Size: 81.00 B
+   Last Modified: 2025-11-30T13:26:26Z
+   ETag: "cd7f921b9459039c36ceaf55d3eb5109"
+
+3. Object Key: data-file.txt
+   Size: 4.00 KB
+   Last Modified: 2025-11-30T13:26:27Z
+   ETag: "c18dbd7d02baf443b9364ac200ba7783"
+
+==================================================
+Deleting specific objects...
+==================================================
+
+Deleting: test.txt
+  ✓ Deletion successful!
+    Response Code: 204
+    Delete Marker: false
+
+Deleting: sample-document.txt
+  ✓ Deletion successful!
+    Response Code: 204
+    Delete Marker: false
+
+==================================================
+Objects in bucket AFTER deletion:
+Total objects in bucket: 1
+
+1. Object Key: data-file.txt
+   Size: 4.00 KB
+   Last Modified: 2025-11-30T13:26:27Z
+   ETag: "c18dbd7d02baf443b9364ac200ba7783"
+
+==================================================
+✓ All deletions completed!
+==================================================
+
+✓ S3Client closed.
+
+===========================================================================
+IMPORTANT NOTES:
+===========================================================================
+
+1. DELETION IS PERMANENT
+   - Deleted objects cannot be recovered
+   - There is no trash/recycle bin in S3
+   - Unless versioning is enabled, deletion is final
+
+2. RESPONSE CODES
+   - 204 No Content: Object was deleted
+   - 200 OK: Object didn't exist, but request was successful
+   - Both are considered successful operations
+
+3. DELETE MARKER
+   - Only relevant for versioned buckets
+   - Indicates soft delete (can be undeleted)
+   - Our buckets don't have versioning, so this is always false
+
+4. BATCH DELETION
+   - This program deletes objects one by one
+   - For large batches, use DeleteObjects (plural) request
+   - More efficient for deleting 1000+ objects
+
+===========================================================================
+TROUBLESHOOTING:
+===========================================================================
+
+Error: "NoSuchKey"
+Solution: The object doesn't exist - this is not an error in S3
+         Both "object exists" and "object doesn't exist" return 200/204
+
+Error: "AccessDenied"
+Solution: Check IAM policy has s3:DeleteObject permission
+
+Error: "NoSuchBucket"
+Solution: Make sure bucket name is correct:
+         "group35-d7078-bucket-eu-north-1"
+
+Output shows different number of objects:
+Solution: Objects from Step 4 (upload) are still in bucket
+         The program shows before/after deletion state
+
+===========================================================================
+KEY DIFFERENCES FROM STEPS 3-4:
+===========================================================================
+
+Step 3 (List):
+- Uses ListBucketsRequest
+- Read-only on bucket metadata
+- No file handling
+
+Step 4 (Upload):
+- Uses PutObjectRequest
+- Write operation
+- Reads local files
+- Adds objects to S3
+
+Step 5 (Delete):
+- Uses DeleteObjectRequest
+- Write operation (removes data)
+- Lists objects with ListObjectsV2Request
+- Shows before/after state
+- PERMANENT operation
+
+===========================================================================
+WORKFLOW DEMONSTRATION:
+===========================================================================
+
+This program demonstrates a complete workflow:
+
+1. List objects BEFORE deletion
+   └─ Shows what's currently in bucket
+
+2. Delete specific objects
+   └─ Removes 2 objects (test.txt, sample-document.txt)
+   └─ Keeps 1 object (data-file.txt)
+
+3. List objects AFTER deletion
+   └─ Confirms deletion was successful
+   └─ Shows remaining objects
+
+This is a common pattern in S3 operations for data management.
+
+===========================================================================
+ACTION CHECKLIST:
+===========================================================================
+
+[ ] Create file: src/main/java/com/group35/d7078/DeleteS3Objects.java
+[ ] Copy the code from above into the file
+[ ] Save the file
+[ ] Run: mvn clean compile
+[ ] Run: mvn exec:java -Dexec.mainClass="com.group35.d7078.DeleteS3Objects"
+[ ] Share the output with me
+[ ] Note: After this runs, 2 objects will be deleted from your bucket
+
+===========================================================================

@@ -1,0 +1,44 @@
+===========================================================================
+STEP 1: Verify AWS CLI Installation and Configuration
+===========================================================================
+
+Run the following commands to verify AWS CLI is installed and configured:
+
+# Check AWS CLI version
+aws --version
+
+# Check if AWS credentials are configured
+aws configure list
+
+# Verify AWS credentials work by getting your account identity
+aws sts get-caller-identity
+
+===========================================================================
+Expected Output:
+- AWS CLI version should be 2.x or higher
+- configure list should show access_key, secret_key, and region
+- get-caller-identity should return your Account ID, UserId, and ARN
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws --version
+aws-cli/2.32.6 Python/3.13.9 Linux/6.12.38+kali-amd64 exe/x86_64.kali.2025
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ aws configure list
+NAME       : VALUE                    : TYPE             : LOCATION
+profile    : <not set>                : None             : None
+access_key : ****************X3UT     : shared-credentials-file : 
+secret_key : ****************+96O     : shared-credentials-file : 
+region     : eu-north-1               : config-file      : ~/.aws/config
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ aws sts get-caller-identity 
+{
+    "UserId": "793891462342",
+    "Account": "793891462342",
+    "Arn": "arn:aws:iam::793891462342:root"
+}
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ curl ifconfig.me 
+79.167.66.242  

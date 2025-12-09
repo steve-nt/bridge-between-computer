@@ -1,0 +1,60 @@
+===========================================================================
+STEP 6: Create an IAM Role
+===========================================================================
+
+First, we need to create a trust policy document that allows EC2 to assume 
+this role. This file will tell AWS that EC2 instances can use this role.
+
+The trust policy file already exists as Labs3TrustPolicy.json
+
+Run this command to create the IAM role:
+
+aws iam create-role \
+  --role-name Group35-D7078-Lab2-Role \
+  --assume-role-policy-document file:///home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3TrustPolicy.json
+
+===========================================================================
+Expected Output:
+- You will get a RoleId and ARN
+- Example output:
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "Group35-D7078-Lab2-Role",
+        "RoleId": "AIDACKCEVSQ6C2EXAMPLE",
+        "Arn": "arn:aws:iam::793891462342:role/Group35-D7078-Lab2-Role",
+        ...
+    }
+}
+
+===========================================================================
+ACTION:
+1. Run the create-role command
+2. Share the output with me (especially the Role ARN)
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws iam create-role \
+  --role-name Group35-D7078-Lab2-Role \
+  --assume-role-policy-document file:///home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3TrustPolicy.json
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "Group35-D7078-Lab2-Role",
+        "RoleId": "AROA3RV46LTDDLVXQOXIU",
+        "Arn": "arn:aws:iam::793891462342:role/Group35-D7078-Lab2-Role",
+        "CreateDate": "2025-11-30T09:30:57+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "ec2.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+    }
+}
+  

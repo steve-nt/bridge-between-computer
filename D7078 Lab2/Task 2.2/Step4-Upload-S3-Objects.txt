@@ -1,0 +1,348 @@
+===========================================================================
+TASK 2.2 - PART II: Using Storage Service
+===========================================================================
+
+STEP 4: Create Java Program to Upload Objects to S3
+===========================================================================
+
+Objective:
+Create a Java program that uploads files to your S3 bucket.
+This program will:
+- Upload a local file to S3
+- Display upload status and details
+- Handle errors appropriately
+
+===========================================================================
+File to Create: UploadS3Objects.java
+Location: aws-s3-java-lab/src/main/java/com/group35/d7078/UploadS3Objects.java
+===========================================================================
+
+DETAILED STEPS TO CREATE THE FILE:
+
+Step 1: Create the Java file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/UploadS3Objects.java
+
+OR use VS Code:
+- Open file: src/main/java/com/group35/d7078/UploadS3Objects.java
+
+Step 2: Copy the complete code below into the file
+
+===========================================================================
+Here is the complete Java program:
+
+---START OF CODE---
+
+package com.group35.d7078;
+
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class UploadS3Objects {
+    
+    public static void main(String[] args) {
+        System.out.println("==================================================");
+        System.out.println("AWS S3 - Upload Objects");
+        System.out.println("==================================================\n");
+        
+        // S3 bucket and region
+        String bucketName = "group35-d7078-bucket-eu-north-1";
+        Region region = Region.EU_NORTH_1;
+        
+        // Files to upload
+        String[] filesToUpload = {
+            "/tmp/test.txt",
+            "/tmp/sample-document.txt",
+            "/tmp/data-file.txt"
+        };
+        
+        // Create S3 client
+        S3Client s3Client = S3Client.builder()
+            .region(region)
+            .build();
+        
+        try {
+            System.out.println("Uploading objects to bucket: " + bucketName);
+            System.out.println("Region: " + region);
+            System.out.println();
+            
+            // Create sample files first
+            createSampleFiles();
+            
+            // Upload each file
+            for (String filePath : filesToUpload) {
+                uploadFileToS3(s3Client, bucketName, filePath);
+            }
+            
+            System.out.println("==================================================");
+            System.out.println("✓ All files uploaded successfully!");
+            System.out.println("==================================================");
+            
+        } catch (S3Exception e) {
+            System.out.println("✗ S3 Error during upload: " + e.getMessage());
+            System.out.println("  Error Code: " + e.awsErrorDetails().errorCode());
+        } catch (Exception e) {
+            System.out.println("✗ Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            s3Client.close();
+            System.out.println("\n✓ S3Client closed.");
+        }
+    }
+    
+    public static void uploadFileToS3(S3Client s3Client, String bucketName, String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            File file = new File(filePath);
+            
+            // Check if file exists
+            if (!file.exists()) {
+                System.out.println("✗ File not found: " + filePath);
+                return;
+            }
+            
+            String fileName = path.getFileName().toString();
+            long fileSize = Files.size(path);
+            
+            System.out.println("Uploading: " + fileName);
+            System.out.println("  File size: " + formatFileSize(fileSize));
+            System.out.println("  File path: " + filePath);
+            
+            // Create PutObjectRequest
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+            
+            // Upload the file
+            PutObjectResponse response = s3Client.putObject(putObjectRequest, 
+                RequestBody.fromFile(file));
+            
+            System.out.println("  ✓ Upload successful!");
+            System.out.println("    ETag: " + response.eTag());
+            System.out.println("    Response Code: " + response.sdkHttpResponse().statusCode());
+            System.out.println();
+            
+        } catch (S3Exception e) {
+            System.out.println("  ✗ S3 Error: " + e.getMessage());
+            System.out.println("    Error Code: " + e.awsErrorDetails().errorCode());
+            System.out.println();
+        } catch (Exception e) {
+            System.out.println("  ✗ Error uploading file: " + e.getMessage());
+            System.out.println();
+        }
+    }
+    
+    private static void createSampleFiles() {
+        try {
+            // Create test.txt if it doesn't exist
+            Path testFile = Paths.get("/tmp/test.txt");
+            if (!Files.exists(testFile)) {
+                Files.write(testFile, "This is a test file for S3 upload.\n".getBytes());
+            }
+            
+            // Create sample-document.txt
+            Path docFile = Paths.get("/tmp/sample-document.txt");
+            if (!Files.exists(docFile)) {
+                Files.write(docFile, "This is a sample document.\nIt contains multiple lines.\nGreat for testing uploads!".getBytes());
+            }
+            
+            // Create data-file.txt
+            Path dataFile = Paths.get("/tmp/data-file.txt");
+            if (!Files.exists(dataFile)) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i <= 100; i++) {
+                    sb.append("Line ").append(i).append(": Sample data for S3 upload test.\n");
+                }
+                Files.write(dataFile, sb.toString().getBytes());
+            }
+            
+            System.out.println("Sample files created/verified in /tmp/");
+            System.out.println();
+            
+        } catch (Exception e) {
+            System.out.println("Warning: Could not create sample files: " + e.getMessage());
+        }
+    }
+    
+    private static String formatFileSize(long bytes) {
+        if (bytes <= 0) return "0 B";
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(bytes) / Math.log10(1024));
+        return String.format("%.2f %s", bytes / Math.pow(1024, digitGroups), units[digitGroups]);
+    }
+}
+
+---END OF CODE---
+
+===========================================================================
+Code Explanation:
+===========================================================================
+
+1. IMPORTS:
+   - RequestBody: For sending file data
+   - Region: AWS region enum
+   - S3Client: S3 operations client
+   - PutObjectRequest: Request to upload objects
+   - PutObjectResponse: Response from upload
+   - S3Exception: S3-specific exceptions
+   - File/Path utilities: For file handling
+
+2. MAIN METHOD:
+   - Specifies bucket name and region
+   - Lists files to upload
+   - Creates S3Client
+   - Creates sample files if needed
+   - Uploads each file
+   - Closes resources
+
+3. uploadFileToS3() METHOD:
+   - Validates file exists
+   - Gets file metadata (size, name)
+   - Creates PutObjectRequest with bucket and key
+   - Uploads using s3Client.putObject()
+   - Displays upload status and response
+
+4. createSampleFiles() METHOD:
+   - Creates test files in /tmp/ directory
+   - Only creates if files don't exist
+   - Creates variety of file sizes for testing
+
+5. Helper Methods:
+   - formatFileSize(): Converts bytes to human-readable format (B, KB, MB, etc.)
+
+===========================================================================
+How S3 Upload Works:
+===========================================================================
+
+Step 1: Create PutObjectRequest
+PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+    .bucket(bucketName)
+    .key(objectKey)
+    .build();
+
+Step 2: Create RequestBody from file
+RequestBody body = RequestBody.fromFile(file);
+
+Step 3: Upload the object
+PutObjectResponse response = s3Client.putObject(putObjectRequest, body);
+
+Key Points:
+- Bucket name must be the actual S3 bucket name
+- Key is the object name (file name in S3)
+- RequestBody can be created from File, String, or byte array
+- Response includes ETag and HTTP status code
+- Must close S3Client when done
+
+===========================================================================
+Steps to Run the Program:
+===========================================================================
+
+Step 1: Create the Java file
+nano ~/aws-s3-java-lab/src/main/java/com/group35/d7078/UploadS3Objects.java
+
+Step 2: Copy the complete code above into the file
+
+Step 3: Build the project
+cd ~/aws-s3-java-lab
+mvn clean compile
+
+Expected output:
+[INFO] BUILD SUCCESS
+
+Step 4: Run the program
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+
+===========================================================================
+Expected Output:
+===========================================================================
+
+==================================================
+AWS S3 - Upload Objects
+==================================================
+
+Uploading objects to bucket: group35-d7078-bucket-eu-north-1
+Region: eu-north-1
+
+Sample files created/verified in /tmp/
+
+Uploading: test.txt
+  File size: 0.04 KB
+  File path: /tmp/test.txt
+  ✓ Upload successful!
+    ETag: "abc123def456"
+    Response Code: 200
+
+Uploading: sample-document.txt
+  File size: 0.08 KB
+  File path: /tmp/sample-document.txt
+  ✓ Upload successful!
+    ETag: "xyz789abc123"
+    Response Code: 200
+
+Uploading: data-file.txt
+  File size: 3.52 KB
+  File path: /tmp/data-file.txt
+  ✓ Upload successful!
+    ETag: "123abc456def"
+    Response Code: 200
+
+==================================================
+✓ All files uploaded successfully!
+==================================================
+
+✓ S3Client closed.
+
+===========================================================================
+TROUBLESHOOTING:
+===========================================================================
+
+Error: "File not found"
+Solution: The program creates sample files automatically, but you can also
+         create your own files in /tmp/ and modify the filesToUpload array
+
+Error: "AccessDenied" 
+Solution: Check your IAM policy has s3:PutObject permission for the bucket
+
+Error: "NoSuchBucket"
+Solution: Make sure the bucket name is correct:
+         "group35-d7078-bucket-eu-north-1"
+
+Error: "Cannot find symbol: class RequestBody"
+Solution: Make sure AWS SDK is properly installed with mvn clean install
+
+===========================================================================
+KEY DIFFERENCES FROM STEP 3:
+===========================================================================
+
+Step 3 (List):
+- Uses ListBucketsRequest
+- Reads-only operation
+- No file handling needed
+
+Step 4 (Upload):
+- Uses PutObjectRequest
+- Write operation
+- Requires file reading capability
+- Uses RequestBody for file data
+- Handles file metadata (size, name)
+
+===========================================================================
+ACTION CHECKLIST:
+===========================================================================
+
+[ ] Create file: src/main/java/com/group35/d7078/UploadS3Objects.java
+[ ] Copy the code from above into the file
+[ ] Save the file
+[ ] Run: mvn clean compile
+[ ] Run: mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+[ ] Share the output with me
+
+===========================================================================

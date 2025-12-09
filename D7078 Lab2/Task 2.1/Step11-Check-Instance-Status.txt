@@ -1,0 +1,31 @@
+===========================================================================
+STEP 11: Wait for EC2 Instance to be Running & Get Public IP
+===========================================================================
+
+The instance is currently in "pending" state. We need to wait for it to 
+transition to "running" and obtain its public IP address.
+
+Step 1: Check instance status
+
+aws ec2 describe-instances \
+  --instance-ids i-0c32227bfffc472e0 \
+  --region eu-north-1 \
+  --query 'Reservations[0].Instances[0].[InstanceId,State.Name,PublicIpAddress,PrivateIpAddress]' \
+  --output table
+
+===========================================================================
+Expected Output:
+|  InstanceId          |  State    |  PublicIpAddress  |  PrivateIpAddress  |
+|----------------------|-----------|-------------------|--------------------|
+|  i-0c32227bfffc472e0 |  running  |  XX.XXX.XXX.XXX   |  172.31.35.231     |
+
+Note: It may take 30-60 seconds for the instance to be fully running 
+and receive a public IP. You may need to run this command multiple times.
+
+===========================================================================
+ACTION:
+1. Run the describe-instances command
+2. Wait for State to show "running" and PublicIpAddress to appear
+3. If still pending, wait 30 seconds and run again
+4. Once running, share the public IP address with me
+===========================================================================
