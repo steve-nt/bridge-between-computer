@@ -588,7 +588,7 @@ SCREENSHOT 5.3: Show the URL path parameter mapping
 
 STEP 5.4 - DEPLOY API
 -----------
-1. Back in the API, click "Deploy"
+1. Back in the API, click "Deploy"A
 2. Configure:
    Stage name: prod
    Description: "Production stage"
