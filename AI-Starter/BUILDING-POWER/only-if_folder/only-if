@@ -1,0 +1,90 @@
+only-if
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+Level 6
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+only-if.js
+—
+Mindful AI Mode
+
+Context
+You are close to achieving ultimate power! Are you ready to command your robot using conditions? In JavaScript, conditions allow you to control what your robots do based on different situations.
+
+Let's have some fun with it!
+
+AI-Powered Learning Techniques
+Interactive Learning Technique: This type of prompt asks AI to create practice challenges and provide immediate feedback on your solutions. Use this technique to test your understanding through progressively harder problems and get personalized guidance.
+
+Find examples throughout the subject ;)
+
+Concepts
+Basic Conditions
+Conditions allow you to execute different code based on whether something is true or false:
+
+let batteryLevel = 75;
+
+if (batteryLevel > 50) {
+  console.log("Robot is ready to patrol!");
+} else {
+  console.log("Robot needs to recharge.");
+}
+Truthy and Falsy Values
+JavaScript evaluates all values as either truthy or falsy in conditions:
+
+Falsy values: false, 0, '' (empty string), null, undefined, NaN
+Truthy values: Everything else (including '0', [], {})
+
+if (robotName) {
+  console.log("Robot has a name");
+} // Only runs if robotName is truthy
+Logical Operators
+AND (&&) - All conditions must be true:
+
+if (robot.status === "active" && robot.battery > 50) {
+  console.log("Robot is ready for duty");
+}
+OR (||) - At least one condition must be true:
+
+if (robot.cash >= 10 || robot.hasVoucher) {
+  console.log("Robot can buy the item");
+}
+Prompt example:
+"Create a JavaScript conditional challenge involving a robot's battery level and status. Then check my solution and give me feedback on how to improve it."
+
+Instructions
+Task 1:
+A variable truth has been provided. Write an if/else statement:
+
+If truth is truthy, log: 'The truth was spoken.'
+
+If truth is falsy, log: 'Lies !!!!'
+
+Task 2:
+A user object with age and activeMembership properties has been provided. A variable ticket already exists.
+
+First, assign the message 'You cannot benefit from our special promotion.' to ticket
+
+Then use an if statement to check if ALL these conditions are true:
+
+user.age is 18 or older (>=)
+
+user.age is 25 or younger (<=)
+
+user.activeMembership is true
+
+If all conditions pass, change ticket to: 'You can benefit from our special promotion.'
+
+Task 3:
+A customer object with cash and hasVoucher properties has been provided. A variable ticketSold already exists.
+
+Check if the customer can afford a $9.99 ticket by testing if EITHER condition is true:
+
+customer.cash is 9.99 or more
+
+customer.hasVoucher is true
+
+If either condition is true, add 1 to ticketSold (use += operator).

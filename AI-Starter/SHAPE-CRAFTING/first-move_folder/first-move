@@ -1,0 +1,95 @@
+first-move
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+→Jump to Building Power !
+Level 4
+optional
+XP
+Files to submit
+Allowed functions
+0.00 B
+first-move.html, first-move.css, first-move.js
+—
+Brainpower Mode
+
+Context
+Great work so far! Now you'll see how JavaScript can make your robot interactive. In this exercise, you'll use JavaScript to close your robot's left eye, giving you a first taste of how JavaScript controls HTML elements.
+
+Follow the instructions, ask your peers if you get stuck, and pay attention to every hint!
+
+Instructions
+Your JS file is named first-move.js. Copy your last HTML submission into the first-move.html file.
+
+First, add this new class to your class-it.css file:
+
+.eye-closed {
+  height: 4px;
+  padding: 0 5px;
+  border-radius: 10px;
+}
+Task 1
+Link a JS script to your HTML file before the closing </body> tag.
+
+Hint: Place the script tag just before </body> to ensure the HTML is loaded before the JavaScript runs.
+
+Task 2
+In your JavaScript file, target the left eye of your robot. Use the getElementById method to select the HTML element with the id eye-left.
+
+Task 3
+After targeting the eye element, perform these two actions:
+
+Set its style to change its background color to black
+
+Add the eye-closed class to the element using the classList.add() method
+
+This will close the left eye by changing both its color and shape.
+
+Code Examples
+Example 1
+To target the nose HTML element by its id using getElementById:
+
+In the HTML file:
+
+<!-- HTML -->
+<div id="nose"></div>
+In the JS file:
+
+const nose = document.getElementById("nose");
+Example 2
+To add a CSS class to an element:
+
+.nose-red {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  border-radius: 50%;
+}
+nose.classList.add("nose-red");
+Example 3
+To change the background color of an element using inline styles:
+
+nose.style.backgroundColor = "yellow";
+Expected Output
+By the way, do you like the new background color you chose earlier? Me too.
+To personalize your robot even more, feel free to adjust the inclination of its arms to reflect the personality you've envisioned!
+Adding a rotation to the arm class is a great way to achieve this.
+
+This is what you should see in the browser:
+Expected Output
+
+Your robot should display with the left eye closed (appears as a thin black line) while the right eye remains open and red.
+
+Resources
+Here are some resources to help you get started smoothly. Check them out!
+
+Video: Link a JS script to your HTML file
+
+Video: JS variables explained
+
+Video: DOM JS - getElementById
+
+Video: DOM JS - Set an element's inline style
+
+Video: DOM JS - classList: add & remove
+
+Memo DOM JS
