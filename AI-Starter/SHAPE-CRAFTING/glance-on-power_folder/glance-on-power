@@ -1,0 +1,97 @@
+glance-on-power
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+→Jump to Building Power !
+Level 3
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+glance-on-power.js
+—
+Brainpower Mode
+
+Context
+Congratulations! You've successfully shaped your robot friend into existence. Now, it's time to take the next exciting step and build the power to bring your robot to life. Yes, it's time to start thinking like a coder and builder! Using JavaScript, you'll add dynamic abilities and interactions to your creation. Get ready to breathe life into your robot friend!
+
+Ready to start gathering your power by learning to code? Let's go!
+
+Concepts
+Values
+In the coding world, values are like the energy sources that power your robot. There are three types of values that can model the WORLD! (Ultimately, it's all 1s and 0s for the computer), but for us, humans, we need a simpler way to represent things.
+
+We can all agree that 11010001100101110110011011001101111 isn't a very friendly way to say 'hello'!
+
+Numbers
+Numbers are like the vital stats of your robot:
+
+Whole numbers: 1, 23, 232139283
+
+Negative numbers are prefixed with -: -1, -1231
+
+Decimal numbers: 3.14, -2.53343, etc.
+
+Use them for quantities, just like in daily life.
+
+Booleans
+Booleans are the simple true/false logic gates for your robot:
+
+Something is true
+
+or false
+
+They represent a truth, an answer to a closed-ended question (anything that can be answered with yes or no):
+
+Is the robot's battery full? true
+
+Is the robot currently charging? false
+
+Can the robot see an obstacle? true (most likely)
+
+Strings
+Strings are the commands and messages your robot can use:
+
+'Activate'
+
+'Hello, human!'
+
+A string is a sequence of characters used to represent text. It needs delimiters to define its beginning and end. Delimiters are matching quotes, either `, ", or '.
+
+Using console.log
+To display output from a script in a console, use the function console.log:
+
+console.log(); // <- will show an empty line
+Add any value between the parentheses to see it appear when the script is executed.
+
+It is very important to use this often to validate that your code is working correctly. The more you test, the easier it is to understand what's happening in the code!
+
+When in doubt, console.log everything—don't be shy, it's free.
+
+Instructions
+To complete this exercise, use the code editor on the right side of your window. In the glance-on-power.js file, write a program that displays the following values using console.log:
+
+The exact text Hello There ! (as a string)
+
+Any number greater than 0 (like representing the robot's serial number)
+
+A boolean value (true or false) indicating whether the robot's sensors are active
+
+Each value should be displayed on a separate line using separate console.log statements.
+
+Hint
+Your output should look something like this:
+
+Hello There !
+42
+true
+Don't forget to test your code before submitting it by using the Run button.
+
+Code examples
+Display different types of values:
+
+console.log('This is a string');
+console.log(123);
+console.log(true);
+Resources
+Introduction to JavaScript

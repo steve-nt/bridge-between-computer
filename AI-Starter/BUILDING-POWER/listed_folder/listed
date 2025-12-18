@@ -1,0 +1,122 @@
+listed
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+Level 5
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+listed.js
+—
+Mindful AI Mode
+
+Context
+Sometimes, we don't need a key; we just want a list of things. JavaScript has a special type for that, called an array.
+
+In JavaScript, arrays are essential tools for efficiently managing these lists.
+
+Let's explore them together!
+
+AI-Powered Learning Techniques
+Example-Based Learning Technique: This type of prompt asks AI to generate multiple concrete examples that demonstrate the same concept in different contexts. Use this technique to see how array operations work across various scenarios, helping you understand patterns and applications.
+
+Look for examples throughout the subject and ask AI to create more scenarios! ;)
+
+Concepts
+Understanding Arrays
+Arrays are special types of objects in JavaScript used to store lists of items. Unlike objects, arrays don't have keys for each element, just a list of values.
+
+Example of an Array
+
+Here's an example of an array:
+
+let batteryLevels = [
+  80, // <- no keys!
+  60,
+  90,
+  50,
+];
+
+// Or, for brevity, we often write them on a single line like this:
+
+let batteryLevels = [80, 60, 90, 50];
+Indexes in Arrays
+The position of an element in an array is called its index, starting from 0. So, our batteryLevels array is roughly equivalent to writing this object:
+
+let batteryLevelsObject = {
+  0: 80,
+  1: 60,
+  2: 90,
+  3: 50,
+};
+Accessing Array Values
+To access a value in an array, use the index inside square brackets:
+
+let batteryLevels = [80, 60, 90, 50];
+console.log(batteryLevels[0]); // -> 80 (first element)
+console.log(batteryLevels[3]); // -> 50 (fourth element)
+console.log(batteryLevels[6]); // -> undefined (doesn't exist)
+Using the .length Property
+Arrays keep track of how many elements they contain using the .length property:
+
+console.log([].length); // -> 0
+console.log([80].length); // -> 1
+console.log([80, 60, 90, 50].length); // -> 4
+Accessing the Last Element
+To access the last element dynamically (when you don't know the array length):
+
+let robotTasks = ["Charging", "Cleaning", "Maintenance"];
+let lastTask = robotTasks[robotTasks.length - 1]; // "Maintenance"
+Replacing an Array Value
+You can replace an array value by accessing it via its index and assigning a new value:
+
+let robotTasks = [
+  "Charging",
+  "Cleaning",
+  "Maintenance",
+  "Patrolling",
+  "Greeting",
+];
+
+// Let's say I want to change 'Charging' to 'Upgrading'
+robotTasks[0] = "Upgrading";
+
+console.log(robotTasks);
+Now, the array looks like this:
+
+["Upgrading", "Cleaning", "Maintenance", "Patrolling", "Greeting"];
+Prompt example:
+"Show me 5 different examples of arrays in real-world programming scenarios (like storing user names, product prices, game scores, etc.). For each example, demonstrate how to access the first element, last element, and modify a specific element."
+
+Instructions
+Task 1:
+Declare a variable components that contains an array with exactly 4 string elements in this order: 'motor', 'sensor', 'battery', and 'camera'.
+
+Task 2:
+A variable robotParts (an array) has been provided for you. Create the following variables:
+
+firstPart: Assign it the first element of the robotParts array.
+
+lastPart: Assign it the last element of the robotParts array.
+
+comboParts: Create a new array containing exactly 2 elements: the last element first, then the first element (use the variables you just created).
+
+Task 3:
+Two arrays have been provided for you: replaceComponents and swapComponents.
+
+Part A - Replace:
+
+Replace the third element (index 2) of replaceComponents with the string 'enhanced'
+
+Part B - Swap:
+
+Swap the first and second elements of swapComponents using a temporary variable called temp
+
+First, store the first element in temp
+
+Then, assign the second element to the first position
+
+Finally, assign temp to the second position
+
+"Programming is like building a robot. You start with the basics, but the fun really begins when you start swapping parts and adding enhancements!"

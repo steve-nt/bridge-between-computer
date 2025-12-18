@@ -1,0 +1,102 @@
+objects-around
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+Level 5
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+objects-around.js
+—
+Mindful AI Mode
+
+Context
+Consider all the objects around you, like your book or robot companion. Each of these objects has different properties that describe it. For example, a robot can have a name, age, and energy status. In JavaScript, we use objects to group these related properties together, making it easier to manage and access this information.
+
+AI-Powered Learning Techniques
+Visualization Technique: This type of prompt asks AI to create visual representations or diagrams that help you understand how concepts are structured and connected. Use this technique to see the "big picture" of how object properties relate to each other.
+
+Look for examples throughout the topic! ;)
+
+Concepts
+JavaScript Objects
+Objects in JavaScript are fundamental data structures used to group related values together. They are like containers that hold multiple pieces of related information.
+
+Example
+First, let's look at different types of variables:
+
+let name = "RoboMax";
+let age = 5;
+let hasEnergy = true;
+Now, we can group them into an object. Objects are values too, so let's assign one to a robot variable:
+
+let robot = {
+  name: "RoboMax",
+  age: 5,
+  hasEnergy: true,
+};
+console.log(robot); // This will display the 'robot' object
+Here, the robot variable is declared, and its value is an object.
+
+Object Literal Syntax
+Objects are defined using curly brackets {}.
+
+let emptyRobot = {}; // An empty object
+Properties
+Objects consist of properties, each having a key and a value:
+
+let robot = {
+  name: "RoboMax", // 'name' is the key, 'RoboMax' is the value
+  age: 5,
+  hasEnergy: true,
+};
+Each property is separated by a comma ,. It's good practice to add a trailing comma to every property, though it's not required for the last one.
+
+Accessing Values
+To access values in an object, use dot notation. For example:
+
+let robot = {
+  name: "RoboMax",
+  age: 5,
+  hasEnergy: true,
+};
+
+console.log(robot); // Logs the entire 'robot' object
+console.log(robot.age); // Logs the age of the robot (5)
+You can use the property values just like any other values:
+
+let efficiency = 1.15; // Efficiency factor
+let robot = {
+  name: "RoboMax",
+  age: 5,
+  hasEnergy: true,
+};
+
+const adjustedAge = robot.age * efficiency;
+console.log(adjustedAge); // Logs the adjusted age
+Prompt example:
+"Can you create a visual diagram showing how a JavaScript object with properties like name, age, and hasEnergy is structured? Show me how the properties connect to their values and how dot notation accesses them."
+
+Instructions
+Task 1:
+Declare a variable myRobot and assign it an object with the following properties:
+
+A name property with the string value "RoboMax"
+
+An age property with the number value 5
+
+A hasEnergy property with the boolean value true
+
+Task 2:
+A robot object has been provided for you with name, age, and hasEnergy properties.
+
+Extract each property value into separate variables:
+
+Create a name variable that gets its value from the robot's name property.
+
+Create an age variable that gets its value from the robot's age property.
+
+Create a hasEnergy variable that gets its value from the robot's hasEnergy property.
+
+NOTE: Do not redeclare the provided object, as this will cause your solution to fail the tests.
