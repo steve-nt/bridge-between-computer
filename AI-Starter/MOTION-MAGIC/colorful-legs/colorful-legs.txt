@@ -1,0 +1,57 @@
+Level 7
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+colorful-legs.html, colorful-legs.css, colorful-legs.js
+—
+JS-Powered Mode
+
+Context
+Your robot is cool! But you can make it even more striking! Or at least, make it show off its colorful legs to everyone!
+
+Follow the instructions, ask your peers if you are stuck, and stay motivated because you are close to the goal! Follow every hint you have in the subject! Continue on the code from the last exercise, and change the file names!
+
+AI-Powered Learning Techniques
+Pattern Recognition Technique: This approach uses AI to help you identify and apply patterns from previous code to new situations. When implementing similar functionality, ask AI to help you recognize the patterns and adapt them to new requirements.
+
+Instructions
+Just like you turned your robot's arms special in the last exercise, you will do the same now with the legs!
+
+Follow the same steps.
+
+Task 1:
+Let's put another button in the top right corner of the page with an id leg-color that will change the legs' color. Add it in the HTML structure:
+
+<button id="leg-color">Change robot's leg colors</button>
+Add the button style in the CSS file:
+
+#leg-color {
+  position: fixed;
+  top: 240px;
+  right: 30px;
+  padding: 10px;
+  margin-bottom: 20px;
+  z-index: 2;
+}
+Task 2:
+In the JS file, like in the previous exercise, select the following elements:
+
+The button with the ID leg-color.
+
+The left and right leg elements with the IDs leg-left and leg-right.
+
+Task 3:
+Following the same pattern as the arms exercise:
+
+Create a function that applies the same random color to both legs by changing their backgroundColor whenever the function is called.
+
+Add an event listener for the click event on the button with the ID leg-color.
+
+Expected result
+You can see an example of the expected result here
+
+Prompt example:
+
+"I just implemented a color-changing feature for robot arms. Can you help me recognize the pattern and adapt it to create the same functionality for robot legs? What parts stay the same and what needs to change?"
