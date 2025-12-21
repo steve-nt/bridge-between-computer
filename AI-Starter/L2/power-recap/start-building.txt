@@ -1,0 +1,275 @@
+start-building
+available
+js
+650 B
+1
+AI-Surge mode
+
+Context
+Welcome back! Let's start your journey to unlock the Gate of Knowledge for your robot.
+
+Your mission is to build the Knowledge Gate chatbot, a learning portal where your robot can ask for book recommendations on any topic while learning more about Earth.
+
+Today, you will code the user interface. You will add the brain later!
+
+The instructions guide you toward the result. Don't hesitate to ask for help from your peers. From now on, you will discover new concepts. The best way to understand them is by quickly moving to the instructions after using the learning prompts.
+
+Using AI Tools for Learning
+Objective: Use your AI assistant tools (Amazon Q, Gemini, Copilot, etc.) to support your learning while building your project. Here is a video to help you get started.
+
+Concepts
+Flexbox: Your UI Superpower
+Flexbox is a powerful tool in CSS that helps you neatly arrange items on your webpage. It makes stacking, spacing, and aligning elements simple, whether you're placing them in rows or columns, ensuring your layout always looks good.
+
+Example:
+
+#chatbox {
+  display: flex; /* Enables Flexbox for inner elements */
+  flex-direction: column; /* Stacks messages, input, and button vertically */
+}
+This stacks the children of #chatbox vertically.
+
+Prompt to Learn More:
+"As a beginner, explain to me how to stack items vertically using Flexbox."
+
+Box Model: Spacing and Layout
+What is px?
+px means pixel, the smallest visible unit on a screen. It's used to define fixed sizes in CSS.
+
+padding: 10px; means 10 pixels of space inside the element.
+
+margin: 10px; means 10 pixels of space outside the element (all four sides unless specified otherwise).
+
+Remember that border-radius defines the curve of the element's corners.
+
+Example:
+
+.message {
+  padding: 10px 15px; /* Internal spacing for text bubbles */
+  margin: 5px 0; /* Vertical spacing between messages */
+  border-radius: 5px; /* Smooth, rounded bubble edges */
+}
+Prompt to Learn More:
+"As a beginner, explain to me the difference between margin and padding in CSS."
+
+Hint: Remember that you learn fully by practicing. Start the project, and you will learn more!
+
+Instructions
+For this project, you don't need to create any JavaScript file since that will be the next step in the next project. This is a UI-only project focused on layout and styling.
+
+Section 1 - HTML Setup
+Objective: Create a basic HTML structure for your chatbot.
+
+Tasks:
+
+Set up project structure:
+
+Create a folder called start-building inside your workspace folder, and open it in VSCode.
+
+Create a new file inside it called: knowledge-gate.html.
+
+Create base HTML structure:
+
+Begin by creating your base HTML structure.
+
+Make sure to include the <!DOCTYPE html> declaration at the very top.
+
+You can quickly scaffold a complete HTML5 structure in VSCode using Emmet:
+
+Type ! (exclamation mark) in your HTML file and press Tab — this will auto-generate the boilerplate HTML, including <!DOCTYPE html>, <html>, <head>, and <body> tags.
+
+Inside the <head> tag, add a title element with the text "My Gate Of Knowledge".
+
+Add a link element to connect your CSS file "knowledge-gate.css" to your HTML file.
+
+Add chatbot HTML structure:
+
+Inside the <body> tag, paste this HTML structure for your chatbot, as shown below:
+
+<div id="chatbot-container">
+  <h1>Knowledge Gate</h1>
+  <div id="chatbox">
+    <div id="messages"></div>
+    <div id="input-area">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Type your message..."
+      />
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+</div>
+Hint: Use the Live Preview extension to see the progress of your work. You can follow this video.
+
+Understand the structure:
+
+Here is the explanation of this structure:
+
+Step 1: The <div> with the ID chatbot-container is the outer wrapper that holds your entire chatbot interface.
+
+Step 2: The <div> with the ID chatbox will act as the main chat area where you'll place all the components.
+
+Step 3: Inside #chatbox, the <div> with the ID messages is where all your user and bot messages will appear.
+
+Step 4: Also inside #chatbox, there is a <div> with an id of input-area containing the <input> element with the ID user-input where users will type their messages.
+
+Step 5: Inside #input-area, there is a <button> element with the ID send-button that allows users to submit messages.
+
+Section 2 - CSS Styling
+Objective: Use Flexbox and the box model to style your chatbot layout.
+
+Tasks:
+
+Style the body element (main page background):
+
+Create a file called knowledge-gate.css.
+
+Inside it, select your body element and set a font-family of your choice. For example, you can use 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif' for a clean, modern text font.
+
+Center the layout using Flexbox by setting display to flex, justify-content to center, and align-items to center.
+
+Set height to 100vh.
+
+Set margin to 0.
+
+Use a dark background-color like #1d0731.
+
+Style the #chatbot-container element (outer container):
+
+Select the #chatbot-container element.
+
+Set the width to 360px.
+
+Set the max-width to 90%.
+
+Set the background-color to #2e0b45 (feel free to customize).
+
+Set rounded corners with border-radius of 16px.
+
+Add depth with a shadow using box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3).
+
+Add overflow hidden to ensure child elements don't extend beyond the rounded corners.
+
+Make it a vertical Flexbox layout by setting display to flex and flex-direction to column.
+
+Prompt:
+
+"What does overflow: hidden do and why is it important for rounded corners?"
+
+Style the h1 element (your chatbot title):
+
+Select the h1 element.
+
+Set the color to white (#ffffff) (try your own favorite light color).
+
+Set the font-size to 22px.
+
+Set text-align to center.
+
+Set the padding top and bottom to 16px with margin set to 0.
+
+Set the bottom border to 1px solid rgba(255, 255, 255, 0.1) for subtle separation.
+
+Prompt:
+
+"How can I set the bottom border in CSS?"
+
+Style the #chatbox element (main content zone):
+
+Select the #chatbox element.
+
+Stack its children vertically using Flexbox by setting display to flex and flex-direction to column.
+
+Set the height to 500px.
+
+Set the background-color to white (#ffffff) (feel free to customize it).
+
+Style the #messages element (chat history area):
+
+Select the #messages element.
+
+Expand to fill space by setting flex to 1.
+
+Set the padding to 16px.
+
+Enable scrolling by setting overflow-y to auto.
+
+Prompt:
+
+"What does overflow-y: auto mean?"
+
+Style the #input-area element (input and send section):
+
+Select the #input-area element.
+
+Use Flexbox layout to place input and button side by side by setting display to flex.
+
+Set padding to 10px.
+
+Set background to #f9f9f9.
+
+Set border-top to 1px solid #ccc.
+
+Style the #user-input element (input box):
+
+Select the #user-input element.
+
+Set flexible width by setting flex to 1.
+
+Set padding to 10px 14px (10 pixels top/bottom and 14 pixels left/right).
+
+Set rounded border by setting border-radius to 8px.
+
+Remove outline by setting outline to none.
+
+Set font-size to 14px.
+
+Add space by setting margin-right to 10px.
+
+Add border by setting border to 1px solid #ccc.
+
+Style the #send-button element (send message button):
+
+Select the #send-button element.
+
+Set background to #007bff (change to match your style).
+
+Set text color to white (#ffffff).
+
+Set padding to 10px 16px (10 pixels top/bottom and 16 pixels left/right).
+
+Set border-radius to 8px.
+
+Set font-size to 14px.
+
+Set cursor to pointer.
+
+Remove border by setting border to none.
+
+Add hover effect by setting the background-color to #0056b3 when hovering over the button.
+
+Bonus
+How about adding some animations? Use your AI tools to add captivating animations to your project!
+
+Update the font-family in your CSS from Google Fonts to give your chatbot a unique typography style.
+
+Submission
+Expected Output
+Your submission should look something like this.
+
+How to Submit Your Work
+Make a new folder on Gitea with the name of the current project, and add all the expected files.
+
+Required files to submit:
+
+knowledge-gate.html
+
+knowledge-gate.css
+
+To submit your work, follow the same steps as the last project tutorial.
+
+Something is wrong ?
+Submit an issue
+or even better
+propose a change !

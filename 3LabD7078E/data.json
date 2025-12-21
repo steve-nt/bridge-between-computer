@@ -1,0 +1,85 @@
+{
+  "lab_metadata": {
+    "course_code": "D7078E",
+    "lab_number": 3,
+    "lab_title": "Multi-Tier Isolation",
+    "submission_deadline": "2025-12-10",
+    "created_date": "2025-12-20"
+  },
+  "infrastructure": {
+    "vpc": "default",
+    "region": "eu-north-1",
+    "instances": [
+      {
+        "name": "WEB-SERVER-D7078E-Lab3",
+        "instance_id": "i-09b2da9995b961dc9",
+        "role": "Web Application Server",
+        "public_ip": "16.171.112.166",
+        "private_ip": "172.31.30.14",
+        "security_group": "SG-WEB",
+        "software": "Nginx"
+      },
+      {
+        "name": "DB-SERVER-D7078E-Lab3",
+        "instance_id": "i-081af8cc4ec64625e",
+        "role": "Database Server",
+        "public_ip": "13.53.126.50",
+        "private_ip": "172.31.25.135",
+        "security_group": "SG-DB",
+        "software": "MySQL"
+      },
+      {
+        "name": "STORAGE-SERVER-D7078E-Lab3",
+        "instance_id": "i-0f8da4bee4b8ff2ba",
+        "role": "Storage and API Gateway Server",
+        "public_ip": "13.49.18.107",
+        "private_ip": "172.31.20.229",
+        "security_group": "SG-STORAGE",
+        "software": "AWS CLI v2, Python3"
+      }
+    ]
+  },
+  "security_groups": {
+    "SG-WEB": {
+      "description": "Web Application Server",
+      "inbound_rules": [
+        {
+          "protocol": "TCP",
+          "port": 443,
+          "source": "0.0.0.0/0",
+          "description": "HTTPS from anywhere"
+        },
+        {
+          "protocol": "TCP",
+          "port": 22,
+          "source": "203.0.113.55/32",
+          "description": "SSH from admin IP only"
+        }
+      ]
+    },
+    "SG-DB": {
+      "description": "Database Server",
+      "inbound_rules": [
+        {
+          "protocol": "TCP",
+          "port": 22,
+          "source": "203.0.113.55/32",
+          "description": "SSH from admin IP only"
+        }
+      ]
+    },
+    "SG-STORAGE": {
+      "description": "Storage and API Server",
+      "inbound_rules": [],
+      "note": "No inbound traffic from EC2 instances. API Gateway access is external."
+    }
+  },
+  "isolation_rules": {
+    "ec2_to_ec2_traffic": "BLOCKED",
+    "external_to_web": "ALLOWED (HTTPS only)",
+    "admin_to_db": "ALLOWED (SSH only)",
+    "web_to_db_direct": "BLOCKED",
+    "web_to_storage_direct": "BLOCKED",
+    "db_to_storage_direct": "BLOCKED"
+  }
+}

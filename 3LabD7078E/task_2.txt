@@ -1,0 +1,71 @@
+TASK 2: Install Required Software
+==================================
+
+Objective:
+Install necessary software on each EC2 instance for their respective roles.
+
+Software Installed:
+
+1. WEB-SERVER (16.171.112.166 | 172.31.30.14)
+   - Nginx web server
+   - Status: Running and enabled
+
+2. DB-SERVER (13.53.126.50 | 172.31.25.135)
+   - MySQL server
+   - Status: Running and enabled
+
+3. STORAGE-SERVER (13.49.18.107 | 172.31.20.229)
+   - AWS CLI v2 (latest version)
+   - Python 3 with pip
+   - curl and unzip utilities
+   - Status: Installed and verified
+
+Installation Method:
+- WEB-SERVER: apt install nginx
+- DB-SERVER: apt install mysql-server
+- STORAGE-SERVER: AWS CLI v2 from official installer + python3-pip
+
+More Details:
+DB-SERVER-D7078E-Lab3
+Instance ID             i-081af8cc4ec64625e
+Public IPv4 address     13.53.126.50
+Private IPv4 addresses  172.31.25.135
+
+On your DB-SERVER (16.171.112.166), run these commands instead:
+sudo apt update
+sudo apt install -y mysql-server
+sudo systemctl start mysql
+sudo systemctl enable mysql
+
+WEB-SERVER-D7078E-Lab3
+Instance ID             i-09b2da9995b961dc9
+Public IPv4 address     16.171.112.166
+Private IPv4 addresses  172.31.30.14
+
+On your WEB-SERVER (16.171.112.166), run these commands instead:
+sudo apt update
+sudo apt install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+STORAGE-SERVER-D7078E-Lab3
+Instance ID             i-0f8da4bee4b8ff2ba
+Public IPv4 address     13.49.18.107
+Private IPv4 addresses  172.31.20.229
+
+On your STORAGE-SERVER (13.49.18.107), run these commands instead:
+sudo apt update
+sudo apt install -y python3 python3-pip curl unzip
+# Install AWS CLI v2 (latest version)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -rf aws awscliv2.zip
+   
+# Verify installation
+aws --version
+
+
+Status: COMPLETED ✓
+
+Next Task: Task 3 - Create 3 Security Groups with proper access control rules
