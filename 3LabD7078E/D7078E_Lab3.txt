@@ -1,0 +1,203 @@
+D7078E Lab 3: Multi-Tier Isolation
+Submission: Deadline is December 10, 2025
+Welcome to the second lab of the D7078E: Cloud Security course. In this lab, we
+will use 3 AWS VMs/EC2 Instances for hosting different services. Through
+security firewalls we need to put constraints and then test the environment. Later
+we will use CloudWatch for monitoring and CloudTrail for logging suspicious
+attempts.
+Prerequisites:
+* Valid AWS Account with access to the AWS Management Console.
+* Access to your school email address (@stud.ltu.se).
+Important Note:
+Complete this lab with group collaborations and clearly mentioning each
+member’s contributions (More than one individual can work on similar tasks).
+Lab Objectives:
+a) Deploy three isolated EC2 instances with separate roles and functions.
+b) Set up a database server, web application server, and a storage instance
+using S3 + API Gateway.
+c) Configure strict, isolated security groups so none of the instances can reach
+each other directly.
+d) Enforce data access through secure channels:
+Web App → DB (ONLY via HTTPS API, not direct SG rules)
+App → S3 bucket (via API Gateway, not direct S3 endpoint)
+e) Create IAM roles and policies for least privilege access.
+f) Use CloudWatch for monitoring (CPU alarms, API metrics, etc.)
+g) Use CloudTrail to log suspicious attempts such as unauthorized role usage
+or SSH attempts.
+h) Perform troubleshooting and reflection.
+
+Lab Architecture:
+
+EC2 Instance          Role                              Security Group    Inbound Rules                    Notes
+-------------------  -----------------------------      ----------------  ------------------------------  --------------------
+EC2 Instance 1       Web Server (Nginx/LAMP)            SG-WEB            HTTPS Only                       Users access web app
+EC2 Instance 2       Database Server (MySQL/MariaDB)    SG-DB             SSH Only                         Only Admin can access
+EC2 Instance 3       Storage Gateway (S3 Bucket & API)  SG-STORAGE        No inbound except API calls      Web App queries S3
+
+
+Access Control Rules — “Who Can Access What”:
+The lab environment consists of three fully isolated EC2 instances, each with a
+distinct function:
+1. Instance #1 – Web Application Server (WEB-SERVER)
+2. Instance #2 – Database Server (DB-SERVER)
+3. Instance #3 – Storage/API Server (STORAGE-SERVER)
+Additionally:
+• S3 bucket (for storage tasks)
+• API Gateway (to expose controlled access to the S3 bucket)
+• Security Groups (network-layer access control)
+• IAM Roles & Policies (identity-layer access control)
+
+Traffic Rules:
+Resource                Who Can Access It?                     Through What?                                  Notes
+----------------------- -------------------------------------- ---------------------------------------------- -----------------------------------------------
+Web App (HTTPS)         Only external clients (browser/cURL)   Port 443 inbound on SG-WEB                    Other EC2 instances are NOT allowed
+Database (MySQL)        Only administrator's laptop            SSH (port 22) to DB instance                  No EC2-to-EC2 database connections allowed
+S3 Bucket               Only STORAGE server (instance #3)      IAM Role permissions OR API Gateway           Web server cannot directly access S3
+API Gateway Endpoint    Only Web Server (instance #1)          HTTPS API call                                SG/STORAGE does NOT allow access from DB or others
+EC2 → EC2 traffic       None allowed                           Blocked by SG rules                           The three instances must remain isolated
+SSH                     Only Admin → DB Server                 Admin PC → DB-SERVER port 22                  No other connections allowed
+CloudWatch              System and student monitoring          IAM (implicit)                                Students may view but not modify others' alarms
+CloudTrail              Logs all API calls                     IAM (read permissions only)                   Students may query their own activity logs
+
+
+🧱 NETWORK RULES (Security Group Requirements)
+
+1. SG-WEB (Security Group for Web Application Server)
+Allowed:
+HTTPS (443) from anywhere (0.0.0.0/0) — for external access to the web app
+Optional: SSH from admin IP only
+Denied:
+❌ No traffic from DB Server
+❌ No traffic from Storage Server
+❌ No MySQL (3306) inbound
+❌ No EC2-to-EC2 traffic allowed at all
+❌ No outbound access to DB server
+
+2. SG-DB (Security Group for Database Server)
+Allowed:
+SSH (22) only from administrator's IP
+Example: 203.0.113.55/32
+Denied:
+❌ No inbound from Web Server
+❌ No inbound from Storage Server
+❌ No public HTTP/HTTPS
+❌ No traffic from any EC2 instance
+❌ MySQL must NOT be exposed publicly
+❌ Web App cannot directly talk to the DB
+
+3. SG-STORAGE (Security Group for Storage/API Server)
+Allowed:
+No external inbound ports except those the student explicitly configures
+API Gateway access happens outside the EC2 → it does NOT use SG-
+STORAGE
+Instance access to S3 is via IAM roles, not via Security Group connectivity
+Denied:
+❌ No inbound from DB
+❌ No inbound from Web Server
+❌ No inter-instance traffic
+Disallowed Data Flow
+NONE of the EC2 instances can talk directly to each other.
+❌ Web Server → DB Server (No TCP allowed)
+❌ Web Server → Storage Server
+❌ DB Server → Web Server
+❌ DB Server → Storage Server
+❌ Storage Server → Web Server
+❌ Storage Server → DB Server
+
+Task 1: Create 3 EC2 Instances
+Instance Roles:
+
+1. EC2 #1 → Web Server
+2. EC2 #2 → Database Server
+3. EC2 #3 → Storage/API Gateway
+
+Task 2: Install Required Software
+1. On Instance 1: Web server (Lamp/Nginx)
+2. On instance 2: Database server (MySQL/MariaDB)
+3. On Instance 3: Storage/API Gateway (Install AWS CLI and Basic Tools
+like python 3)
+
+Task 3: Create 3 Security Groups
+1. SG-WEB (Only HTTPS allowed), No access from SG-DB or SG-
+STORAGE.
+2. SG-DB (Only SSH from Admin IP)
+3. SG-STORAGE (No Inbound Allowed except internal API Testing)
+
+Task 4: Create S3 Bucket & Upload Files
+
+Task 5: Create IAM Role for Storage Server (EC2 #3)
+
+Task 6: Create API Gateway to Access S3 Files
+The Storage Server will call API Gateway → API Gateway fetches objects from S3.
+1. Create REST API
+2. Define a GET method → Integrate with S3
+3. Deploy it
+4. Store the invoke URL
+5. Use Storage Instance to call API:
+curl https://<API-ID>.execute-api.<REGION>.amazonaws.com/prod/file.txt
+
+Task 7: Monitoring with Cloudwatch
+To monitor the EC2 instances using AWS CloudWatch and create an alert that
+notifies you when suspicious or abnormal system behavior occurs (CPU spikes).
+Students will also perform a load generation to intentionally trigger the alarm.
+a) Install the CloudWatch agent
+b) Create a CPU Utilization Alarm for the Web Server instance:
+c) Trigger when CPU Utilization > 70% for 2 consecutive periods (5 minutes each)..
+d) Generate a CPU spike
+e) Wait for the CloudWatch Alarm
+
+Task 8: CloudTrail for Suspicious Attempts
+To enable AWS CloudTrail and analyze logs for suspicious or unauthorized
+operations. Students will intentionally perform actions that generate warnings or
+errors in CloudTrail logs (failed API calls or denied IAM operations).
+
+a) Create a CloudTrail trail that stores logs in an S3 bucket
+b) Trigger suspicious or unauthorized activity such as:
+• Attempting to access an S3 bucket you do NOT have permissions for.
+• Attempting to stop/terminate an EC2 instance using an IAM user without
+that permission.
+• Attempting to modify IAM roles or policies without necessary
+permissions.
+c) Search CloudTrail logs for these events
+d) Identify:
+• Source IP
+• Identity used
+• Failed action
+• Time of attempt
+
+Reflection Questions
+1. Why is IAM required when the Storage Instance uses S3?
+2. Why must EC2 instances be isolated using security groups?
+3. What would be the risk if SG-WEB allowed port 3306 (MySQL)
+inbound?
+4. How does CloudTrail help detect attack attempts?
+5. Compare direct S3 access vs API Gateway-mediated access.
+6. What challenges did you face implementing instance isolation?
+7. What would change if we enabled VPC Endpoints for S3?
+Lab Report should contain following things:
+1. Security Group rule screenshots
+2. IAM policy files (json files)
+3. API Gateway invoke URL + output
+4. CloudWatch alarm screenshot
+5. CloudTrail suspicious event logs
+6. S3 bucket with uploaded files
+7. Testing screenshots:
+a. Web app page
+b. DB setup commands
+c. API Gateway → S3 response
+8. Written reflections
+Lab Report Submission
+The report should be written in the lab report format template file. This can be
+found here [2] (Do not edit this template file, make a copy in your own Overleaf
+account to edit!) using LaTeX in Overleaf. Download the PDF file after you finish
+writing and submit the PDF along with your zipped code files and short video to
+Canvas. You must document your code properly so its readable.
+I. Submit a lab report to the designated LAB 2 folder in Canvas.
+II. Submit as a zip file (report, codes).
+III. Follow the template instructions.
+IV. The report *must* be well-formatted and easy to read.
+V. Mention each group member’s contribution in a section.
+VI. Screenshots: Consider including screenshots for all steps to aid you in the
+grading.
+VII. Submit the code files as well.
+VIII. Make a short video to explain the lab and display the implemetations

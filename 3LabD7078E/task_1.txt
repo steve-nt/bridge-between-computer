@@ -1,0 +1,29 @@
+TASK 1: Create 3 EC2 Instances
+==============================
+
+Objective:
+Deploy three isolated EC2 instances with separate roles and functions.
+
+Instances Created:
+
+1. DB-SERVER-D7078E-Lab3
+   - Instance ID: i-081af8cc4ec64625e
+   - Public IPv4: 13.53.126.50
+   - Private IPv4: 172.31.25.135
+   - Role: Database Server (MySQL/MariaDB)
+
+2. WEB-SERVER-D7078E-Lab3
+   - Instance ID: i-09b2da9995b961dc9
+   - Public IPv4: 16.171.112.166
+   - Private IPv4: 172.31.30.14
+   - Role: Web Application Server (Nginx/LAMP)
+
+3. STORAGE-SERVER-D7078E-Lab3
+   - Instance ID: i-0f8da4bee4b8ff2ba
+   - Public IPv4: 13.49.18.107
+   - Private IPv4: 172.31.20.229
+   - Role: Storage/API Gateway Server
+
+Status: COMPLETED ✓
+
+Next Task: Task 2 - Install Required Software on each instance
