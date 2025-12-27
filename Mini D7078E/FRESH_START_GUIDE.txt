@@ -101,9 +101,15 @@ aws cloudwatch put-metric-alarm \
   --threshold 80 \
   --comparison-operator GreaterThanOrEqualToThreshold \
   --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
-  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:PUT-YOUR-SCALE-OUT-POLICY-ARN-HERE \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy \
   --region eu-north-1
 
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MIN 
+   I-PROJECT-GROUP35-ASG:policyName/scale-out-policy \
+       --region eu-north-1
+
+df92a041-8f71-4231-b76e-8e9eac0aeac2 
+   :autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy \
 IMPORTANT: Replace "ACCOUNT-ID" with your 12-digit account ID
 IMPORTANT: Replace "PUT-YOUR-SCALE-OUT-POLICY-ARN-HERE" with the ARN from Step 1
 
