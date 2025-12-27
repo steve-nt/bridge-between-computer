@@ -1,0 +1,197 @@
+================================================================================
+SIMPLIFIED APPROACH: CREATE SCALING POLICIES & ALARMS
+================================================================================
+
+STATUS: ✅ IN PROGRESS - USING AWS CLI
+DATE: 2025-12-27 17:49:38 UTC
+Account ID: 793891462342
+Region: eu-north-1
+
+IMPORTANT: We will use AWS CLI instead of the Console.
+AWS CLI is simpler and clearer - just copy and paste commands.
+
+================================================================================
+OPTION 1: SIMPLE APPROACH - USE AWS CLI (RECOMMENDED)
+================================================================================
+
+This approach:
+✓ Avoids confusing web forms
+✓ Everything is in simple commands
+✓ Faster and more reliable
+
+Requirements:
+- AWS CLI installed on your computer
+- Or use CloudShell (browser-based AWS CLI in AWS Console)
+
+Let's use this approach!
+
+================================================================================
+FIRST: GET YOUR INFORMATION
+================================================================================
+
+You need these values (from your setup):
+
+ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+Region: eu-north-1
+Account ID: (You can find this in AWS Console top-right)
+
+How to find Account ID:
+1. Go to AWS Console (any page)
+2. Look at top-right corner
+3. Click on your account name
+4. Account ID shows as a 12-digit number
+5. Copy it down: 793891462342
+================================================================================
+STEP 1: CREATE SCALE-OUT POLICY ✅ COMPLETED
+================================================================================
+
+Command executed:
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-out-policy \
+  --policy-type StepScaling \
+  --adjustment-type ChangeInCapacity \
+  --step-adjustments MetricIntervalLowerBound=0,ScalingAdjustment=1 \
+  --region eu-north-1
+
+Result: ✅ SUCCESS
+
+Scale-Out Policy ARN: 
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy
+
+This policy: Adds +1 instance when triggered by alarm
+
+================================================================================
+STEP 2: CREATE SCALE-IN POLICY (Just copy and paste this command)
+================================================================================
+
+Run this command:
+
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-in-policy \
+  --policy-type StepScaling \
+  --adjustment-type ChangeInCapacity \
+  --step-adjustments MetricIntervalUpperBound=0,ScalingAdjustment=-1 \
+  --region eu-north-1
+
+This creates: A policy that removes -1 instance
+
+Expected output: Another PolicyARN (copy this down)
+
+Save this: Scale-In Policy ARN: {
+    "PolicyARN": "arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy",
+    "Alarms": []
+}
+
+================================================================================
+STEP 3: CREATE CLOUDWATCH ALARM FOR SCALE-OUT (CPU >= 80%)
+================================================================================
+
+Run this command (replace POLICY-ARN-HERE with the output from Step 1):
+
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-high-alarm-80percent \
+  --alarm-description "Triggers scale-out when CPU >= 80%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 2 \
+  --threshold 80 \
+  --comparison-operator GreaterThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:PUT-YOUR-SCALE-OUT-POLICY-ARN-HERE \
+  --region eu-north-1
+
+IMPORTANT: Replace "ACCOUNT-ID" with your 12-digit account ID
+IMPORTANT: Replace "PUT-YOUR-SCALE-OUT-POLICY-ARN-HERE" with the ARN from Step 1
+
+What this does: Creates an alarm that watches CPU and triggers scale-out policy when CPU >= 80%
+
+================================================================================
+STEP 4: CREATE CLOUDWATCH ALARM FOR SCALE-IN (CPU <= 30%)
+================================================================================
+
+Run this command (replace POLICY-ARN-HERE with the output from Step 2):
+
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-low-alarm-30percent \
+  --alarm-description "Triggers scale-in when CPU <= 30%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 5 \
+  --threshold 30 \
+  --comparison-operator LessThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:ACCOUNT-ID:scalingPolicy:PUT-YOUR-SCALE-IN-POLICY-ARN-HERE \
+  --region eu-north-1
+
+IMPORTANT: Replace "ACCOUNT-ID" with your 12-digit account ID
+IMPORTANT: Replace "PUT-YOUR-SCALE-IN-POLICY-ARN-HERE" with the ARN from Step 2
+
+What this does: Creates an alarm that watches CPU and triggers scale-in policy when CPU <= 30%
+
+================================================================================
+STEP 5: VERIFY EVERYTHING WAS CREATED
+================================================================================
+
+Run these commands to verify:
+
+--- Verify policies exist ---
+aws autoscaling describe-scaling-policies \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --region eu-north-1
+
+Expected output: You should see 2 policies listed:
+- scale-out-policy
+- scale-in-policy
+
+--- Verify alarms exist ---
+aws cloudwatch describe-alarms \
+  --alarm-names cpu-high-alarm-80percent cpu-low-alarm-30percent \
+  --region eu-north-1
+
+Expected output: You should see 2 alarms listed:
+- cpu-high-alarm-80percent
+- cpu-low-alarm-30percent
+
+If you see both, SUCCESS! ✅
+
+================================================================================
+WHAT HAPPENS NEXT
+================================================================================
+
+Once created:
+1. When CPU >= 80% for 2 minutes → cpu-high-alarm-80percent triggers
+2. This triggers scale-out-policy → adds +1 instance
+3. When CPU <= 30% for 5 minutes → cpu-low-alarm-30percent triggers
+4. This triggers scale-in-policy → removes -1 instance
+
+Your ASG will automatically scale from 1 → 2 → 3 instances as needed!
+
+================================================================================
+IF YOU PREFER THE WEB CONSOLE INSTEAD
+================================================================================
+
+If you don't want to use CLI, I can guide you through the console step-by-step,
+but it will be slower and more confusing with all the dropdown menus.
+
+CLI is recommended because:
+✓ Faster
+✓ No confusing forms
+✓ All settings in one place
+✓ Easy to verify
+
+================================================================================
+WHICH APPROACH DO YOU PREFER?
+================================================================================
+
+Option A: CLI (simpler, faster) ← RECOMMENDED
+Option B: Web Console (more visual, but confusing forms)
+
+Let me know which you prefer and we'll proceed!
+
+================================================================================

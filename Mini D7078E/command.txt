@@ -1,0 +1,63 @@
+================================================================================
+CLOUDWATCH ALARM COMMAND - SCALE-OUT (CPU >= 80%)
+================================================================================
+
+COPY AND PASTE THIS ENTIRE COMMAND (all lines together):
+
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-high-alarm-80percent \
+  --alarm-description "Triggers scale-out when CPU >= 80%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 2 \
+  --threshold 80 \
+  --comparison-operator GreaterThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy \
+  --region eu-north-1
+
+================================================================================
+CLOUDWATCH ALARM COMMAND - SCALE-IN (CPU <= 30%)
+================================================================================
+
+First, you need to create the scale-in-policy. Run this first:
+
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-in-policy \
+  --policy-type StepScaling \
+  --adjustment-type ChangeInCapacity \
+  --step-adjustments MetricIntervalUpperBound=0,ScalingAdjustment=-1 \
+  --region eu-north-1
+
+This will return a PolicyARN for scale-in-policy. Save it.
+
+Then run this command (AFTER you get the scale-in-policy ARN):
+
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-low-alarm-30percent \
+  --alarm-description "Triggers scale-in when CPU <= 30%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 5 \
+  --threshold 30 \
+  --comparison-operator LessThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions [REPLACE-WITH-SCALE-IN-POLICY-ARN] \
+  --region eu-north-1
+
+================================================================================
+EXECUTION ORDER
+================================================================================
+
+1. Run the scale-out alarm command above
+2. Run the scale-in policy command above  
+3. Get the PolicyARN from scale-in policy output
+4. Replace [REPLACE-WITH-SCALE-IN-POLICY-ARN] with the actual ARN
+5. Run the scale-in alarm command
+
+================================================================================

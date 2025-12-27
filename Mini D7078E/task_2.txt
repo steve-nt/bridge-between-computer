@@ -1,0 +1,314 @@
+================================================================================
+TASK 2: CREATE ALB + TARGET GROUP + ASG + LAUNCH TEMPLATE
+================================================================================
+
+OBJECTIVE:
+Create an Application Load Balancer with a Target Group, an Auto Scaling Group,
+and a Launch Template to distribute traffic across multiple instances.
+
+REGION: eu-north-1
+VPC: Default VPC
+AMI ID: ami-01bb672d521e213d4 (from Task 1)
+
+================================================================================
+STEP 1: CREATE LAUNCH TEMPLATE
+================================================================================
+
+A Launch Template specifies how to launch new instances in the ASG.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Launch Templates > Create launch template
+2. Launch template name: "D7078E-MINI-PROJECT-GROUP35-WEBSRV-APP-TEMPLATE"
+3. Template description: "Template for web app instances with D7078E web app"
+4. AMI: ami-01bb672d521e213d4 (your web app AMI from Task 1)
+5. Instance type: t2.micro
+6. Key pair: Select your key pair (for debugging if needed)
+7. Security group: Create new "web-app-asg-sg"
+   - Allow SSH (port 22) from your IP (for debugging)
+   - Allow HTTP (port 80) from 0.0.0.0/0 (for ALB traffic)
+   - Allow HTTPS (port 443) from 0.0.0.0/0 (if needed)
+   - Allow traffic from ALB security group (will configure this after ALB creation)
+8. Advanced details (Optional):
+   - IAM instance profile: (leave default or create one with CloudWatch permissions)
+9. Click Create launch template
+
+Note down:
+- Launch Template ID:   lt-069828023507f20f6
+- Launch Template Name: D7078E-MINI-PROJECT-GROUP35-WEBSRV-APP-TEMPLATE
+
+Alternative using AWS CLI:
+aws ec2 create-launch-template \
+  --launch-template-name "web-app-template" \
+  --version-description "Web app for D7078E lab" \
+  --launch-template-data '{
+    "ImageId": "ami-01bb672d521e213d4",
+    "InstanceType": "t2.micro",
+    "KeyName": "your-key-pair-name",
+    "SecurityGroupIds": ["sg-xxxxx"]
+  }' \
+  --region eu-north-1
+
+================================================================================
+STEP 2: CREATE TARGET GROUP
+================================================================================
+
+A Target Group specifies where the ALB sends traffic and health check settings.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Target Groups > Create target group
+2. Name: "web-app-tg"
+3. Protocol: HTTP
+4. Port: 80
+5. VPC: default
+6. Health check settings:
+   - Protocol: HTTP
+   - Path: /
+   - Port: 80
+   - Matcher: 200 (HTTP status codes)
+   - Interval: 30 seconds (default)
+   - Timeout: 5 seconds (default)
+   - Healthy threshold: 2 consecutive checks
+   - Unhealthy threshold: 3 consecutive checks
+7. Do NOT register targets yet (ASG will do this automatically)
+8. Click Create target group
+
+Note down:
+- Target Group ARN: arn:aws:elasticloadbalancing:eu-north-1:793891462342:targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+- Target Group Name: D7078E-MINI-PROJECT-GROUP35-TG
+
+
+Alternative using AWS CLI:
+aws elbv2 create-target-group \
+  --name D7078E-MINI-PROJECT-GROUP35-TG
+ \
+  --protocol HTTP \
+  --port 80 \
+  --vpc-id vpc-xxxxx \
+  --health-check-protocol HTTP \
+  --health-check-path / \
+  --health-check-interval-seconds 30 \
+  --health-check-timeout-seconds 5 \
+  --healthy-threshold-count 2 \
+  --unhealthy-threshold-count 3 \
+  --matcher HttpCode=200 \
+  --region eu-north-1
+
+
+================================================================================
+STEP 3: CREATE APPLICATION LOAD BALANCER (ALB)
+================================================================================
+
+An ALB distributes incoming traffic across multiple targets.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Load Balancers > Create load balancer
+2. Choose Application Load Balancer (ALB)
+3. Name: "web-app-alb"
+4. Scheme: Internet-facing
+5. IP address type: IPv4
+6. Network mapping:
+   - VPC: default
+   - Availability Zones: Select at least 2 zones in eu-north-1
+     * eu-north-1a
+     * eu-north-1b (or eu-north-1c)
+7. Security groups: Create new "alb-sg"
+   - Allow HTTP (port 80) from 0.0.0.0/0
+   - Allow HTTPS (port 443) from 0.0.0.0/0
+8. Listeners and routing:
+   - Listener 1: HTTP (port 80)
+   - We'll configure the target group in the next step
+9. Review and click Create load balancer
+
+Wait for ALB to reach "Active" state.
+
+Note down:
+
+- ALB Name:       D7078E-MINI-PROJECT-GROUP35-LB
+- ALB DNS Name:   D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+- ALB ARN:        arn:aws:elasticloadbalancing:eu-north-1:793891462342:loadbalancer/app/D7078E-MINI-PROJECT-GROUP35-LB/6cfd2486d594acf4
+
+Alternative using AWS CLI:
+aws elbv2 create-load-balancer \
+  --name web-app-alb \
+  --subnets subnet-xxxxx subnet-xxxxx \
+  --security-groups sg-xxxxx \
+  --scheme internet-facing \
+  --type application \
+  --ip-address-type ipv4 \
+  --region eu-north-1
+
+
+================================================================================
+STEP 4: ATTACH TARGET GROUP TO ALB LISTENER
+================================================================================
+
+Connect the ALB to the Target Group.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Load Balancers
+2. Click on "web-app-alb"
+3. Go to Listeners tab
+4. Click on the HTTP:80 listener
+5. Edit the listener:
+   - Default action: Forward to "web-app-tg"
+   - Click Save
+
+Alternative using AWS CLI:
+aws elbv2 modify-listener \
+  --listener-arn arn:aws:elasticloadbalancing:eu-north-1:xxxxx:listener/app/web-app-alb/xxxxx/xxxxx \
+  --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:eu-north-1:xxxxx:targetgroup/web-app-tg/xxxxx \
+  --region eu-north-1
+
+================================================================================
+STEP 5: CREATE AUTO SCALING GROUP (ASG)
+================================================================================
+
+The ASG automatically launches/terminates instances based on demand.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Auto Scaling Groups > Create Auto Scaling Group
+2. Auto Scaling group name: "web-app-asg"
+3. Launch template:
+   - Select "web-app-template" (created in Step 1)
+   - Version: Latest
+4. Network:
+   - VPC: default
+   - Subnets: Select at least 2 subnets in different AZs
+     * subnet-xxxxx (eu-north-1a)
+     * subnet-xxxxx (eu-north-1b)
+5. Load balancing:
+   - ✓ Attach to an existing load balancer target group
+   - Choose "web-app-tg" (created in Step 3)
+   - Health check type: ELB (Elastic Load Balancer)
+   - Health check grace period: 300 seconds
+6. Group size:
+   - Desired capacity: 1
+   - Minimum capacity: 1
+   - Maximum capacity: 3
+7. Scaling policies: (We'll add these in Task 3, so skip for now)
+8. Notifications: (Optional - skip for now)
+9. Tags: (Optional - add tags for identification)
+10. Review and click Create Auto Scaling Group
+
+Wait for the ASG to launch the initial instance.
+
+Note down:
+- ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+- ASG ARN: arn:aws:autoscaling:eu-north-1:793891462342:autoScalingGroup:1af62d4a-5738-46cf-bf3b-bd25253b53f2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG
+
+Alternative using AWS CLI:
+aws autoscaling create-auto-scaling-group \
+  --auto-scaling-group-name web-app-asg \
+  --launch-template LaunchTemplateName=web-app-template,Version='$Latest' \
+  --min-size 1 \
+  --desired-capacity 1 \
+  --max-size 3 \
+  --vpc-zone-identifier "subnet-xxxxx,subnet-xxxxx" \
+  --target-group-arns arn:aws:elasticloadbalancing:eu-north-1:xxxxx:targetgroup/web-app-tg/xxxxx \
+  --health-check-type ELB \
+  --health-check-grace-period 300 \
+  --region eu-north-1
+
+================================================================================
+STEP 6: VERIFY ASG AND TARGET GROUP
+================================================================================
+
+Check that instances are launching and registering with the target group.
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Auto Scaling Groups
+2. Click on D7078E-MINI-PROJECT-GROUP35-ASG
+3. Check:
+   - Instance management tab: Should show 1 instance in "Lifecycle: InService"
+   - Activity tab: Should show recent scaling activity
+
+4. Go to EC2 Dashboard > Target Groups
+5. Click on D7078E-MINI-PROJECT-GROUP35-TG
+6. Check:
+   - Targets tab: Should show 1 target registered
+   - Status should be "Healthy" after health check passes (30-60 seconds)
+
+Using AWS CLI:
+aws autoscaling describe-auto-scaling-groups \
+  --auto-scaling-group-names web-app-asg \
+  --region eu-north-1
+
+aws elbv2 describe-target-health \
+  --target-group-arn arn:aws:elasticloadbalancing:eu-north-1:xxxxx:targetgroup/web-app-tg/xxxxx \
+  --region eu-north-1
+
+================================================================================
+STEP 7: TEST ALB CONNECTIVITY
+================================================================================
+
+Verify that traffic flows through the ALB to your instance.
+
+From your local machine:
+1. Get the ALB DNS name (noted earlier)
+2. Test the endpoints:
+
+curl http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+curl http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/metrics
+curl http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/burn
+
+All should return 200 OK and the same responses as direct instance access.
+
+Example:
+curl http://web-app-alb-123456789.eu-north-1.elb.amazonaws.com/
+
+================================================================================
+STEP 8: CONFIGURE IAM ROLE FOR INSTANCES (OPTIONAL BUT RECOMMENDED) NOT IMPLEMENTED
+================================================================================
+
+Allows instances to access AWS services (CloudWatch, SSM, etc.).
+
+Using AWS Console:
+1. Go to IAM Dashboard > Roles > Create role
+2. Trusted entity type: AWS service
+3. Service: EC2
+4. Permissions policies:
+   - Add "CloudWatchAgentServerPolicy"
+   - Add "AmazonSSMManagedInstanceCore" (for SSM access)
+5. Role name: "ec2-web-app-role"
+6. Create role
+
+Then:
+1. Go to EC2 Dashboard > Instances
+2. Select any instance in the ASG
+3. Instance State > Security > Modify IAM instance profile
+4. Attach the "ec2-web-app-role" to the instance
+
+OR: Update the Launch Template to use this IAM role before launching new instances.
+
+================================================================================
+DELIVERABLES FOR TASK 2:
+================================================================================
+
+□ Screenshot: Launch Template created
+□ Screenshot: ALB in "Active" state
+□ Screenshot: Target Group with 1 healthy target
+□ Screenshot: ASG with 1 instance in "InService"
+□ Screenshot: curl output from ALB endpoint
+□ Document: ALB DNS name
+□ Document: Target Group ARN
+□ Document: ASG name
+
+ALB DNS NAME: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+TARGET GROUP ARN: arn:aws:elasticloadbalancing:eu-north-1:793891462342:targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+ASG NAME: D7078E-MINI-PROJECT-GROUP35-ASG
+================================================================================
+TASK 2 SUMMARY
+================================================================================
+
+✓ Launch Template configured to use your web app AMI
+✓ Application Load Balancer created and active
+✓ Target Group configured with health checks
+✓ Auto Scaling Group created with min=1, desired=1, max=3
+✓ First instance automatically launched and registered as healthy
+✓ Traffic flows through ALB to the instance
+
+Ready for Task 3: Configure CloudWatch alarms and scaling policies
+
+================================================================================
+NEXT TASK: Task 3 - Configure CloudWatch Alarms & Scaling Policies
+================================================================================

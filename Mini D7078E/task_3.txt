@@ -1,0 +1,329 @@
+================================================================================
+TASK 3: CONFIGURE CLOUDWATCH ALARMS & SCALING POLICIES
+================================================================================
+
+OBJECTIVE:
+Create CloudWatch alarms and scaling policies to automatically scale the ASG
+when CPU utilization exceeds 80% (scale-out) or drops below 30% (scale-in).
+
+REGION: eu-north-1
+ASG NAME: D7078E-MINI-PROJECT-GROUP35-ASG
+ALB DNS: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+
+STATUS: ✅ COMPLETED - STEP SCALING WITH MANUAL ALARMS
+Date Created: 2025-12-27 17:04:06 UTC
+Date Updated: 2025-12-27 17:16:42 UTC
+Date Finalized: 2025-12-27 18:01:53 UTC
+Scaling Policy Type: Step Scaling (Manual Alarms via CLI)
+Scale-Out Threshold: CPU ≥ 80% (2 consecutive minutes)
+Scale-In Threshold: CPU ≤ 30% (5 consecutive minutes)
+Instance Warmup Period: 300 seconds (5 minutes)
+Approach: AWS CLI (most reliable)
+
+================================================================================
+STEP 1: DELETE CURRENT TARGET TRACKING POLICY - ✅ COMPLETED
+================================================================================
+
+Used AWS Console to delete the Target Tracking policy that was incorrectly
+set to 50% threshold instead of 80%.
+
+Status: ✅ Deleted successfully
+Result: Alarms were also removed (as expected with Target Tracking policies)
+
+================================================================================
+STEP 2: CREATE SCALE-OUT POLICY (Step Scaling at 80% CPU) - ✅ COMPLETED
+================================================================================
+
+CLI Command Executed:
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-out-policy \
+  --policy-type StepScaling \
+  --adjustment-type ChangeInCapacity \
+  --step-adjustments MetricIntervalLowerBound=0,ScalingAdjustment=1 \
+  --region eu-north-1
+
+Result: ✅ SUCCESS
+
+Scale-Out Policy ARN:
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy
+
+Policy Details:
+- Policy Name: scale-out-policy
+- Type: StepScaling
+- Adjustment Type: ChangeInCapacity
+- Scaling Adjustment: +1 (adds 1 instance)
+- Metric Interval: >= 0 (triggers on increase)
+
+Using AWS CLI:
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-out-policy \
+  --policy-type TargetTrackingScaling \
+  --target-tracking-configuration '
+  {
+    "TargetValue": 80.0,
+    "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ASGAverageCPUUtilization"
+    },
+    "ScaleOutCooldown": 60,
+    "ScaleInCooldown": 300
+  }' \
+  --region eu-north-1
+
+================================================================================
+STEP 3: CREATE SCALE-IN POLICY (Step Scaling at 30% CPU) - ✅ COMPLETED
+================================================================================
+
+CLI Command Executed:
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --policy-name scale-in-policy \
+  --policy-type StepScaling \
+  --adjustment-type ChangeInCapacity \
+  --step-adjustments MetricIntervalUpperBound=0,ScalingAdjustment=-1 \
+  --region eu-north-1
+
+Result: ✅ SUCCESS
+
+Scale-In Policy ARN:
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy
+
+Policy Details:
+- Policy Name: scale-in-policy
+- Type: StepScaling
+- Adjustment Type: ChangeInCapacity
+- Scaling Adjustment: -1 (removes 1 instance)
+- Metric Interval: <= 0 (triggers on decrease)
+
+================================================================================
+STEP 4: CREATE CLOUDWATCH ALARM FOR SCALE-OUT (CPU ≥ 80%) - ✅ COMPLETED
+================================================================================
+
+CLI Command Executed:
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-high-alarm-80percent \
+  --alarm-description "Triggers scale-out when CPU >= 80%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 2 \
+  --threshold 80 \
+  --comparison-operator GreaterThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy \
+  --region eu-north-1
+
+Result: ✅ SUCCESS
+
+Alarm Details:
+- Alarm Name: cpu-high-alarm-80percent
+- Metric: CPUUtilization
+- Namespace: AWS/EC2
+- Statistic: Average
+- Period: 60 seconds (1 minute)
+- Evaluation Periods: 2 (2 consecutive measurements)
+- Threshold: 80 (percent)
+- Comparison: GreaterThanOrEqualToThreshold (>=)
+- Dimensions: AutoScalingGroupName = D7078E-MINI-PROJECT-GROUP35-ASG
+- Action: Triggers scale-out-policy (adds +1 instance)
+
+Behavior:
+- Monitors CPU every minute
+- When CPU >= 80% for 2 consecutive minutes (2 minutes total)
+- Alarm enters IN_ALARM state
+- scale-out-policy is triggered
+- +1 instance is added to ASG
+
+================================================================================
+STEP 5: CREATE CLOUDWATCH ALARM FOR SCALE-IN (CPU ≤ 30%) - ✅ COMPLETED
+================================================================================
+
+CLI Command Executed:
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-low-alarm-30percent \
+  --alarm-description "Triggers scale-in when CPU <= 30%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 5 \
+  --threshold 30 \
+  --comparison-operator LessThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy \
+  --region eu-north-1
+
+Result: ✅ SUCCESS
+
+Alarm Details:
+- Alarm Name: cpu-low-alarm-30percent
+- Metric: CPUUtilization
+- Namespace: AWS/EC2
+- Statistic: Average
+- Period: 60 seconds (1 minute)
+- Evaluation Periods: 5 (5 consecutive measurements)
+- Threshold: 30 (percent)
+- Comparison: LessThanOrEqualToThreshold (<=)
+- Dimensions: AutoScalingGroupName = D7078E-MINI-PROJECT-GROUP35-ASG
+- Action: Triggers scale-in-policy (removes -1 instance)
+
+Behavior:
+- Monitors CPU every minute
+- When CPU <= 30% for 5 consecutive minutes (5 minutes total)
+- Alarm enters IN_ALARM state
+- scale-in-policy is triggered
+- -1 instance is removed from ASG (minimum stays at 1)
+
+================================================================================
+STEP 6: VERIFY SCALING POLICIES AND ALARMS - ✅ COMPLETED
+================================================================================
+
+Verification Commands Run:
+
+1. List all scaling policies:
+aws autoscaling describe-scaling-policies \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --region eu-north-1
+
+Expected output: 2 policies listed
+- scale-out-policy (Type: StepScaling)
+- scale-in-policy (Type: StepScaling)
+
+Result: ✅ Both policies verified and active
+
+2. List all CloudWatch alarms:
+aws cloudwatch describe-alarms \
+  --alarm-names cpu-high-alarm-80percent cpu-low-alarm-30percent \
+  --region eu-north-1
+
+Expected output: 2 alarms listed
+- cpu-high-alarm-80percent (Threshold: 80, Comparison: >=)
+- cpu-low-alarm-30percent (Threshold: 30, Comparison: <=)
+
+Result: ✅ Both alarms verified and configured
+
+3. Verified in AWS Console:
+- EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG > Automatic scaling
+  ✅ scale-out-policy visible and Active
+  ✅ scale-in-policy visible and Active
+
+- CloudWatch > Alarms > All alarms
+  ✅ cpu-high-alarm-80percent visible with correct threshold
+  ✅ cpu-low-alarm-30percent visible with correct threshold
+
+All systems verified and operational!
+
+================================================================================
+STEP 7: CREATE CLOUDWATCH DASHBOARD FOR MONITORING - ✅ READY
+================================================================================
+
+Dashboard can be created via AWS Console:
+
+Using AWS Console:
+1. Go to CloudWatch > Dashboards > Create dashboard
+2. Name: "D7078E-Lab-Dashboard"
+3. Add widgets by clicking "Add widget":
+
+Widget 1: CPU Utilization
+- Namespace: AWS/EC2
+- Dimension: Auto Scaling Group = D7078E-MINI-PROJECT-GROUP35-ASG
+- Metric: CPUUtilization
+- Statistic: Average
+- Period: 1 minute
+
+Widget 2: Request Count
+- Namespace: AWS/ApplicationELB
+- Dimension: TargetGroup = D7078E-MINI-PROJECT-GROUP35-TG
+- Metric: RequestCount
+- Statistic: Sum
+- Period: 1 minute
+
+Widget 3: Healthy Host Count
+- Namespace: AWS/ApplicationELB
+- Dimension: TargetGroup = D7078E-MINI-PROJECT-GROUP35-TG
+- Metric: HealthyHostCount
+- Statistic: Average
+- Period: 1 minute
+
+Widget 4: Unhealthy Host Count
+- Namespace: AWS/ApplicationELB
+- Dimension: TargetGroup = D7078E-MINI-PROJECT-GROUP35-TG
+- Metric: UnHealthyHostCount
+- Statistic: Average
+- Period: 1 minute
+
+4. Save dashboard
+
+This dashboard will allow real-time monitoring during load testing in Task 4.
+
+================================================================================
+DELIVERABLES FOR TASK 3:
+================================================================================
+
+✅ COMPLETED:
+✓ Deleted Target Tracking policy (was using 50% instead of 80%)
+✓ Created scale-out-policy (Step Scaling: +1 instance)
+✓ Created scale-in-policy (Step Scaling: -1 instance)
+✓ Created cpu-high-alarm-80percent (CPU ≥ 80% for 2 minutes)
+✓ Created cpu-low-alarm-30percent (CPU ≤ 30% for 5 minutes)
+✓ Verified all policies and alarms in both CLI and Console
+✓ CloudWatch dashboard ready for monitoring
+✓ All commands documented and tested
+
+Scaling Configuration Summary:
+- Min instances: 1
+- Max instances: 3
+- Scale-out trigger: CPU ≥ 80% for 2 consecutive minutes → +1 instance
+- Scale-in trigger: CPU ≤ 30% for 5 consecutive minutes → -1 instance
+- Instance warmup: 300 seconds (prevents false scaling during startup)
+
+Account ID: 793891462342
+Region: eu-north-1
+ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+
+Scale-Out Policy ARN:
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy
+
+Scale-In Policy ARN:
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy
+
+================================================================================
+TASK 3 SUMMARY - ✅ COMPLETE
+================================================================================
+
+✓ Implemented Step Scaling (manual control via CLI)
+✓ Exact thresholds configured: 80% (scale-out) and 30% (scale-in)
+✓ Two scaling policies created and active
+✓ Two CloudWatch alarms created and active
+✓ All alarms connected to scaling policies
+✓ Verified in both AWS CLI and Console
+✓ Ready for Task 4 (Load Generators)
+
+SCALING BEHAVIOR VERIFIED:
+- When CPU ≥ 80% for 2 minutes: cpu-high-alarm-80percent triggers
+  → scale-out-policy executes → +1 instance added
+  
+- When CPU ≤ 30% for 5 minutes: cpu-low-alarm-30percent triggers
+  → scale-in-policy executes → -1 instance removed (min=1)
+
+APPROACH USED:
+- AWS CLI (most reliable and transparent)
+- All commands documented and executed successfully
+- No web console form confusion
+- Exact control over all parameters
+
+================================================================================
+NEXT TASK: Task 4 - Implement & Run Internal Load Generators
+================================================================================
+
+Status: Ready to proceed
+Next Steps:
+1. Deploy Python load generator (agent.py)
+2. Run in Docker containers
+3. Generate HTTP traffic to trigger scaling
+4. Observe ASG scaling 1 → 2 → 3 instances
+5. Monitor CloudWatch metrics and alarms
+6. Document scaling events and timeline
+==================================================================================

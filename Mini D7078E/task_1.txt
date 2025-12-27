@@ -1,0 +1,268 @@
+================================================================================
+TASK 1: PREPARE A WEB APP AMI
+================================================================================
+
+OBJECTIVE:
+Launch an EC2 instance, install a lightweight web app with two endpoints
+(normal and CPU-intensive), and create an AMI for the Auto Scaling Group.
+
+REGION: eu-north-1
+VPC: Default VPC
+INSTANCE TYPE: t2.micro
+AMI BASE: Ubuntu 22.04 LTS (ami-0989fb2c34ce4b462 for eu-north-1)
+
+================================================================================
+STEP 1: LAUNCH EC2 INSTANCE
+================================================================================
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Instances > Launch Instances
+2. Name: "web-server-base"
+3. AMI: Ubuntu 22.04 LTS (search for "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04" in your region)
+4. Instance Type: t2.micro
+5. Key Pair: Select your new key pair
+6. Network Settings:
+   - VPC: default
+   - Auto-assign Public IP: Enable
+   - Security Group: Create new "web-server-sg"
+     * Allow SSH (port 22) from your IP
+     * Allow HTTP (port 80) from 0.0.0.0/0
+     * Allow HTTPS (port 443) from 0.0.0.0/0
+7. Storage: 8 GB (default)
+8. Click Launch
+
+Wait for instance to reach "Running" state and status checks to pass.
+
+Note down:
+- Instance ID: i-0e9a1ca191446016b
+- Public IP Address: 13.49.73.251
+- Private IP Address: 172.31.29.127
+
+================================================================================
+STEP 2: CONNECT TO INSTANCE VIA SSH
+================================================================================
+
+From your terminal (for Ubuntu):
+ssh -i your-key.pem ubuntu@<PUBLIC_IP_ADDRESS>
+
+(If using PowerShell on Windows, you may need to adjust permissions first:
+ icacls "C:\path\to\key.pem" /reset
+ icacls "C:\path\to\key.pem" /grant:r "%username%:F"
+ icacls "C:\path\to\key.pem" /inheritance:r
+)
+
+Once connected, you should see the Ubuntu prompt.
+
+================================================================================
+STEP 3: INSTALL WEB APP
+================================================================================
+
+Run these commands in order (copy and paste into SSH session):
+
+--- Update system ---
+sudo apt update && sudo apt upgrade -y
+
+--- Install Python and pip ---
+sudo apt install -y python3 python3-pip
+
+--- Create app directory ---
+mkdir -p ~/web-app
+cd ~/web-app
+
+--- Create the web app script (using cat with heredoc) ---
+cat > app.py << 'EOF'
+import http.server
+import socketserver
+import json
+import time
+import threading
+
+PORT = 80
+
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/':
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            
+            html = """
+            <html>
+            <head><title>Web Server Lab</title></head>
+            <body>
+                <h1>Welcome to D7078E Cloud Security Lab</h1>
+                <p>Web Server is running!</p>
+                <p>Instance: {}</p>
+                <p>Time: {}</p>
+                <hr>
+                <p><a href="/metrics">/metrics</a> - View server metrics</p>
+                <p><a href="/burn">/burn</a> - CPU-intensive endpoint (5s load)</p>
+            </body>
+            </html>
+            """.format(self.server.hostname, time.strftime("%Y-%m-%d %H:%M:%S"))
+            self.wfile.write(html.encode())
+            self.log_message("INFO", "Served index page")
+        
+        elif self.path == '/burn':
+            # CPU-intensive operation
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            
+            start = time.time()
+            # Compute-heavy loop (approx 5 seconds on t2.micro)
+            result = 0
+            for i in range(50000000):
+                result += i ** 2
+            elapsed = time.time() - start
+            
+            response = json.dumps({
+                "status": "burn_complete",
+                "cpu_time_seconds": round(elapsed, 2),
+                "iterations": 50000000
+            })
+            self.wfile.write(response.encode())
+            self.log_message("INFO", f"Burn completed in {elapsed:.2f}s")
+        
+        elif self.path == '/metrics':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            
+            response = json.dumps({
+                "status": "ok",
+                "uptime_seconds": time.time() - self.server.start_time,
+                "requests_served": self.server.request_count
+            })
+            self.wfile.write(response.encode())
+            self.log_message("INFO", "Served metrics")
+        
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b"404 Not Found")
+    
+    def log_message(self, format, *args):
+        print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {format % args}")
+
+if __name__ == '__main__':
+    handler = CustomHTTPRequestHandler
+    with socketserver.TCPServer(("", PORT), handler) as httpd:
+        httpd.hostname = "web-server-lab"
+        httpd.start_time = time.time()
+        httpd.request_count = 0
+        print(f"Server running on port {PORT}")
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            print("Server stopped")
+EOF
+
+--- Install required Python packages ---
+(No external packages needed for this basic version)
+
+--- Test the app locally ---
+sudo python3 app.py &
+
+--- Test endpoints (in another SSH session or after stopping the server) ---
+curl http://localhost/
+curl http://localhost/metrics
+curl http://localhost/burn
+
+Press Ctrl+C to stop the server once tested.
+
+================================================================================
+STEP 4: CREATE SYSTEMD SERVICE (Optional but Recommended)
+================================================================================
+
+This allows the app to auto-start on instance boot:
+
+sudo cat > /etc/systemd/system/web-app.service << 'EOF'
+[Unit]
+Description=D7078E Web App
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/ubuntu/web-app
+ExecStart=/usr/bin/python3 /home/ubuntu/web-app/app.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+Enable the service:
+sudo systemctl daemon-reload
+sudo systemctl enable web-app.service
+sudo systemctl start web-app.service
+
+Check status:
+sudo systemctl status web-app.service
+
+================================================================================
+STEP 5: VERIFY WEB APP IS RUNNING
+================================================================================
+
+From your local machine (not SSH session):
+curl http://<PUBLIC_IP>/
+curl http://<PUBLIC_IP>/metrics
+curl http://<PUBLIC_IP>/burn
+
+All should return 200 OK responses.
+
+================================================================================
+STEP 6: CREATE AMI FROM INSTANCE
+================================================================================
+
+Using AWS Console:
+1. Go to EC2 Dashboard > Instances
+2. Right-click the "web-server-base" instance
+3. Image and templates > Create image
+4. Image name: "web-app-ami-d7078e"
+5. Image description: "Web app with /burn endpoint for D7078E lab"
+6. Click Create image
+7. Wait for image to complete (status: Available)
+
+Note down:
+- AMI ID: ami-01bb672d521e213d4  web-app-ami-d7078e
+
+Using AWS CLI (alternative):
+aws ec2 create-image \
+  --instance-id <INSTANCE_ID> \
+  --name "web-app-ami-d7078e" \
+  --description "Web app with /burn endpoint for D7078E lab" \
+  --region eu-north-1
+
+Wait for the AMI to be in "Available" state before proceeding.
+
+Check AMI status:
+aws ec2 describe-images --image-ids <AMI_ID> --region eu-north-1
+
+================================================================================
+STEP 7: CLEANUP (Optional)
+================================================================================
+
+Once AMI is created and verified, you can:
+- Terminate the "web-server-base" instance (optional - keep it for reference)
+- OR keep it running for testing purposes
+
+================================================================================
+DELIVERABLES FOR TASK 1:
+================================================================================
+
+□ Screenshot: EC2 instance running state
+□ Screenshot: Web app responding to /
+□ Screenshot: Web app responding to /burn
+□ Screenshot: CloudWatch showing CPU spike during /burn
+□ Document: Instance ID and AMI ID
+□ Copy of: app.py script used
+
+AMI ID FOR NEXT TASK: ami-01bb672d521e213d4
+
+================================================================================
+NEXT TASK: Task 2 - Create ALB + Target Group + ASG + Launch Template
+================================================================================
