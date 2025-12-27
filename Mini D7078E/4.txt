@@ -1,0 +1,38 @@
+================================================================================
+CLOUDWATCH ALARM COMMAND - SCALE-IN (CPU <= 30%)
+================================================================================
+
+COPY AND PASTE THIS ENTIRE COMMAND (all lines together):
+
+aws cloudwatch put-metric-alarm \
+  --alarm-name cpu-low-alarm-30percent \
+  --alarm-description "Triggers scale-in when CPU <= 30%" \
+  --metric-name CPUUtilization \
+  --namespace AWS/EC2 \
+  --statistic Average \
+  --period 60 \
+  --evaluation-periods 5 \
+  --threshold 30 \
+  --comparison-operator LessThanOrEqualToThreshold \
+  --dimensions Name=AutoScalingGroupName,Value=D7078E-MINI-PROJECT-GROUP35-ASG \
+  --alarm-actions arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy \
+  --region eu-north-1
+
+================================================================================
+DETAILS
+================================================================================
+
+Account ID: 793891462342
+Region: eu-north-1
+
+Scale-In Policy ARN:
+arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy
+
+This alarm:
+- Monitors CPU utilization every 60 seconds
+- When CPU <= 30% for 5 consecutive minutes, triggers scale-in-policy
+- Removes -1 instance
+
+Expected result: Command completes with no error
+
+================================================================================

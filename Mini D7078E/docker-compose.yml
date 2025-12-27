@@ -1,0 +1,9 @@
+version: "3.8"
+services:
+  agent1:
+    build: .
+    command: ["--url", "http://<ALB_DNS_NAME>/", "--workers", "4", "--rps", "2", "--duration", "600"]
+  agent2:
+    build: .
+    command: ["--url", "http://<ALB_DNS_NAME>/burn", "--workers", "4", "--rps", "2", "--duration", "600"]
+  # add or duplicate agent services as lab approval allows
