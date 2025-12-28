@@ -310,5 +310,47 @@ TASK 2 SUMMARY
 Ready for Task 3: Configure CloudWatch alarms and scaling policies
 
 ================================================================================
+IMPORTANT NOTES & TIPS
+================================================================================
+
+TIPS FOR TASK 2:
+- Create Launch Template FIRST (before ALB and ASG)
+- Make sure to attach ALB to Target Group BEFORE creating ASG
+- ASG will automatically launch first instance - monitor this in Activity tab
+- Security groups: ALB needs to allow 80 from internet, instances need to allow 80 from ALB
+- Cross-AZ deployment: Select at least 2 different availability zones for high availability
+
+VERIFICATION AFTER COMPLETING TASK 2:
+- ALB should be in "Active" state (takes 1-2 minutes)
+- Target Group should have 1 healthy target (takes 30-60 seconds after instance boots)
+- First instance should be "InService" in ASG
+- curl to ALB DNS should return 200 OK on all endpoints
+
+TROUBLESHOOTING:
+- If target shows "unhealthy": Check security group allows traffic from ALB to instance on port 80
+- If instance doesn't launch: Check Launch Template has correct AMI ID from Task 1
+- If ALB doesn't become active: Check subnets are properly selected
+
+SUCCESS CRITERIA:
+✓ Launch Template created with correct AMI ID
+✓ ALB in Active state with correct DNS name
+✓ Target Group with 1 healthy target
+✓ ASG with 1 running instance
+✓ curl to ALB returns 200 on all endpoints
+✓ All IDs and ARNs documented
+
+RESOURCES CREATED:
+- 1 Launch Template
+- 1 Application Load Balancer
+- 1 Target Group
+- 1 Auto Scaling Group (starts with 1 instance, can scale to max 3)
+- 1 EC2 Instance (automatically launched by ASG)
+
+ESTIMATED COST:
+- ALB: ~$0.0225/hour
+- t2.micro instances: ~$0.01/hour each
+- Total for 1 instance + ALB: ~$0.0325/hour
+
+================================================================================
 NEXT TASK: Task 3 - Configure CloudWatch Alarms & Scaling Policies
 ================================================================================

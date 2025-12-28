@@ -1,0 +1,313 @@
+================================================================================
+HOW TO RUN THE POWERSHELL LOAD TEST SCRIPT
+================================================================================
+
+You now have two PowerShell scripts:
+1. run_load_test.ps1 - Main script with interactive menu
+2. start_load_test.ps1 - Quick launcher
+
+================================================================================
+STEP 1: PREPARE YOUR SYSTEM
+================================================================================
+
+1. Open Windows Terminal or PowerShell
+   - Right-click on Windows Terminal
+   - Select "Run as Administrator"
+
+2. Navigate to your project folder:
+   cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E
+
+3. Verify you're in the right directory:
+   ls agent.py
+   
+   Should output: agent.py
+
+4. Check PowerShell version (should be 5.0+):
+   $PSVersionTable.PSVersion
+
+================================================================================
+STEP 2: ENABLE SCRIPT EXECUTION (If needed)
+================================================================================
+
+PowerShell may block script execution. To allow it:
+
+Option A: For current session only (temporary)
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
+Option B: For current user (permanent)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+You'll be asked to confirm. Type: Y (yes)
+
+================================================================================
+STEP 3: RUN THE SCRIPT
+================================================================================
+
+METHOD 1: Quick Start (Recommended)
+.\start_load_test.ps1
+
+This will automatically run run_load_test.ps1 with all features.
+
+METHOD 2: Direct Run
+.\run_load_test.ps1
+
+Same as above, just more explicit.
+
+METHOD 3: Full Path (If above don't work)
+PowerShell -ExecutionPolicy Bypass -File "C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\run_load_test.ps1"
+
+================================================================================
+STEP 4: WHAT YOU'LL SEE
+================================================================================
+
+The script will:
+
+1. Check Prerequisites
+   ✓ Verify Python is installed
+   ✓ Verify aiohttp is installed
+   ✓ Verify agent.py exists
+
+2. Test ALB Connectivity
+   ✓ Send test request to your ALB
+   ✓ Confirm it's responding
+
+3. Check ASG Status
+   ✓ Get current instance count
+   ✓ Show ASG configuration
+
+4. Show Dashboard Instructions
+   ✓ Remind you to open CloudWatch Dashboard
+   ✓ Tell you what metrics to watch
+
+5. Interactive Menu
+   Choose what to run:
+   1. Quick Test (Phase 1+2, 15 min)
+   2. Full Test (Phase 1-3, 30 min)
+   3. Complete Test (Phase 1-4, 40 min)
+   4. Custom Configuration
+   5. Phase 1 only
+   6. Phase 2 only
+   7. Exit
+
+================================================================================
+STEP 5: SELECT WHICH TEST TO RUN
+================================================================================
+
+RECOMMENDED FOR FIRST TIME: Option 1 (Quick Test)
+- Takes 15 minutes total
+- Shows all scaling events
+- Good demonstration of the lab
+
+If you have time: Option 2 (Full Test)
+- Takes 30 minutes
+- Includes maximum stress test
+- Shows full capability
+
+For complete observation: Option 3 (Complete Test)
+- Takes 40 minutes
+- Includes scale-down (scale-in)
+- Shows entire scaling lifecycle
+
+For quick validation: Option 5 (Phase 1 only)
+- Takes 5 minutes
+- Just baseline load
+- Verify everything works
+
+================================================================================
+STEP 6: MONITOR DURING TEST
+================================================================================
+
+IMPORTANT: Open CloudWatch Dashboard BEFORE running the script!
+
+1. In a browser, go to:
+   AWS Console → CloudWatch → Dashboards → D7078E-Mini-Project-Dashboard
+
+2. Arrange windows:
+   - PowerShell script on left side
+   - CloudWatch Dashboard on right side
+   - Or use multiple monitors if available
+
+3. Watch these metrics in real-time:
+   ✓ CPU Utilization: Should spike during load
+   ✓ RequestCount: Should increase
+   ✓ HealthyHostCount: Should increase 1 → 2 → 3
+
+4. Also monitor:
+   ✓ CloudWatch Alarms: Watch cpu-high-alarm-80percent go to IN_ALARM
+   ✓ ASG Activity: Go to EC2 > Auto Scaling Groups > Activity tab
+   ✓ EC2 Instances: Watch instance count increase
+
+================================================================================
+STEP 7: TAKE SCREENSHOTS
+================================================================================
+
+During the load test, take screenshots at these points:
+
+☐ Start of Phase 1 (baseline)
+☐ End of Phase 1 (before Phase 2)
+☐ CPU reaching 50% (during Phase 2)
+☐ CPU reaching 80% (alarm trigger)
+☐ After first instance launches (HealthyHostCount = 2)
+☐ After second instance launches (HealthyHostCount = 3)
+☐ Peak metrics (all 3 instances running)
+☐ CloudWatch Alarms showing IN_ALARM
+☐ ASG Activity showing scaling events
+☐ EC2 Instances showing 3 running instances
+
+These screenshots are your proof that scaling worked!
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ERROR: "Scripts disabled on this system"
+SOLUTION: Run Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+Then run the script again.
+
+ERROR: "Python not found"
+SOLUTION: Install Python from python.org
+Make sure to check "Add Python to PATH" during installation
+
+ERROR: "aiohttp not found"
+SOLUTION: The script will try to install it automatically
+If it fails, run manually: pip install aiohttp
+
+ERROR: "Cannot reach ALB"
+SOLUTION: 
+- Verify ALB URL is correct
+- Check ALB is active in AWS Console
+- Check your internet connection
+- Check security group allows HTTP from your IP
+
+ERROR: "ASG not found"
+SOLUTION:
+- This is just a warning - the test can still run
+- Verify ASG exists in AWS Console: EC2 > Auto Scaling Groups
+
+NO SCALING HAPPENING:
+SOLUTION:
+- Check CloudWatch > Alarms > cpu-high-alarm-80percent exists
+- Check alarm threshold is 80
+- Wait 2 minutes (alarm needs 2 consecutive measurements)
+- Check EC2 instance specs (needs enough capacity for 80% CPU)
+
+================================================================================
+EXAMPLE OUTPUT
+================================================================================
+
+When you run the script, you'll see something like:
+
+================================================================================
+D7078E CLOUD SECURITY LAB - LOAD TEST AUTOMATION
+================================================================================
+
+ALB: http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+ASG: D7078E-MINI-PROJECT-GROUP35-ASG
+Region: eu-north-1
+
+================================================================================
+CHECKING PREREQUISITES
+================================================================================
+
+▶ Checking Python installation...
+✓ Python found: Python 3.11.0
+▶ Checking aiohttp installation...
+✓ aiohttp found: 3.9.0
+▶ Checking agent.py...
+✓ agent.py found
+✓ All prerequisites satisfied
+
+[More checks...]
+
+================================================================================
+D7078E LOAD TEST MENU
+================================================================================
+
+Select which phases to run:
+
+1. Quick Test (Phase 1 + 2 only, 15 min total)
+2. Full Test (Phases 1-3, 30 min total)
+3. Complete Test (Phases 1-4, 40 min total)
+4. Custom Configuration
+5. Run Phase 1 only (baseline)
+6. Run Phase 2 only (trigger scaling)
+7. Exit
+
+Enter your choice (1-7): 1
+
+[Script then runs Phase 1, then Phase 2...]
+
+================================================================================
+PHASE: PHASE 1: MODERATE LOAD
+================================================================================
+
+Baseline load test (100 RPS)
+
+Configuration:
+  - Workers: 20
+  - RPS per worker: 5
+  - Total RPS: 100
+  - Duration: 300 seconds (5 minutes)
+
+▶ Starting load generation at 12/27/2025 2:45:00 PM
+
+[agent.py runs for 5 minutes...]
+
+================================================================================
+LOAD TEST COMPLETE
+================================================================================
+
+Next steps:
+  1. Check CloudWatch Dashboard for metrics
+  2. Review ASG Activity for scaling events
+  3. Take final screenshots of results
+  4. Document observations in your lab report
+
+✓ Load test script completed!
+
+================================================================================
+
+================================================================================
+NEXT STEPS AFTER TEST COMPLETES
+================================================================================
+
+1. Document Results:
+   - Collect all screenshots
+   - Note down timestamps of scaling events
+   - Record peak CPU and RequestCount values
+
+2. Check Metrics:
+   - CloudWatch Dashboards
+   - CloudWatch Metrics
+   - ASG Activity log
+
+3. Analyze:
+   - How long did it take to scale from 1 → 2 → 3?
+   - What was peak CPU?
+   - What was peak RequestCount?
+   - Did any requests fail?
+   - How did CPU distribute across instances?
+
+4. Report:
+   - Include screenshots
+   - Include metrics
+   - Include timeline of events
+   - Include lessons learned
+
+================================================================================
+YOU'RE READY TO GO!
+================================================================================
+
+Just run:
+.\start_load_test.ps1
+
+Then sit back and watch your infrastructure scale automatically!
+
+Questions? Check the other documentation files:
+- CREATE_DASHBOARD.txt - Dashboard setup
+- HIGH_LOAD_GENERATOR.txt - Detailed load info
+- LOAD_COMMANDS.txt - Command reference
+
+Good luck with your D7078E lab!
+
+================================================================================

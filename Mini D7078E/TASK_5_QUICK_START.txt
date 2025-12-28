@@ -1,0 +1,139 @@
+================================================================================
+TASK 5 QUICK START - FAILURE SIMULATION
+================================================================================
+
+OBJECTIVE: Simulate failure on one instance and observe auto-recovery
+
+STATUS: Ready! (ASG almost at 3 instances)
+
+================================================================================
+WHAT TO DO NOW
+================================================================================
+
+1. WAIT for 3 instances
+   └─ Keep load scripts running
+   └─ Should reach 3 within 1-2 minutes
+   └─ Watch HealthyHostCount: 1 → 2 → 3
+
+2. ONCE at 3 instances, STOP load scripts
+   └─ Both PowerShell windows: Ctrl+C
+   └─ Load can continue or stop (your choice)
+
+3. PICK an instance to stress
+   └─ AWS Console > EC2 > Instances
+   └─ Find one instance from your ASG
+   └─ Copy its Instance ID (starts with i-)
+
+4. RUN stress command
+   └─ Open new PowerShell
+   └─ Paste command below (replace Instance ID)
+   └─ Press Enter
+
+5. WATCH dashboard
+   └─ Keep CloudWatch open
+   └─ Take screenshots during failure
+   └─ Observe recovery
+
+6. COLLECT evidence
+   └─ Screenshots
+   └─ Logs
+   └─ Timeline
+
+================================================================================
+THE COMMAND
+================================================================================
+
+Copy, replace <INSTANCE_ID>, and paste:
+
+aws ssm send-command \
+  --instance-ids i-0abc1234def567890 \
+  --document-name "AWS-RunShellScript" \
+  --parameters "commands=['sudo apt-get update -y','sudo apt-get install -y stress-ng','stress-ng -c 0 -l 90 -t 120s']" \
+  --region eu-north-1
+
+Example with real ID:
+aws ssm send-command \
+  --instance-ids i-0a1b2c3d4e5f6g7h8 \
+  --document-name "AWS-RunShellScript" \
+  --parameters "commands=['sudo apt-get update -y','sudo apt-get install -y stress-ng','stress-ng -c 0 -l 90 -t 120s']" \
+  --region eu-north-1
+
+================================================================================
+EXPECTED BEHAVIOR (2-3 minutes)
+================================================================================
+
+Minute 0: Stress starts
+  ├─ Target instance CPU: 0% → 90%
+  └─ Other instances: normal
+
+Minute 0-1: Health check fails
+  ├─ HealthyHostCount: 3 → 2
+  ├─ ALB: stops sending traffic to failed instance
+  └─ RequestCount: drops temporarily
+
+Minute 1-2: Replacement launches
+  ├─ ASG: launches new instance
+  ├─ HealthyHostCount: still 2
+  ├─ New instance: booting
+  └─ RequestCount: rising again
+
+Minute 2: Stress ends
+  ├─ Old instance: CPU drops, but unhealthy
+  └─ Replacement: becoming healthy
+
+Minute 2-3: Recovery complete
+  ├─ HealthyHostCount: 2 → 3
+  ├─ Metrics: normalize
+  ├─ Old instance: terminates
+  └─ System: RECOVERED! ✓
+
+================================================================================
+SCREENSHOTS TO TAKE
+================================================================================
+
+☐ Before: 3 healthy, normal metrics
+☐ During: Health check failing, CPU spiking
+☐ Replacement: New instance launching
+☐ Recovery: HealthyHostCount back to 3
+☐ Final: All metrics normalized
+
+================================================================================
+RESULT
+================================================================================
+
+You'll demonstrate:
+  ✓ Health checks detect failures
+  ✓ ALB removes failed instance
+  ✓ ASG replaces it automatically
+  ✓ No manual intervention needed
+  ✓ System recovers in ~2-3 minutes
+  ✓ High availability works!
+
+This is what DevOps/Cloud Engineering is about! 🚀
+
+================================================================================
+DETAILED GUIDE
+================================================================================
+
+For more details, see: TASK_5_FAILURE_SIMULATION.txt
+
+Includes:
+- Multiple simulation options (FIS, SSM, SSH)
+- Expected timeline
+- Screenshots checklist
+- Deliverables
+- Analysis questions
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+After Task 5:
+  1. Stop load generators
+  2. Collect all evidence (screenshots, logs)
+  3. Task 6: Teardown (delete resources)
+  4. Create lab report with findings
+
+But first: DO TASK 5! 🎯
+
+================================================================================

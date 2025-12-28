@@ -1,0 +1,240 @@
+================================================================================
+YOUR COMPLETE D7078E LOAD TEST PACKAGE
+================================================================================
+
+Location: C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\
+
+================================================================================
+EXECUTABLE SCRIPTS (Run these!)
+================================================================================
+
+✅ run_load_test.ps1
+   └─ MAIN SCRIPT - Interactive menu with multiple test options
+      • Checks prerequisites
+      • Tests ALB connectivity
+      • Shows CloudWatch instructions
+      • Menu: Choose Phase 1, 2, 3, 4, or custom
+      • Recommended for full control
+
+✅ start_load_test.ps1
+   └─ QUICK LAUNCHER - One-click to start
+      • Automatically runs run_load_test.ps1
+      • Simpler if you just want to start immediately
+
+✅ agent.py
+   └─ LOAD GENERATOR - Python script that creates HTTP requests
+      • Already exists in your folder
+      • Used by the PowerShell scripts
+      • Can also run directly if needed
+
+================================================================================
+INSTRUCTION FILES (Read these first!)
+================================================================================
+
+📖 QUICK_START.txt
+   └─ Copy-paste one-liners
+      • Option A: Full interactive script
+      • Option B: Quick test (Phase 1+2)
+      • Option C: Just Phase 2 (instant scaling)
+      • Option D: Custom configuration
+      • FASTEST WAY TO START
+
+📖 POWERSHELL_GUIDE.txt (START HERE!)
+   └─ Complete overview
+      • What the scripts do
+      • Menu options explained
+      • Step-by-step walkthrough
+      • Metrics to watch
+      • Troubleshooting
+      • Timeline example
+
+📖 RUN_POWERSHELL_SCRIPT.txt
+   └─ Detailed instructions
+      • Prepare your system
+      • Enable script execution
+      • Run the script
+      • What you'll see
+      • Monitor during test
+      • Take screenshots
+      • Troubleshooting
+
+📖 CREATE_DASHBOARD.txt
+   └─ CloudWatch Dashboard setup
+      • Step-by-step to create D7078E-Lab-Dashboard
+      • Widget configuration
+      • Metric selection
+      • Monitoring tips
+
+📖 HIGH_LOAD_GENERATOR.txt
+   └─ Load generation theory
+      • Why more load is needed
+      • Load calculation (workers × RPS)
+      • 3-phase approach explanation
+      • What to expect at each phase
+
+📖 LOAD_COMMANDS.txt
+   └─ Direct Python commands
+      • Phase 1, 2, 3, 4 commands
+      • Custom configurations
+      • Expected timelines
+      • Infrastructure details
+
+================================================================================
+HOW TO USE THIS PACKAGE
+================================================================================
+
+STEP 1: READ (2 minutes)
+   ├─ Read: POWERSHELL_GUIDE.txt (this gives you the overview)
+   └─ OR read: QUICK_START.txt (if you want to jump in)
+
+STEP 2: PREPARE (2 minutes)
+   ├─ Open AWS Console in browser
+   ├─ Navigate to: CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+   └─ Keep this tab open (you'll watch metrics here)
+
+STEP 3: RUN (15-40 minutes, depending on which test)
+   ├─ Open PowerShell
+   ├─ Copy command from QUICK_START.txt OR run: .\run_load_test.ps1
+   └─ Follow the menu prompts
+
+STEP 4: OBSERVE (During test)
+   ├─ Watch CloudWatch Dashboard
+   ├─ Take screenshots at major events
+   ├─ Monitor ASG Activity tab
+   └─ Watch EC2 Instances count increase
+
+STEP 5: DOCUMENT (After test)
+   ├─ Collect all screenshots
+   ├─ Note down timelines
+   ├─ Record peak metrics
+   └─ Document observations
+
+================================================================================
+RECOMMENDED FIRST-TIME WORKFLOW
+================================================================================
+
+TIME: 20 minutes total
+
+0:00-2:00 Minutes:
+  □ Open POWERSHELL_GUIDE.txt
+  □ Read the "Overview" section
+  □ Read "Menu Options Explained"
+  □ Open AWS Console (CloudWatch Dashboard)
+
+2:00-3:00 Minutes:
+  □ Check Python is installed: python --version
+  □ Check aiohttp: pip install aiohttp
+  □ Verify agent.py exists in folder
+
+3:00-5:00 Minutes:
+  □ Open PowerShell
+  □ Copy command from QUICK_START.txt (Option A)
+  □ Paste and run it
+
+5:00-20:00 Minutes:
+  □ Script runs (choose option 1: Quick Test)
+  □ Watch CloudWatch Dashboard
+  □ See scaling: 1 → 2 → 3 instances!
+  □ Take screenshots
+
+================================================================================
+COMPLETE FILE MAP
+================================================================================
+
+Your Folder Structure:
+
+Mini D7078E/
+├── EXECUTABLE SCRIPTS
+│   ├── run_load_test.ps1          ← Main interactive script
+│   ├── start_load_test.ps1        ← Quick launcher
+│   └── agent.py                   ← Load generator
+│
+├── QUICK-START GUIDES
+│   ├── QUICK_START.txt            ← Copy-paste one-liners (START HERE!)
+│   └── POWERSHELL_GUIDE.txt       ← Complete overview
+│
+├── DETAILED INSTRUCTIONS
+│   ├── RUN_POWERSHELL_SCRIPT.txt  ← Step-by-step guide
+│   ├── CREATE_DASHBOARD.txt       ← Dashboard creation
+│   ├── HIGH_LOAD_GENERATOR.txt    ← Load theory
+│   └── LOAD_COMMANDS.txt          ← Direct Python commands
+│
+├── ORIGINAL TASK FILES
+│   ├── task_1.txt                 ← Task 1: Prepare AMI
+│   ├── task_2.txt                 ← Task 2: ALB + ASG setup
+│   ├── task_3.txt                 ← Task 3: Alarms & scaling
+│   ├── task_4.txt                 ← Task 4: Load testing (THIS ONE!)
+│   └── ... (other reference files)
+│
+└── RESULTS
+    └── Results.jpg                ← Your current dashboard screenshot
+
+================================================================================
+DECISION TREE: WHICH COMMAND TO RUN?
+================================================================================
+
+Do you want...
+
+→ Interactive menu with options?
+   RUN: .\run_load_test.ps1
+
+→ Quick test in 15 minutes?
+   COPY: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 20 --rps 5 --duration 300; Read-Host "Phase 1 done. Press Enter for Phase 2"; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+→ Just see scaling immediately?
+   COPY: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+→ Even more aggressive load?
+   COPY: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 100 --rps 20 --duration 900
+
+All commands are ready to copy and paste!
+
+================================================================================
+IF YOU GET STUCK
+================================================================================
+
+Problem                          Solution File
+──────────────────────────────────────────────────────────────────────
+Script won't run                 → RUN_POWERSHELL_SCRIPT.txt (Troubleshooting)
+Dashboard not showing metrics     → CREATE_DASHBOARD.txt
+CPU not reaching 80%             → HIGH_LOAD_GENERATOR.txt
+No scaling happening             → RUN_POWERSHELL_SCRIPT.txt (Troubleshooting)
+Want to understand load theory   → HIGH_LOAD_GENERATOR.txt
+Just want to run it now          → QUICK_START.txt
+
+================================================================================
+YOUR INFRASTRUCTURE (Reference)
+================================================================================
+
+Region: eu-north-1
+ALB URL: http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+Target Group: D7078E-MINI-PROJECT-GROUP35-TG
+Dashboard: D7078E-Mini-Project-Dashboard
+
+Scaling Configuration:
+  - Min instances: 1
+  - Max instances: 3
+  - Scale-out: CPU ≥ 80% for 2 minutes → +1 instance
+  - Scale-in: CPU ≤ 30% for 5 minutes → -1 instance
+
+================================================================================
+YOU'RE ALL SET!
+================================================================================
+
+Everything is ready. Choose ONE:
+
+OPTION 1: Full interactive experience
+  Run: .\run_load_test.ps1
+
+OPTION 2: Quick demo (no menu)
+  Read: QUICK_START.txt
+  Copy-Paste: One of the one-liners
+
+OPTION 3: Understand everything first
+  Read: POWERSHELL_GUIDE.txt
+  Then run: .\run_load_test.ps1
+
+Pick one and get started! The rest is automated. Good luck! 🚀
+
+================================================================================

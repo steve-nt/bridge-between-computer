@@ -315,6 +315,68 @@ APPROACH USED:
 - Exact control over all parameters
 
 ================================================================================
+IMPORTANT NOTES & TIPS
+================================================================================
+
+TIPS FOR TASK 3:
+- Use AWS CLI for exact control (most reliable)
+- Get correct ASG name and Policy ARNs from CLI output - you'll need them for alarms
+- Verify both policies exist before creating alarms
+- Test alarms by manually checking: aws cloudwatch describe-alarms --region eu-north-1
+- Scale-out faster (2 minutes) than scale-in (5 minutes) is intentional - prevents flapping
+
+SCALING BEHAVIOR EXPLAINED:
+- Scale-out (80%): Triggers after 2 consecutive minutes of high CPU
+  └─ Adds 1 instance immediately (ASG increases by 1)
+  └─ New instance boots and becomes healthy within 1-2 minutes
+  └─ Cooldown: 300 seconds (5 minutes) before next scale-out can occur
+
+- Scale-in (30%): Triggers after 5 consecutive minutes of low CPU
+  └─ Removes 1 instance gracefully
+  └─ Instance gets "draining" status, waits for connections to close
+  └─ Terminates after connection timeout
+  └─ Minimum 1 instance always remains (min=1 in ASG)
+
+CLOUDWATCH DASHBOARD SETUP:
+Optional but HIGHLY RECOMMENDED for Task 4:
+1. CloudWatch > Dashboards > Create new
+2. Add 3-4 widgets:
+   - CPU Utilization (from ASG)
+   - RequestCount (from ALB Target Group)
+   - HealthyHostCount (from ALB Target Group)
+   - UnHealthyHostCount (from ALB Target Group)
+3. Set refresh to 10 seconds for real-time monitoring
+4. Use custom time range to watch events
+
+TROUBLESHOOTING:
+- If alarms show "INSUFFICIENT_DATA": Wait 2-3 minutes for metrics to appear
+- If scale-out doesn't trigger: Check alarm threshold (should be 80, not 50)
+- If scale-in never triggers: Check evaluation periods (should be 5, not 2)
+
+VERIFICATION:
+✓ Both scaling policies created and active
+✓ Both alarms created and linked to policies
+✓ Alarms initially in OK state (not in alarm yet)
+✓ Dashboard created (optional)
+
+COMMANDS TO VERIFY:
+aws autoscaling describe-scaling-policies --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG --region eu-north-1
+aws cloudwatch describe-alarms --region eu-north-1
+
+NEXT STEP:
+- Don't trigger alarms yet! ASG needs to be under normal load
+- If you accidentally trigger scaling, instances will be added (costs money!)
+- Task 4 will deliberately trigger scaling with load generators
+
+SUCCESS CRITERIA:
+✓ scale-out-policy created (adds +1 instance)
+✓ scale-in-policy created (removes -1 instance)
+✓ cpu-high-alarm-80percent created and linked to scale-out
+✓ cpu-low-alarm-30percent created and linked to scale-in
+✓ Both alarms in OK state
+✓ Dashboard created and showing correct metrics
+
+================================================================================
 NEXT TASK: Task 4 - Implement & Run Internal Load Generators
 ================================================================================
 

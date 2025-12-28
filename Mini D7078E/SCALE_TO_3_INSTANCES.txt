@@ -1,0 +1,336 @@
+================================================================================
+WHY YOU'RE STUCK AT 2 INSTANCES - AND HOW TO FIX IT
+================================================================================
+
+Your ASG is set to max=3, but only scaling to 2. This means:
+
+POSSIBLE CAUSES:
+1. Second alarm not triggering (CPU needs to hit 80%+ AGAIN)
+2. Alarm evaluation time (takes 2+ minutes between evaluations)
+3. Load decreases after first scaling (CPU drops below 80%)
+4. Scaling cooldown period (prevents rapid successive scaling)
+
+Let me explain each and how to fix it.
+
+================================================================================
+THE ISSUE EXPLAINED
+================================================================================
+
+What happens:
+  Minute 0-3:  CPU rises 0% → 80% → Alarm triggers
+  Minute 3-5:  First scale-out: 1 → 2 instances
+  Minute 5-7:  CPU drops (load distributes to 2 instances): 80% → 50%
+  Minute 7+:   CPU stays below 80%, second alarm never triggers
+  Result:      Stuck at 2 instances, never reaches 3!
+
+Why this happens:
+  • With 2 instances, load is more distributed
+  • CPU drops below 80% threshold
+  • Second alarm doesn't trigger
+  • No second scaling event
+  • Never reaches 3 instances
+
+================================================================================
+SOLUTIONS
+================================================================================
+
+SOLUTION 1: INCREASE THE LOAD (EASIEST & BEST)
+───────────────────────────────────────────────
+
+Problem: Current load (2500 RPS combined) not enough to keep CPU at 80%+ 
+         after first instance launches
+
+Fix: Generate EVEN MORE load so CPU stays high even with 2 instances
+
+Option A: Run 3 load scripts simultaneously
+  └─ Kill current scripts
+  └─ Start run_max_load.ps1 THREE times
+  └─ Total: 3 × 2000 RPS = 6000 RPS
+  └─ Will definitely push past 3 instances!
+
+Option B: Modify script to use more workers
+  └─ Edit run_max_load.ps1
+  └─ Change Phase 3:
+    FROM: --workers 400 --rps 5 (= 2000 RPS)
+    TO:   --workers 600 --rps 10 (= 6000 RPS)
+  └─ Save file
+  └─ Run modified script
+
+Option C: Run original + max load scripts AND run agent.py separately
+  └─ Start both scripts as before
+  └─ In 3rd PowerShell, run:
+    python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 5 --duration 900
+  └─ Total: 2500 + 2000 = 4500 RPS additional
+
+RECOMMENDED: Option B (modify script) or Option A (3 simultaneous scripts)
+
+─────────────────────────────────────────────────────────────────────────────
+
+SOLUTION 2: LOWER THE CPU THRESHOLD (ALTERNATIVE)
+──────────────────────────────────────────────────
+
+Problem: 80% threshold might be too high
+         After first scaling, CPU stays at 60-70% (not reaching 80%)
+
+Fix: Lower the scale-out alarm threshold to 70%
+     (More instances will launch with lower CPU threshold)
+
+Steps:
+  1. Go to: CloudWatch > Alarms
+  2. Click: cpu-high-alarm-80percent
+  3. Click: Edit
+  4. Change threshold: 80% → 70%
+  5. Save
+  6. Now instances will scale at 70% CPU instead of 80%
+  7. More likely to trigger second scaling event
+
+CAUTION: This makes it scale more aggressively (more instances = higher cost)
+
+─────────────────────────────────────────────────────────────────────────────
+
+SOLUTION 3: REMOVE SCALING COOLDOWN (ADVANCED)
+───────────────────────────────────────────────
+
+Problem: ASG has cooldown period between scaling actions (default: 300 seconds)
+         This prevents rapid successive scaling
+
+Fix: Reduce or remove cooldown
+
+Steps:
+  1. EC2 > Auto Scaling Groups
+  2. D7078E-MINI-PROJECT-GROUP35-ASG
+  3. Click "Edit"
+  4. Find: "Default cooldown" (usually 300 seconds)
+  5. Change to: 60 seconds (or 0 for none)
+  6. Save
+
+Effect: Allows faster successive scaling events
+
+CAUTION: Rapid scaling can increase costs quickly
+
+─────────────────────────────────────────────────────────────────────────────
+
+SOLUTION 4: USE STEP SCALING INSTEAD OF SIMPLE ALARM
+─────────────────────────────────────────────────────
+
+Problem: Simple alarm only triggers once per threshold
+         Doesn't have granular response to CPU levels
+
+Fix: Use Step Scaling instead
+     (Different number of instances added based on how HIGH CPU goes)
+
+Example:
+  CPU 70-80%:  Add 1 instance
+  CPU 80-90%:  Add 2 instances
+  CPU 90%+:    Add 3 instances (max)
+
+This is complex to set up via Console, but better for real workloads.
+
+RECOMMENDED: Use Solution 1 (more load) first, then consider step scaling
+
+================================================================================
+IMMEDIATE FIX: GENERATE MORE LOAD
+================================================================================
+
+You currently have:
+  run_high_load.ps1: 500 RPS (Phase 3)
+  run_max_load.ps1: 2000 RPS (Phase 3)
+  Total: 2500 RPS
+
+To reach 3+ instances, try this:
+
+OPTION A: Run BOTH scripts + additional load (RECOMMENDED)
+──────────────────────────────────────────────────────────
+
+Keep your current scripts running, then add a 3rd:
+
+Open NEW PowerShell window:
+
+  cd 'C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E'
+  python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 10 --duration 900
+
+This adds: 300 workers × 10 RPS = 3000 RPS
+
+Total load: 2500 + 3000 = 5500 RPS
+
+This WILL push to 3+ instances!
+
+─────────────────────────────────────────────────────────────────────────────
+
+OPTION B: Modify run_max_load.ps1 (ALTERNATIVE)
+────────────────────────────────────────────────
+
+Edit the file: run_max_load.ps1
+
+Find this section (around line 80):
+
+  # Phase 3 - 2000 RPS
+  python agent.py --url $ALB_URL --workers 400 --rps 5 --duration 900
+
+Change to:
+
+  # Phase 3 - 4000 RPS
+  python agent.py --url $ALB_URL --workers 800 --rps 5 --duration 900
+
+Or for even more:
+
+  # Phase 3 - 5000 RPS
+  python agent.py --url $ALB_URL --workers 1000 --rps 5 --duration 900
+
+Then save and run:
+  .\run_max_load.ps1
+
+─────────────────────────────────────────────────────────────────────────────
+
+OPTION C: Run 3 instances of same script
+─────────────────────────────────────────
+
+Keep current 2 scripts, add a 3rd identical one:
+
+Open 3rd PowerShell:
+
+  .\run_max_load.ps1
+
+Now you have:
+  Script 1: run_high_load.ps1 (500 RPS)
+  Script 2: run_max_load.ps1 (2000 RPS)
+  Script 3: run_max_load.ps1 (2000 RPS)
+  Total: 4500 RPS
+
+This will DEFINITELY scale to 3 instances!
+
+================================================================================
+WHAT TO WATCH FOR
+================================================================================
+
+After increasing load:
+
+Minute 0-5:  CPU should spike HIGHER (70-90%)
+             RequestCount should be MUCH higher
+
+Minute 5-7:  First scale: 1 → 2
+             HealthyHostCount: 2
+
+Minute 7-10: CPU still HIGH (because more load now)
+             Should trigger SECOND alarm!
+
+Minute 10-12: Second scale: 2 → 3 ✨
+              HealthyHostCount: 3
+
+Minute 12+:  All 3 instances running
+             CPU stabilizes (distributed across 3)
+
+Result: FULL SCALING TO 3 INSTANCES! ✓
+
+================================================================================
+RECOMMENDED APPROACH
+================================================================================
+
+DO THIS RIGHT NOW:
+
+Step 1: Keep current scripts running (don't stop them)
+
+Step 2: Open NEW PowerShell window
+
+Step 3: Paste this command:
+
+  cd 'C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E'
+  python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 10 --duration 900
+
+Step 4: Watch CloudWatch Dashboard
+        Within 1-2 minutes, you should see:
+        ├─ CPU spike higher
+        ├─ RequestCount spike higher
+        ├─ Second instance launches
+        ├─ Third instance launches
+        └─ HealthyHostCount: 1 → 2 → 3 ✨
+
+Step 5: Take screenshots of 3rd instance launching
+
+DONE! You'll have 3 instances! 🎉
+
+================================================================================
+COMPARISON: LOAD LEVELS
+================================================================================
+
+Current:
+  run_high_load.ps1 Phase 3: 500 RPS
+  run_max_load.ps1 Phase 3: 2000 RPS
+  Total: 2500 RPS
+  Result: Scales to 2 instances ✓
+
+Recommended (Option A):
+  run_high_load.ps1 Phase 3: 500 RPS
+  run_max_load.ps1 Phase 3: 2000 RPS
+  Extra command: 3000 RPS
+  Total: 5500 RPS
+  Result: Scales to 3 instances! ✓✓✓
+
+Modified (Option B):
+  run_max_load.ps1 with --workers 800: 4000 RPS
+  run_high_load.ps1: 500 RPS
+  Total: 4500 RPS
+  Result: Scales to 3 instances! ✓✓✓
+
+3 scripts (Option C):
+  run_high_load.ps1: 500 RPS
+  run_max_load.ps1: 2000 RPS
+  run_max_load.ps1: 2000 RPS
+  Total: 4500 RPS
+  Result: Scales to 3 instances! ✓✓✓
+
+================================================================================
+QUICK COMMANDS
+================================================================================
+
+To add more load RIGHT NOW:
+
+Option 1: Add load from new PowerShell (easiest):
+
+  python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 10 --duration 900
+
+Option 2: More aggressive:
+
+  python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 500 --rps 10 --duration 900
+
+Option 3: Maximum:
+
+  python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 1000 --rps 10 --duration 900
+
+Just pick one and paste into new PowerShell window!
+
+================================================================================
+EXPECTED RESULT
+================================================================================
+
+With increased load:
+
+✓ CPU will spike higher (80-95%)
+✓ CPU will STAY high (won't drop below 80%)
+✓ Second alarm will trigger (at ~10 minute mark)
+✓ 2nd instance will launch: 2 → 3 ✨
+✓ All 3 instances running
+✓ HealthyHostCount: 3
+✓ SUCCESS! 🎉
+
+You'll finally see 3 instances!
+
+================================================================================
+DO THIS NOW!
+================================================================================
+
+Option A (EASIEST - recommended):
+
+1. Keep current 2 scripts running
+2. Open new PowerShell
+3. Paste:
+
+   cd 'C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E'
+   python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 10 --duration 900
+
+4. Watch dashboard - should see 3rd instance launch in 5-10 minutes!
+5. Take screenshot of HealthyHostCount: 3
+
+Done! 🚀
+
+================================================================================

@@ -458,8 +458,161 @@ Results should show:
 ✓ No failed requests or health check failures
 
 ================================================================================
+IMPORTANT NOTES & TIPS
+================================================================================
+
+TIPS FOR TASK 4:
+- Start with LOW load first (verify connectivity works)
+- Gradually RAMP UP load to avoid overwhelming instances
+- Keep CloudWatch dashboard open and refreshing every 10 seconds
+- Take screenshots FREQUENTLY during scaling events
+- Document EXACT TIMES of each scaling event
+- Monitor terminal output to ensure requests are actually being sent
+
+LOAD PROGRESSION STRATEGY:
+- Phase 1 (Low): 50-100 RPS → CPU 20-30% (no scaling)
+- Phase 2 (Medium): 200-300 RPS → CPU 40-60% (no scaling yet)
+- Phase 3 (High): 500-800 RPS → CPU 80%+ (SCALING TRIGGERS!)
+- Phase 4 (Peak): 1000+ RPS → Demonstrates all 3 instances running
+
+IMPORTANT TIMING:
+- Scaling-out: ~2-3 minutes from alarm trigger to instance healthy
+- Instance boot: ~1-2 minutes (depends on AMI and size)
+- Scaling-in: ~10-15 minutes from load stopping (requires 5 minutes low CPU)
+
+KEY METRICS TO MONITOR:
+1. CPU Utilization
+   - Low load: <30% ← No scaling
+   - Medium load: 30-70% ← No scaling
+   - High load: 80%+ ← SCALING TRIGGERS!
+
+2. RequestCount
+   - Should match your RPS calculation
+   - Example: 10 workers × 5 RPS/worker = 50 RPS
+
+3. HealthyHostCount
+   - Starts: 1
+   - After 1st scaling: 2
+   - After 2nd scaling: 3 (maximum)
+
+4. Response Times
+   - Should stay consistent (under 100ms for / and /metrics)
+   - /burn endpoint takes ~5 seconds (expected, CPU-intensive)
+
+TROUBLESHOOTING:
+
+Problem: "No scaling happening, stuck at 1 instance"
+Solution: CPU not reaching 80%
+  → Increase workers or RPS
+  → Run multiple load scripts simultaneously
+  → Verify alarm is correctly set to 80% (not 50%)
+
+Problem: "Instances scale up but then scale down immediately"
+Solution: Load drops after scaling
+  → Increase total RPS to keep CPU high
+  → Run load for longer duration
+  → More workers needed
+
+Problem: "Only reaches 2 instances, never gets to 3"
+Solution: CPU drops below 80% after 2nd instance added
+  → Load distributes too well across 2 instances
+  → Need MORE load (5-10x more RPS)
+  → Try running 3-5 load scripts simultaneously
+
+Problem: "Requests failing or timeout errors"
+Solution: Instance overloaded
+  → Reduce workers/RPS
+  → Verify instance can handle load
+  → Check application logs on instance
+
+SUCCESS CRITERIA:
+✓ Phase 1: Low load, CPU stays below 30%, no scaling
+✓ Phase 2: Medium load, CPU rises to 50-70%, still no scaling
+✓ Phase 3: High load, CPU reaches 80%+, 1st scaling triggered
+✓ 1st scaling: ASG scales 1 → 2 instances (within 2-3 minutes)
+✓ 2nd scaling (if enough load): ASG scales 2 → 3 instances
+✓ All 3 instances healthy in Target Group
+✓ No failed requests, all instances responding
+✓ Screenshots showing full scaling sequence
+
+WHAT TO EXPECT IN GRAPHS:
+
+CPU Utilization graph:
+  - Starts: ~5%
+  - Phase 1: Rises to 20%
+  - Phase 2: Rises to 50-70%
+  - Phase 3: Rises sharply to 80%+
+  - After 1st scaling: May dip slightly (more CPU available), then rises again
+  - After 2nd scaling: May dip again, load distribution across 3 instances
+  - After 3rd instance: May stabilize lower (3x capacity)
+
+RequestCount graph:
+  - Stays at ~0 before load
+  - Phase 1: Spikes to 50 RPS
+  - Phase 2: Spikes to 200-300 RPS
+  - Phase 3: Spikes to 500+ RPS
+  - Stays high until load stops
+  - Drops to 0 when load ends
+
+HealthyHostCount graph:
+  - Starts: 1
+  - ~2 min mark: Rises to 2 (after 1st scaling)
+  - ~5 min mark: Rises to 3 (after 2nd scaling)
+  - Stays at 3 while load is high
+  - ~15 min after load stops: Drops back to 2, then 1 (scale-in)
+
+ASG Activity log:
+  - "Launching 1 instances" (1st scaling)
+  - "Successfully launched 1 instances" 
+  - "Launching 1 instances" (2nd scaling)
+  - "Successfully launched 1 instances"
+
+DOCUMENTATION:
+Record these exact times:
+- 00:00 - Load test starts (Phase 1)
+- 02:15 - CPU reaches 80%, alarm triggers
+- 02:45 - 1st instance becomes healthy
+- 03:00 - Phase 2 (increase load)
+- 05:30 - 2nd scaling triggered
+- 06:00 - 2nd instance becomes healthy
+- 06:30 - Phase 3 (maximum load)
+- 12:00 - Load test ends
+- 17:00 - Scale-in starts (CPU drops to 30%)
+- 22:00 - Instances start terminating
+- 23:00 - Back to 1 instance
+
+Calculate:
+- Time from alarm trigger to instance healthy: ___ minutes
+- Peak CPU percentage: ____%
+- Peak RequestCount: ___ RPS
+- How many instances reached: ___
+- Total requests served: ___
+- Average RPS achieved: ___
+
+OPTIONAL: Run 3 load scripts simultaneously
+```powershell
+# PowerShell: Run multiple load generators at same time
+# Window 1:
+.\run_high_load.ps1
+
+# Window 2:
+.\run_max_load.ps1
+
+# Window 3:
+python agent.py --url http://ALB-DNS/ --workers 300 --rps 10 --duration 900
+```
+
+This 3x load almost guarantees reaching 3 instances!
+
+================================================================================
 NEXT TASK: Task 5 - Safe Failure Simulation
 ================================================================================
+
+Note: Task 5 is OPTIONAL
+- If 3 instances reached: Do Task 5 (failure simulation)
+- If only 2 instances reached: Can skip to Task 6
+
+===============================================================================
 
 After completing Task 4, you will:
 1. Trigger a controlled failure (FIS or SSM stress command)
@@ -470,3 +623,5 @@ After completing Task 4, you will:
 This completes the scaling and failure observation lab!
 
 ================================================================================
+
+python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 300 --rps 10 --duration 900
