@@ -1,0 +1,222 @@
+================================================================================
+TASK: CREATE CLOUDWATCH DASHBOARD FOR MONITORING
+================================================================================
+
+OBJECTIVE:
+Create a CloudWatch Dashboard named "D7078E-Lab-Dashboard" to monitor:
+- CPU Utilization (ASG metric)
+- RequestCount (ALB metric)
+- HealthyHostCount (Target Group metric)
+
+This dashboard allows real-time monitoring during Task 4 (load testing).
+
+================================================================================
+STEP-BY-STEP: CREATE DASHBOARD VIA AWS CONSOLE
+================================================================================
+
+STEP 1: Go to CloudWatch Console
+---------
+1. Open AWS Console
+2. Search for "CloudWatch" in the search bar at top
+3. Click "CloudWatch"
+
+STEP 2: Create New Dashboard
+---------
+1. In left sidebar, click "Dashboards"
+2. Click blue button "Create dashboard"
+3. Name it: D7078E-Lab-Dashboard
+4. Click "Create dashboard"
+
+STEP 3: Add Widget 1 - CPU Utilization
+---------
+You'll see an empty dashboard with "Add widget" button.
+
+Click "Add widget" → Select "Number" (or "Line" for graph)
+
+Then:
+1. Select metric:
+   - Namespace: AWS/EC2
+   - Dimension: Auto Scaling Group Name = D7078E-MINI-PROJECT-GROUP35-ASG
+   - Metric: CPUUtilization
+   - Statistic: Average
+   - Period: 1 minute (60 seconds)
+
+2. Click "Add to dashboard"
+
+3. (Optional) Rename title to: "CPU Utilization (%)"
+
+STEP 4: Add Widget 2 - Request Count
+---------
+Click "Add widget" → Select "Number" (or "Line")
+
+Then:
+1. Select metric:
+   - Namespace: AWS/ApplicationELB
+   - Dimension 1: TargetGroup = targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+   - Dimension 2: LoadBalancer = app/D7078E-MINI-PROJECT-GROUP35-LB/6cfd2486d594acf4
+   - Metric: RequestCount
+   - Statistic: Sum
+   - Period: 1 minute
+
+2. Click "Add to dashboard"
+
+3. (Optional) Rename title to: "Request Count"
+
+STEP 5: Add Widget 3 - Healthy Host Count
+---------
+Click "Add widget" → Select "Number" (or "Line")
+
+Then:
+1. Select metric:
+   - Namespace: AWS/ApplicationELB
+   - Dimension 1: TargetGroup = targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+   - Dimension 2: LoadBalancer = app/D7078E-MINI-PROJECT-GROUP35-LB/6cfd2486d594acf4
+   - Metric: HealthyHostCount
+   - Statistic: Average
+   - Period: 1 minute
+
+2. Click "Add to dashboard"
+
+3. (Optional) Rename title to: "Healthy Host Count"
+
+STEP 6: Add Widget 4 - Unhealthy Host Count (Optional but Useful)
+---------
+Click "Add widget" → Select "Number"
+
+Then:
+1. Select metric:
+   - Namespace: AWS/ApplicationELB
+   - Dimension 1: TargetGroup = targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+   - Dimension 2: LoadBalancer = app/D7078E-MINI-PROJECT-GROUP35-LB/6cfd2486d594acf4
+   - Metric: UnHealthyHostCount
+   - Statistic: Average
+   - Period: 1 minute
+
+2. Click "Add to dashboard"
+
+3. Rename title to: "Unhealthy Host Count"
+
+STEP 7: Save Dashboard
+---------
+1. Click "Save dashboard" button in top-right
+2. Dashboard is now created and ready to use
+
+================================================================================
+ALTERNATIVE: IF YOU CAN'T FIND METRICS
+================================================================================
+
+If you can't find the metrics when selecting:
+
+FOR CPU UTILIZATION:
+1. Click "Metrics" tab in widget
+2. Search for: CPUUtilization
+3. Browse: AWS/EC2 → Auto Scaling Groups → D7078E-MINI-PROJECT-GROUP35-ASG
+
+FOR REQUEST COUNT & HEALTHY HOST COUNT:
+1. Click "Metrics" tab in widget
+2. Search for: RequestCount or HealthyHostCount
+3. Browse: AWS/ApplicationELB → Target Groups
+4. Look for your target group and load balancer
+
+================================================================================
+WHAT YOU'LL SEE ON THE DASHBOARD
+================================================================================
+
+Once running, the dashboard will display:
+
+1. CPU Utilization (%)
+   - Starts at 0% when idle
+   - Rises as load increases
+   - Targets 80% trigger (scale-out)
+
+2. Request Count
+   - 0 when no load
+   - Increases as load generators send requests
+   - Shows request rate
+
+3. Healthy Host Count
+   - Starts at 1 (one instance)
+   - Increases to 2, then 3 as instances scale out
+   - Decreases back to 1 when load reduces
+
+4. Unhealthy Host Count
+   - Should be 0 normally
+   - Only increases if instances fail health checks
+
+================================================================================
+HOW TO USE DURING TASK 4 (LOAD TESTING)
+================================================================================
+
+When running load generators:
+
+PHASE 1 (Low Load):
+- Keep dashboard open in one browser tab
+- Start load generator with 1-2 containers
+- Watch: CPU stays < 30%, Healthy Count = 1
+
+PHASE 2 (Medium Load):
+- Scale to 3-5 containers
+- Watch: CPU rises toward 50-70%, Request Count increases
+- Healthy Count should still be 1
+
+PHASE 3 (High Load):
+- Scale to 10+ containers
+- Watch: CPU rises toward 80%+
+- When CPU >= 80% for 2 minutes:
+  → cpu-high-alarm-80percent triggers
+  → Healthy Count increases 1 → 2
+  → CPU may drop slightly as load distributes
+- If CPU still high:
+  → Another scale-out happens
+  → Healthy Count 2 → 3
+
+MONITORING:
+- Take screenshots at each major event
+- Note down timestamps when:
+  ✓ CPU crosses 80%
+  ✓ Alarm triggers (state changes in CloudWatch > Alarms)
+  ✓ Healthy Count increases (new instance ready)
+  ✓ Request Count changes
+
+================================================================================
+DASHBOARD LAYOUT TIPS
+================================================================================
+
+Best Layout:
+- Top row: CPU Utilization (large), RequestCount (large)
+- Bottom row: HealthyHostCount (medium), UnHealthyHostCount (medium)
+
+This gives you quick visual feedback on:
+✓ System load (CPU)
+✓ Traffic volume (RequestCount)
+✓ Infrastructure capacity (HealthyHostCount)
+
+================================================================================
+QUICK REFERENCE: YOUR INFRASTRUCTURE
+================================================================================
+
+ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+ALB DNS: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+Target Group: D7078E-MINI-PROJECT-GROUP35-TG
+Region: eu-north-1
+
+Scaling Policy:
+- Scale-Out: CPU ≥ 80% for 2 minutes → +1 instance
+- Scale-In: CPU ≤ 30% for 5 minutes → -1 instance
+- Min instances: 1, Max instances: 3
+
+================================================================================
+NEXT: RUN TASK 4 WITH DASHBOARD OPEN
+================================================================================
+
+Once dashboard is created:
+
+1. Keep dashboard open: CloudWatch > Dashboards > D7078E-Lab-Dashboard
+2. In another terminal, run docker-compose for load generation
+3. Watch metrics update in real-time
+4. Take screenshots of major events
+5. Document scaling timeline
+
+This completes the setup for observing auto-scaling in action!
+
+================================================================================

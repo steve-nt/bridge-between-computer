@@ -1,0 +1,253 @@
+================================================================================
+MONITORING BOTH SCRIPTS RUNNING SIMULTANEOUSLY
+================================================================================
+
+While both scripts are running, here's what to watch for:
+
+================================================================================
+IMMEDIATE SIGNS IT'S WORKING
+================================================================================
+
+In PowerShell Windows:
+✓ See repeated "[worker X] req #N status=200" messages from agent.py
+✓ Requests being counted (both scripts logging)
+✓ No Python errors (ModuleNotFoundError, connection errors)
+✓ Scripts are still running (not crashed)
+
+If you see requests being sent → IT'S WORKING! ✓
+
+================================================================================
+WHAT TO CHECK IN AWS CONSOLE
+================================================================================
+
+1. CloudWatch Dashboard (D7078E-Mini-Project-Dashboard)
+   ├─ CPU Utilization: Should be rising
+   ├─ RequestCount: Should show spike
+   └─ HealthyHostCount: Watch for increases
+
+2. CloudWatch Alarms
+   ├─ Go to: CloudWatch > Alarms
+   ├─ Look for: cpu-high-alarm-80percent
+   └─ Should change: OK → IN_ALARM (when CPU hits 80%)
+
+3. ASG Activity
+   ├─ Go to: EC2 > Auto Scaling Groups
+   ├─ Select: D7078E-MINI-PROJECT-GROUP35-ASG
+   ├─ Click: Activity tab
+   └─ Should see: "Launching 1 new instance" entries
+
+4. EC2 Instances
+   ├─ Go to: EC2 > Instances
+   ├─ Filter by ASG tag
+   └─ Count should increase: 1 → 2 → 3
+
+================================================================================
+COMMON ISSUES & SOLUTIONS
+================================================================================
+
+ISSUE 1: "Connection refused" or connection errors
+  Symptom: Requests failing in PowerShell
+  Cause: ALB might be down or overloaded
+  Solution:
+    - Check ALB is active: AWS Console > EC2 > Load Balancers
+    - Check target group is healthy
+    - Wait 30 seconds and see if it recovers
+    - May need to reduce load
+
+ISSUE 2: No scaling happening
+  Symptom: CPU high but HealthyHostCount stays at 1
+  Cause: Alarms might not be evaluating yet (takes ~2 minutes)
+  Solution:
+    - Wait 2-3 minutes minimum
+    - Check cpu-high-alarm-80percent exists
+    - Verify alarm threshold is 80
+
+ISSUE 3: RequestCount not increasing
+  Symptom: CloudWatch shows 0 or very low RequestCount
+  Cause: Requests might be failing
+  Solution:
+    - Check ALB DNS is correct
+    - Check security groups allow traffic
+    - Test manually: curl http://ALB_URL/
+
+ISSUE 4: Scripts crash or hang
+  Symptom: PowerShell windows stop responding
+  Cause: Network issues or ALB overloaded
+  Solution:
+    - Try stopping one script (Ctrl+C)
+    - Run just one script to verify it works
+    - Retry both later
+
+ISSUE 5: Very slow scaling or no scaling
+  Symptom: CPU at 80%+ but no new instances
+  Cause: Alarm evaluation takes 2+ minutes
+  Solution:
+    - Wait longer (up to 5 minutes)
+    - Check ASG scaling policies are active
+    - Verify min=1, max=3, desired=1
+
+================================================================================
+EXPECTED TIMELINE (What should happen)
+================================================================================
+
+Minutes 0-5 (Both Phase 1):
+  PowerShell: Showing requests being sent
+  CloudWatch CPU: Rising 0% → 20-30%
+  CloudWatch RequestCount: Increasing
+  Status: Normal, no scaling expected
+
+Minutes 5-10 (Both Phase 2):
+  PowerShell: More requests logged
+  CloudWatch CPU: Rising 30% → 50-60%
+  CloudWatch RequestCount: Much higher
+  Status: Normal, still no scaling
+
+Minutes 10-12 (Start of Phase 3):
+  PowerShell: Massive request volume
+  CloudWatch CPU: Spiking 60% → 80%+
+  CloudWatch RequestCount: SPIKE to 2000+ RPS
+  Status: Getting high, scaling should trigger soon
+
+Minutes 12-14 (CRITICAL):
+  CloudWatch Alarm: cpu-high-alarm-80percent → IN_ALARM! 🚨
+  ASG Activity: Shows "Launching 1 new instance"
+  EC2 Instances: Count increases to 2
+  HealthyHostCount: 1 → 2
+  Status: SCALING HAPPENING! ✓
+
+Minutes 14-16:
+  CPU: May drop slightly (load distributing to 2 instances)
+  Then rises again if load is sustained
+  Possible second alarm trigger
+
+Minutes 16-18 (If CPU still high):
+  Second instance launching
+  HealthyHostCount: 2 → 3
+  Status: FULL SCALING ACHIEVED! ✓
+
+Minutes 18-25 (Phase 3 completing):
+  All 3 instances running
+  CPU: 60-80% (balanced across instances)
+  RequestCount: 2000+ RPS sustained
+  Status: WORKING PERFECTLY!
+
+Minutes 25-30 (Both Phase 3 ending):
+  Scripts winding down
+  Requests decreasing
+  CPU should start dropping
+
+Minutes 30-35 (Completion):
+  Both scripts complete
+  Load stops
+  CPU drops toward 0%
+
+IMPORTANT: Scaling might take 2-5 minutes to trigger (alarm evaluation time)
+
+================================================================================
+SIGNS IT'S WORKING PERFECTLY
+================================================================================
+
+You'll know it's working when you see:
+
+✓ Both PowerShell windows showing worker logs
+✓ CloudWatch CPU spike to 80%+
+✓ CloudWatch RequestCount shows 2000+ RPS
+✓ cpu-high-alarm-80percent changes to IN_ALARM
+✓ ASG Activity shows "Launching 1 new instance" (multiple times)
+✓ EC2 Instances count increases 1 → 2 → 3
+✓ HealthyHostCount shows 1 → 2 → 3
+✓ All 3 instances show healthy status
+
+If you see all of the above: SUCCESS! ✅✅✅
+
+================================================================================
+SIGNS SOMETHING IS WRONG
+================================================================================
+
+⚠️ Warning signs:
+
+✗ PowerShell shows repeated "Connection refused" errors
+✗ CloudWatch CPU stays at 0% even after 2-3 minutes
+✗ RequestCount stays at 0
+✗ Scripts crash with Python errors
+✗ ALB shows unhealthy targets
+✗ Instances fail health checks
+✗ EC2 console shows "terminating" instances
+
+If you see these: Problem exists, need to investigate
+
+================================================================================
+WHAT TO DO IF IT'S NOT WORKING
+================================================================================
+
+Step 1: Check one script alone
+  Stop both scripts (Ctrl+C in each window)
+  Run just: .\run_high_load.ps1
+  Does it work alone?
+
+Step 2: Check ALB is healthy
+  AWS Console > EC2 > Load Balancers
+  Status should be "Active"
+  Target group should show "Healthy" targets
+
+Step 3: Test ALB manually
+  Open browser: http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+  Should show web app response
+
+Step 4: Check scaling policies
+  AWS Console > EC2 > Auto Scaling Groups
+  Should see scale-out-policy and scale-in-policy
+  Both should be "Active"
+
+Step 5: Check alarms
+  AWS Console > CloudWatch > Alarms
+  Should see cpu-high-alarm-80percent and cpu-low-alarm-30percent
+  Both should exist
+
+If all above are OK and single script works, but both together fails:
+  → Reduce load: modify one script to use fewer workers
+
+================================================================================
+HOW TO STOP IF NEEDED
+================================================================================
+
+To stop the scripts:
+
+In PowerShell Window 1: Press Ctrl+C
+In PowerShell Window 2: Press Ctrl+C
+
+Both will stop immediately.
+
+ASG will stop receiving requests and CPU will drop.
+Scaling will reverse after 5+ minutes.
+
+================================================================================
+KEEP MONITORING
+================================================================================
+
+Don't close the AWS Console windows!
+
+Keep these open:
+1. CloudWatch Dashboard (watch metrics in real-time)
+2. CloudWatch Alarms (watch alarm state changes)
+3. ASG Activity (watch scaling events)
+4. EC2 Instances (watch instance count)
+
+Refresh every 30 seconds or auto-refresh if available.
+
+================================================================================
+YOU'VE GOT THIS!
+================================================================================
+
+You're running 2500 RPS of combined load - that's EXTREME!
+
+If it works: You'll have AMAZING results showing auto-scaling!
+If it doesn't work immediately: Don't worry, wait a few minutes for alarms.
+
+Key is to monitor and wait. Alarms take time to evaluate.
+
+Check back after 5-10 minutes and see what happened!
+
+Good luck! 🚀
+
+================================================================================

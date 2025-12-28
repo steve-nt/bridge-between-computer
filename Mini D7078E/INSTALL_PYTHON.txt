@@ -1,0 +1,191 @@
+================================================================================
+HOW TO INSTALL PYTHON ON WINDOWS
+================================================================================
+
+OPTION 1: DOWNLOAD FROM python.org (RECOMMENDED)
+================================================================================
+
+Step 1: Go to https://www.python.org/downloads/
+Step 2: Click "Download Python 3.x.x" (latest version, e.g., 3.11 or 3.12)
+Step 3: Run the installer
+
+IMPORTANT: Check the box "Add Python to PATH" during installation!
+
+Step 4: Click "Install Now"
+Step 5: Wait for installation to complete
+Step 6: Click "Close"
+
+VERIFICATION:
+Open PowerShell and type:
+  python --version
+
+Should show: Python 3.x.x (if installed correctly)
+
+================================================================================
+
+OPTION 2: INSTALL VIA WINDOWS PACKAGE MANAGER (winget)
+================================================================================
+
+If you have Windows 10/11 with winget installed:
+
+Open PowerShell and run:
+  winget install Python.Python.3.12
+
+This automatically adds Python to PATH.
+
+VERIFICATION:
+  python --version
+
+================================================================================
+
+OPTION 3: INSTALL VIA CHOCOLATEY
+================================================================================
+
+If you have Chocolatey installed:
+
+Open PowerShell as Administrator and run:
+  choco install python
+
+VERIFICATION:
+  python --version
+
+================================================================================
+
+AFTER INSTALLATION: INSTALL REQUIRED PACKAGES
+================================================================================
+
+You need to install aiohttp (required for the load generator):
+
+Open PowerShell and run:
+  pip install aiohttp
+
+Or if that doesn't work, try:
+  python -m pip install aiohttp
+
+VERIFICATION:
+  python -c "import aiohttp; print('aiohttp OK')"
+
+Should show: aiohttp OK
+
+================================================================================
+
+TROUBLESHOOTING
+================================================================================
+
+"python command not found":
+  → Python was not added to PATH during installation
+  → Solution: Reinstall Python and CHECK "Add Python to PATH"
+  → Or add Python manually to PATH (see below)
+
+"pip command not found":
+  → Try: python -m pip install aiohttp
+
+================================================================================
+
+MANUAL PATH SETUP (If needed)
+================================================================================
+
+If Python is installed but not in PATH:
+
+Step 1: Find Python installation folder
+  Usually: C:\Users\YourUsername\AppData\Local\Programs\Python\Python311
+
+Step 2: Add to PATH
+  1. Press Windows + X
+  2. Select "System"
+  3. Click "Advanced system settings"
+  4. Click "Environment Variables"
+  5. Under "User variables", click "Path"
+  6. Click "Edit"
+  7. Click "New"
+  8. Paste your Python path (e.g., C:\Users\YourUsername\AppData\Local\Programs\Python\Python311)
+  9. Also add the Scripts folder: C:\Users\YourUsername\AppData\Local\Programs\Python\Python311\Scripts
+  10. Click OK
+  11. Restart PowerShell
+
+Test again:
+  python --version
+
+================================================================================
+
+QUICK START CHECKLIST
+================================================================================
+
+After installation:
+
+☐ Open PowerShell
+☐ Type: python --version
+   Should show Python 3.x.x
+☐ Type: pip install aiohttp
+   Should install successfully
+☐ Type: python -c "import aiohttp"
+   Should run without error
+
+If all above work: Python is ready to use!
+
+================================================================================
+
+NOW YOU CAN RUN THE LOAD SCRIPT
+================================================================================
+
+Once Python is installed and aiohttp is installed:
+
+Go to your project folder:
+  cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E
+
+Run the high-load script:
+  .\run_high_load.ps1
+
+The script will:
+1. Check Python is installed
+2. Check aiohttp is installed
+3. Run Phase 1, 2, 3 (and optional Phase 4)
+4. Generate load and trigger auto-scaling
+
+Expected result: HealthyHostCount jumps 1→2→3! ✅
+
+================================================================================
+
+WHICH VERSION TO INSTALL?
+================================================================================
+
+Recommended: Python 3.11 or 3.12 (latest stable)
+
+Available at: https://www.python.org/downloads/
+
+Just download and run the installer!
+
+================================================================================
+
+STILL HAVING ISSUES?
+================================================================================
+
+Try this command in PowerShell:
+
+  python -m ensurepip --upgrade
+
+This ensures pip is properly installed.
+
+Then:
+  python -m pip install aiohttp
+
+Or if you want to check Python location:
+  where python
+
+Should show path like: C:\Users\...\Python311\python.exe
+
+================================================================================
+
+YOU'RE READY!
+================================================================================
+
+Once Python is installed with aiohttp:
+
+1. Open PowerShell
+2. Go to: cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E
+3. Run: .\run_high_load.ps1
+4. Watch auto-scaling happen!
+
+Good luck! 🚀
+
+================================================================================

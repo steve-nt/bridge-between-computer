@@ -1,0 +1,113 @@
+================================================================================
+D7078E LOAD TEST - ONE-LINER QUICK START
+================================================================================
+
+Copy and paste ONE of these commands into PowerShell to start immediately!
+
+================================================================================
+OPTION A: FULL AUTOMATED SCRIPT (EASIEST - RECOMMENDED)
+================================================================================
+
+Copy this entire line and paste into PowerShell:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; .\run_load_test.ps1
+
+This will:
+✓ Enable script execution
+✓ Navigate to your project folder
+✓ Run the interactive menu
+✓ You choose which test to run
+
+================================================================================
+OPTION B: QUICK TEST (PHASE 1 + 2 ONLY)
+================================================================================
+
+If you want to skip the menu and run Phase 1 + 2 directly:
+
+Copy this entire line and paste into PowerShell:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 20 --rps 5 --duration 300; Read-Host "Phase 1 done. Press Enter for Phase 2"; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+This will:
+✓ Run Phase 1 (5 min, 100 RPS)
+✓ Pause for you to press Enter
+✓ Run Phase 2 (10 min, 500 RPS) - THIS WILL TRIGGER SCALING!
+✓ Total time: 15+ minutes
+
+================================================================================
+OPTION C: JUST PHASE 2 (INSTANT SCALING)
+================================================================================
+
+If you just want to see scaling happen right now:
+
+Copy this entire line and paste into PowerShell:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+This will:
+✓ Skip Phase 1
+✓ Jump straight to high load
+✓ Immediately trigger scaling
+✓ Run for 10 minutes
+
+================================================================================
+OPTION D: CUSTOM LOAD
+================================================================================
+
+If you want to customize workers and RPS:
+
+Replace WORKERS and RPS with your numbers:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers WORKERS --rps RPS --duration 600
+
+Examples:
+- Super aggressive: --workers 150 --rps 20 (3000 RPS)
+- Moderate: --workers 30 --rps 8 (240 RPS)
+- Light: --workers 10 --rps 2 (20 RPS)
+
+================================================================================
+BEFORE YOU RUN:
+================================================================================
+
+1. ⚠️ OPEN CLOUDWATCH DASHBOARD IN BROWSER FIRST!
+   AWS Console → CloudWatch → Dashboards → D7078E-Mini-Project-Dashboard
+
+2. Copy one of the commands above
+
+3. Open PowerShell (can be normal user, not admin)
+
+4. Paste the entire command and press Enter
+
+5. Watch the script run and metrics change in real-time!
+
+================================================================================
+WHAT TO EXPECT
+================================================================================
+
+During Phase 1 (5 min):
+- CPU rises to 30-50%
+- RequestCount increases
+- HealthyHostCount stays at 1
+- No scaling yet
+
+During Phase 2 (10 min):
+- CPU spikes toward 80%+
+- RequestCount increases significantly
+- HealthyHostCount increases: 1 → 2 → 3
+- Scaling triggered! ✓
+
+================================================================================
+EASIEST OPTION (COPY-PASTE READY):
+================================================================================
+
+FOR FIRST-TIME FULL TEST:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; .\run_load_test.ps1
+
+FOR QUICK DEMO (SKIP TO SCALING):
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+Pick ONE, copy it, paste it, press Enter. Done!
+
+================================================================================

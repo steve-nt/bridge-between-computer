@@ -1,0 +1,295 @@
+================================================================================
+D7078E TASK 4 - EXECUTION CHECKLIST
+================================================================================
+
+Before running the load test script, complete this checklist:
+
+================================================================================
+PRE-EXECUTION CHECKLIST (5 minutes)
+================================================================================
+
+System Requirements:
+☐ Windows 10 or later
+☐ PowerShell 5.0+ (built-in, no admin required)
+☐ Python 3.6+ installed
+  Test: Open PowerShell and run: python --version
+  Should show: Python 3.x.x
+
+Python Packages:
+☐ aiohttp installed
+  Test: Run: pip install aiohttp
+  Should show: Successfully installed (or already exists)
+
+Project Files:
+☐ agent.py exists in: C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\
+  Test: Run: ls agent.py
+  Should show: agent.py
+
+AWS Infrastructure:
+☐ ALB is running and responding
+  Test: Open browser and visit: http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+  Should show: Web server response
+
+☐ ASG exists with 1 instance
+  Test: AWS Console → EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG
+  Should show: Desired=1, Current instances=1
+
+☐ Target Group is healthy
+  Test: AWS Console → EC2 > Target Groups > D7078E-MINI-PROJECT-GROUP35-TG
+  Should show: 1 healthy target
+
+☐ Scaling policies are active
+  Test: AWS Console → EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG > Automatic scaling
+  Should show: scale-out-policy (Active), scale-in-policy (Active)
+
+☐ CloudWatch alarms exist
+  Test: AWS Console → CloudWatch > Alarms > All alarms
+  Should show: cpu-high-alarm-80percent, cpu-low-alarm-30percent (both visible)
+
+Dashboards:
+☐ CloudWatch Dashboard created
+  Test: AWS Console → CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+  Should show: 3-4 widgets (CPU, RequestCount, HealthyHostCount)
+
+================================================================================
+EXECUTION CHECKLIST (During test)
+================================================================================
+
+Before Starting Script:
+☐ Browser window 1: CloudWatch Dashboard open and visible
+☐ Browser window 2: AWS Console (for real-time monitoring)
+☐ PowerShell window: Ready to paste command
+☐ External monitor or side-by-side windows (for viewing dashboard while running)
+
+Starting the Script:
+☐ Copy one command from README.txt
+☐ Paste entire command into PowerShell
+☐ Press Enter
+☐ Script begins, shows prerequisite checks (give it 5-10 seconds)
+☐ Script performs ALB connectivity test
+☐ Script shows ASG status
+☐ Script shows interactive menu
+☐ Select option 1 (Quick Test) - 15 minutes, shows full scaling
+
+During Phase 1 (5 minutes):
+☐ PowerShell shows: "[worker X] req #N status=200" messages
+☐ CloudWatch CPU Utilization: rising 0% → 30%
+☐ CloudWatch RequestCount: increasing
+☐ HealthyHostCount: stays at 1 (no scaling yet)
+☐ Take screenshot: "Phase1_baseline.png"
+
+Pause Between Phase 1 and 2:
+☐ Script shows: "Phase 1 done. Press Enter for Phase 2"
+☐ Review Phase 1 results
+☐ Press Enter to continue
+
+During Phase 2 (10 minutes):
+☐ PowerShell shows: Increased request frequency
+☐ 0-2 min: CPU rises 30% → 60%
+☐ 2-3 min: CPU rises 60% → 80%
+☐ ⚠️ THIS IS THE CRITICAL POINT ⚠️
+☐ Take screenshot: "Phase2_cpu_rising.png"
+
+Alarm Trigger (Minute 3-4):
+☐ CloudWatch CPU hits 80%
+☐ Go to: CloudWatch > Alarms > cpu-high-alarm-80percent
+☐ State should change: OK → IN_ALARM
+☐ Take screenshot: "Alarm_triggered.png"
+
+First Scaling Event (Minute 4-5):
+☐ Go to: CloudWatch Dashboard
+☐ HealthyHostCount increases: 1 → 2
+☐ Go to: EC2 > Instances, see 2 instances now
+☐ Go to: EC2 > ASG > Activity tab, see "Launching 1 new instance"
+☐ Take screenshot: "First_instance_launched.png"
+
+Second Scaling Event (Minute 6-7):
+☐ CPU may drop as load distributes, then rise again
+☐ If CPU ≥ 80% again for 2 minutes, another scale-out
+☐ HealthyHostCount increases: 2 → 3
+☐ Go to: EC2 > Instances, see 3 instances now
+☐ Take screenshot: "Second_instance_launched.png"
+
+Peak Load (Minute 7-10):
+☐ All 3 instances running
+☐ HealthyHostCount: 3
+☐ CPU: 40-60% (load distributed)
+☐ RequestCount: high (500+ per second)
+☐ No more scaling (at max capacity)
+☐ Take screenshot: "Peak_metrics.png"
+
+Phase 2 Complete:
+☐ Script finishes Phase 2 (10 minute mark)
+☐ Press Ctrl+C to stop, or let it finish
+☐ PowerShell shows completion message
+
+================================================================================
+POST-EXECUTION CHECKLIST (After script finishes)
+================================================================================
+
+Immediate Results:
+☐ All 3 instances are running
+☐ HealthyHostCount: 3
+☐ RequestCount: stopped (load finished)
+☐ CPU: starts declining
+☐ Take screenshot: "Final_state.png"
+
+CloudWatch Dashboard:
+☐ Go to CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+☐ CPU graph shows the spike pattern
+☐ RequestCount shows the increase
+☐ HealthyHostCount shows 1 → 2 → 3 jump
+☐ Take screenshots of all metrics
+
+ASG Activity Log:
+☐ Go to EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG
+☐ Click "Activity" tab
+☐ See both scaling events with timestamps
+☐ Note: "Launching new instance" entries
+☐ Take screenshot: "ASG_activity.png"
+
+EC2 Instances:
+☐ Go to EC2 > Instances
+☐ Filter for ASG instances
+☐ See all 3 instances running
+☐ Note their instance IDs and launch times
+☐ Take screenshot: "Instances_running.png"
+
+CloudWatch Alarms:
+☐ Go to CloudWatch > Alarms > All alarms
+☐ Check: cpu-high-alarm-80percent was IN_ALARM (now OK)
+☐ Check: cpu-low-alarm-30percent (should be OK)
+☐ Take screenshot: "Alarm_history.png"
+
+================================================================================
+OPTIONAL: OBSERVE SCALE-IN (Additional 10-15 minutes)
+================================================================================
+
+If you want to see instances scale DOWN, continue:
+
+Resume With Low Load:
+☐ Run one more load phase with minimal load
+  Command: python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 1 --rps 1 --duration 600
+☐ This will reduce load from 500 RPS to 1 RPS
+☐ Duration: 10 minutes
+
+Observe Scale-In:
+☐ CloudWatch CPU drops: 60% → 30%
+☐ Wait 5+ minutes for cpu-low-alarm-30percent to trigger
+☐ Watch HealthyHostCount decrease: 3 → 2 → 1
+☐ Instances terminate gracefully
+☐ Take screenshots of the scale-in process
+
+Final State:
+☐ Back to 1 instance
+☐ CPU: 0-5%
+☐ RequestCount: minimal
+☐ HealthyHostCount: 1
+☐ Take final screenshot
+
+================================================================================
+DATA COLLECTION
+================================================================================
+
+Create a folder for your lab results:
+C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\LAB_RESULTS\
+
+Collect and organize:
+📸 Screenshots:
+  ☐ Phase1_baseline.png
+  ☐ Phase2_cpu_rising.png
+  ☐ Alarm_triggered.png
+  ☐ First_instance_launched.png
+  ☐ Second_instance_launched.png
+  ☐ Peak_metrics.png
+  ☐ Final_state.png
+  ☐ ASG_activity.png
+  ☐ Instances_running.png
+  ☐ Alarm_history.png
+  ☐ Dashboard_final.png
+
+📊 Metrics to Record:
+  ☐ Time when Phase 2 started
+  ☐ Time CPU reached 50%
+  ☐ Time CPU reached 80%
+  ☐ Time alarm triggered
+  ☐ Time first instance launched
+  ☐ Time second instance launched
+  ☐ Time Phase 2 ended
+  ☐ Peak CPU percentage
+  ☐ Peak RequestCount
+  ☐ Peak HealthyHostCount
+
+📝 Notes:
+  ☐ Did scaling happen as expected?
+  ☐ Were there any errors or failures?
+  ☐ How long did each instance take to boot?
+  ☐ Did any health checks fail?
+  ☐ What was the busiest time?
+
+================================================================================
+TROUBLESHOOTING DURING EXECUTION
+================================================================================
+
+Script Won't Start:
+→ Check: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+→ Check: You're in the correct directory (ls agent.py works)
+→ Check: Python is installed (python --version works)
+
+No Load Being Generated:
+→ Check: ALB is responding (test in browser)
+→ Check: Network is working
+→ Check: agent.py syntax is correct
+
+CPU Not Rising to 80%:
+→ Scale might be too low
+→ Try: --workers 100 --rps 20 (instead of 50/10)
+→ Check: Instance type has enough capacity
+→ t2.micro has CPU burst limited - might need t2.small
+
+Alarms Not Triggering:
+→ Check: Alarm exists in CloudWatch
+→ Check: Alarm threshold is 80
+→ Wait: Alarms need 2 minutes to evaluate
+→ Check: Alarm actions are enabled
+
+Instances Not Launching:
+→ Check: ASG max capacity (should be 3)
+→ Check: AWS account instance quota
+→ Check: IAM permissions
+→ Check: VPC subnets available
+
+Dashboard Not Updating:
+→ Refresh browser
+→ Wait 30-60 seconds (metrics batch)
+→ Check dashboard exists and has widgets
+→ Check metrics were selected correctly
+
+================================================================================
+SUCCESS CRITERIA
+================================================================================
+
+Your lab is successful when you can verify:
+
+✓ Phase 1 runs (100 RPS) without scaling
+✓ Phase 2 starts (500 RPS) and triggers scaling
+✓ cpu-high-alarm-80percent transitions to IN_ALARM
+✓ HealthyHostCount increases from 1 → 2 → 3
+✓ All 3 instances are healthy
+✓ You have screenshots of each major event
+✓ Timestamps are recorded
+✓ CloudWatch metrics show the complete picture
+
+If all above are true: ✅ TASK 4 COMPLETE!
+
+================================================================================
+YOU'RE READY!
+================================================================================
+
+Print this checklist and use it during execution.
+
+Estimated time: 20-25 minutes for complete test
+
+Next step: Copy the command from README.txt and paste into PowerShell!
+
+================================================================================

@@ -1,0 +1,426 @@
+================================================================================
+✅ ALL TASK FILES CONSOLIDATED & MERGED - CONSOLIDATION COMPLETE
+================================================================================
+
+COMPLETION STATUS: 21:17 UTC, 2025-12-27
+
+CONSOLIDATED FILES CREATED:
+✅ task_1.txt (MERGED with tips & notes)
+✅ task_2.txt (MERGED with tips & notes)
+✅ task_3.txt (MERGED with tips & notes)
+✅ task_4.txt (MERGED with detailed tips & notes)
+✅ task_5.txt (CREATED - comprehensive failure simulation guide)
+✅ task_6.txt (CREATED - comprehensive cleanup & report guide)
+✅ COMPLETE_GUIDE_TASKS_1-6.txt (CREATED - consolidated overview)
+✅ INDEX.txt (EXISTS - file directory)
+
+TOTAL CONSOLIDATED CONTENT: ~100+ KB of comprehensive guides
+
+================================================================================
+WHAT WAS MERGED & ADDED:
+================================================================================
+
+INTO task_1.txt:
+  ✅ Original Task 1 content
+  + Added: IMPORTANT NOTES & TIPS section
+  + Added: TROUBLESHOOTING section
+  + Added: SUCCESS CRITERIA section
+  + Added: Next task reference
+
+INTO task_2.txt:
+  ✅ Original Task 2 content
+  + Added: IMPORTANT NOTES & TIPS section
+  + Added: VERIFICATION AFTER COMPLETING section
+  + Added: TROUBLESHOOTING section
+  + Added: RESOURCES CREATED summary
+  + Added: ESTIMATED COST section
+  + Added: SUCCESS CRITERIA section
+
+INTO task_3.txt:
+  ✅ Original Task 3 content
+  + Added: IMPORTANT NOTES & TIPS section
+  + Added: SCALING BEHAVIOR EXPLAINED section
+  + Added: CLOUDWATCH DASHBOARD SETUP section
+  + Added: TROUBLESHOOTING section
+  + Added: VERIFICATION section
+  + Added: NEXT STEP warnings
+  + Added: SUCCESS CRITERIA section
+
+INTO task_4.txt:
+  ✅ Original Task 4 content
+  + Added: IMPORTANT NOTES & TIPS section
+  + Added: LOAD PROGRESSION STRATEGY section
+  + Added: IMPORTANT TIMING section
+  + Added: KEY METRICS TO MONITOR section
+  + Added: TROUBLESHOOTING section (8 detailed solutions)
+  + Added: SUCCESS CRITERIA section
+  + Added: WHAT TO EXPECT IN GRAPHS section
+  + Added: DOCUMENTATION section
+  + Added: OPTIONAL: Run 3 load scripts section
+
+INTO task_5.txt (CREATED):
+  + Prerequisites for Task 5
+  + Step 1: Verify 3 instances running
+  + Step 2-10: Detailed failure simulation
+  + THREE failure simulation methods (FIS, SSM, SSH)
+  + Expected timeline (minute-by-minute)
+  + 5 critical screenshots to take
+  + Observation documentation template
+  + SSM command execution verification
+  + Cleanup after Task 5
+  + Deliverables checklist
+  + Task summary and lessons learned
+
+INTO task_6.txt (CREATED):
+  + Importance: Don't skip cleanup!
+  + Step 1-11: Complete teardown process
+  + Evidence collection checklist
+  + Resource deletion procedures
+  + Cost verification
+  + Evidence organization
+  + LAB REPORT outline (comprehensive)
+  + Final checklist
+  + Submission instructions
+  + Task summary
+
+NEW CONSOLIDATED GUIDES:
+
+COMPLETE_GUIDE_TASKS_1-6.txt:
+  + Quick summary of each task
+  + Essential resources & references
+  + Important AWS resource IDs
+  + Troubleshooting quick reference
+  + Recommended next steps
+  + Success metrics
+  + Cost estimates
+  + File organization
+
+================================================================================
+KEY ADDITIONS TO EACH TASK:
+================================================================================
+
+TASK 1 ENHANCEMENTS:
+  ✅ Tips for web app testing
+  ✅ Troubleshooting SSH/curl issues
+  ✅ Success criteria checklist
+  ✅ What to note down for Task 2
+
+TASK 2 ENHANCEMENTS:
+  ✅ Tips for creating each resource
+  ✅ Verification after each step
+  ✅ Security group configuration details
+  ✅ Expected cost breakdown
+  ✅ Troubleshooting ALB/TG issues
+
+TASK 3 ENHANCEMENTS:
+  ✅ Detailed scaling behavior explanation
+  ✅ AWS CLI command details
+  ✅ Dashboard setup instructions
+  ✅ Verification commands
+  ✅ Troubleshooting alarms
+
+TASK 4 ENHANCEMENTS:
+  ✅ Load progression strategy
+  ✅ Important timing expectations
+  ✅ 8 troubleshooting solutions
+  ✅ What to monitor (detailed)
+  ✅ Expected graph shapes
+  ✅ Documentation template
+  ✅ How to run 3 simultaneous scripts
+
+TASK 5 NEW:
+  ✅ Complete failure simulation guide
+  ✅ 3 different simulation methods
+  ✅ Minute-by-minute timeline
+  ✅ Screenshot collection guide
+  ✅ Observation documentation template
+  ✅ Timeline tracking template
+
+TASK 6 NEW:
+  ✅ Step-by-step cleanup procedure
+  ✅ Evidence collection checklist
+  ✅ Lab report outline (20-30 pages)
+  ✅ Submission instructions
+  ✅ Final verification checklist
+
+================================================================================
+CURRENT LAB STATUS:
+================================================================================
+
+COMPLETED TASKS:
+  ✅ Task 1: Web app AMI created
+  ✅ Task 2: ALB, TG, ASG, Launch Template created
+  ✅ Task 3: CloudWatch alarms & scaling policies configured
+  ✅ Task 4: Load testing completed (1 → 2 → 3 instances observed)
+
+REMAINING TASKS:
+  ⏳ Task 5: Failure simulation (OPTIONAL, 15-20 minutes)
+     - Highly recommended for lab report
+     - Demonstrates automatic failover
+     - Only requires 3 instances running
+
+  ⏳ Task 6: Cleanup & Lab Report (REQUIRED, 45-60 minutes)
+     - Must delete all AWS resources (save costs!)
+     - Must write comprehensive lab report
+     - Must collect all evidence
+
+CURRENT RUNNING RESOURCES:
+  ├─ 2-3 t2.micro EC2 instances
+  ├─ 1 Application Load Balancer
+  ├─ 1 Target Group
+  ├─ 1 Launch Template
+  └─ 2 CloudWatch alarms
+
+CURRENT COSTS ACCRUING:
+  └─ ~$0.05-0.10 per hour
+
+================================================================================
+HOW TO USE THE CONSOLIDATED GUIDES:
+================================================================================
+
+FOR COMPLETE OVERVIEW:
+  1. Read: COMPLETE_GUIDE_TASKS_1-6.txt (this provides full summary)
+  2. Quick start: 30 minutes per task
+  3. Detailed review: Read individual task file
+
+FOR STEP-BY-STEP EXECUTION:
+  1. Open: relevant task_N.txt file
+  2. Follow each step carefully
+  3. Refer to tips and troubleshooting sections
+  4. Take screenshots
+  5. Document observations
+
+FOR QUICK REFERENCE DURING TESTING:
+  1. Keep open: QUICK_REFERENCE.txt
+  2. Keep open: task_4.txt (for load testing)
+  3. Check troubleshooting sections as needed
+
+FOR PROBLEM SOLVING:
+  1. Task 1 issues: See task_1.txt TROUBLESHOOTING
+  2. Task 2 issues: See task_2.txt TROUBLESHOOTING
+  3. Task 3 issues: See task_3.txt TROUBLESHOOTING
+  4. Task 4 issues: See task_4.txt TROUBLESHOOTING (8 solutions)
+  5. Scaling problems: See SCALE_TO_3_INSTANCES.txt, etc.
+
+FOR TASK 5 EXECUTION:
+  1. Quick version: TASK_5_QUICK_START.txt
+  2. Full version: task_5.txt or TASK_5_FAILURE_SIMULATION.txt
+
+FOR TASK 6 EXECUTION:
+  1. Quick version: TASK_6_QUICK_CHECKLIST.txt
+  2. Full version: task_6.txt or TASK_6_TEARDOWN.txt
+
+FOR LAB REPORT WRITING:
+  1. See: task_6.txt - LAB REPORT TEMPLATE section
+  2. Includes 10-section outline
+  3. 20-30 page target length
+  4. All deliverables listed
+
+================================================================================
+KEY IMPROVEMENTS IN CONSOLIDATED VERSION:
+================================================================================
+
+BETTER ORGANIZATION:
+  ✅ Each task now has clear sections
+  ✅ Tips and notes added to each task
+  ✅ Troubleshooting built into each task
+  ✅ Success criteria for verification
+
+MORE DETAILED EXPLANATIONS:
+  ✅ Task 4: 8 specific troubleshooting solutions
+  ✅ Task 3: Detailed scaling behavior explanation
+  ✅ Task 2: Security group configuration details
+  ✅ Task 5: Minute-by-minute failure timeline
+  ✅ Task 6: Complete lab report outline
+
+PRACTICAL GUIDANCE:
+  ✅ What to watch for (success indicators)
+  ✅ Typical timing expectations
+  ✅ Common problems and solutions
+  ✅ Screenshot collection guidance
+  ✅ Evidence organization
+
+COMPREHENSIVE COVERAGE:
+  ✅ Original task content preserved
+  ✅ Additional tips and tricks added
+  ✅ Troubleshooting expanded
+  ✅ Success criteria documented
+  ✅ Next steps clarified
+
+================================================================================
+RECOMMENDED READING ORDER:
+================================================================================
+
+FOR FIRST-TIME USERS:
+  1. COMPLETE_GUIDE_TASKS_1-6.txt (20 min overview)
+  2. task_1.txt (30 min read + 20 min execute)
+  3. task_2.txt (30 min read + 20 min execute)
+  4. task_3.txt (25 min read + 15 min execute)
+  5. task_4.txt (25 min read + 30 min execute)
+  6. Task 5 or skip to Task 6
+  7. task_6.txt (30 min read + 60 min execute + 60 min write report)
+
+FOR USERS ALREADY IN PROGRESS:
+  1. COMPLETE_GUIDE_TASKS_1-6.txt (Quick overview, 5 min)
+  2. Jump to current task file
+  3. Review TIPS and TROUBLESHOOTING sections
+  4. Continue where you left off
+
+FOR USERS JUST STARTING TASK 4:
+  1. task_4.txt - Full document (includes all details)
+  2. task_4.txt - LOAD PROGRESSION STRATEGY section (key!)
+  3. task_4.txt - TROUBLESHOOTING section (8 solutions)
+  4. QUICK_REFERENCE.txt - Keep open during testing
+
+FOR CLEANUP:
+  1. task_6.txt or TASK_6_QUICK_CHECKLIST.txt
+  2. Follow step-by-step
+  3. Don't skip resource deletion (save costs!)
+
+================================================================================
+FILE SIZES & CONTENT:
+================================================================================
+
+CONSOLIDATED TASK FILES:
+  task_1.txt .................... ~10 KB (enhanced)
+  task_2.txt .................... ~12 KB (enhanced)
+  task_3.txt .................... ~13 KB (enhanced)
+  task_4.txt .................... ~18 KB (enhanced with tips)
+  task_5.txt .................... ~16 KB (NEW comprehensive)
+  task_6.txt .................... ~20 KB (NEW comprehensive)
+
+NEW CONSOLIDATED GUIDES:
+  COMPLETE_GUIDE_TASKS_1-6.txt ... ~17 KB (full overview)
+
+TOTAL NEW CONTENT: ~106 KB of comprehensive guides
+
+All files work together to provide:
+  ✓ Step-by-step instructions
+  ✓ Detailed explanations
+  ✓ Troubleshooting solutions
+  ✓ Success criteria
+  ✓ Lab report templates
+  ✓ Evidence checklists
+
+================================================================================
+VERIFICATION: ALL CONTENT MERGED SUCCESSFULLY ✅
+================================================================================
+
+ORIGINAL TASK FILES ENHANCED:
+  ✅ task_1.txt - Enhanced with tips & notes
+  ✅ task_2.txt - Enhanced with tips & notes
+  ✅ task_3.txt - Enhanced with tips & notes
+  ✅ task_4.txt - Heavily enhanced (troubleshooting, etc.)
+
+NEW COMPREHENSIVE GUIDES:
+  ✅ task_5.txt - Complete failure simulation guide
+  ✅ task_6.txt - Complete cleanup & report guide
+  ✅ COMPLETE_GUIDE_TASKS_1-6.txt - Consolidated overview
+
+CONTENT COVERAGE:
+  ✅ All original task content preserved
+  ✅ All helper guides' content integrated
+  ✅ Tips and tricks added throughout
+  ✅ Troubleshooting solutions expanded
+  ✅ Success criteria documented
+  ✅ Lab report template included
+
+ACCESSIBILITY:
+  ✅ Easy-to-find sections with headers
+  ✅ Quick reference guides available
+  ✅ Step-by-step instructions clear
+  ✅ Examples provided where needed
+  ✅ Cross-references between files
+
+================================================================================
+NEXT ACTIONS FOR YOU:
+================================================================================
+
+IMMEDIATE (Now):
+  1. Read COMPLETE_GUIDE_TASKS_1-6.txt (20 minutes)
+  2. Assess current state (which instances running?)
+  3. Decide: Do Task 5 or go straight to Task 6?
+
+OPTION A: Do Task 5 (Recommended if 3 instances available):
+  1. Read: task_5.txt or TASK_5_QUICK_START.txt (10 min)
+  2. Prepare monitoring (CloudWatch open)
+  3. Execute failure simulation (20 minutes)
+  4. Document observations
+  5. Then proceed to Task 6
+
+OPTION B: Go Straight to Task 6 (If time is limited):
+  1. Read: task_6.txt or TASK_6_QUICK_CHECKLIST.txt (15 min)
+  2. Collect final evidence (screenshots, etc.) (15 min)
+  3. Delete all AWS resources (15 min)
+  4. Write lab report (60 min)
+  5. Submit deliverables
+
+RECOMMENDED TIMELINE:
+  Next 30 minutes: Task 5 (optional but impressive)
+  After 30 minutes: Start Task 6 (cleanup & report)
+  Next 2-3 hours: Complete Task 6 (includes report writing)
+
+================================================================================
+SUCCESS INDICATORS:
+================================================================================
+
+YOU KNOW YOU'RE READY FOR TASK 5 WHEN:
+  ✅ 3 EC2 instances running in ASG
+  ✅ All 3 instances "Healthy" in Target Group
+  ✅ HealthyHostCount = 3 in CloudWatch
+  ✅ ALB responding to requests
+
+YOU KNOW YOU'RE READY FOR TASK 6 WHEN:
+  ✅ Task 4 or 5 completed
+  ✅ All observations documented
+  ✅ Screenshots collected
+  ✅ Timeline recorded
+
+YOU KNOW TASK 6 IS COMPLETE WHEN:
+  ✅ All AWS resources deleted
+  ✅ EC2, ALB, TG, ASG all gone
+  ✅ CloudWatch dashboard removed
+  ✅ Lab report written (20-30 pages)
+  ✅ All evidence organized
+  ✅ Cost monitoring shows $0 accruing
+
+================================================================================
+BONUS: EVERYTHING IS NOW CROSS-REFERENCED
+================================================================================
+
+Each task file now includes:
+  ✓ Links to related sections
+  ✓ Cross-references to other tasks
+  ✓ Tips that reference troubleshooting
+  ✓ Suggestions for additional reading
+  ✓ Related task file pointers
+
+EXAMPLE:
+  "If stuck at 2 instances, see SCALE_TO_3_INSTANCES.txt"
+  "For faster scale-in, see INSTANCES_DECREASE_FASTER.txt"
+  "For detailed scaling, see STEP_SCALING_DETAILED.txt"
+
+This makes it easy to jump between related topics!
+
+================================================================================
+YOU'RE WELL EQUIPPED! 🎯
+================================================================================
+
+With the consolidated guides, you have:
+
+✅ Complete step-by-step instructions
+✅ Detailed explanations of concepts
+✅ 30+ specific troubleshooting solutions
+✅ Success criteria for verification
+✅ Lab report template with outline
+✅ Evidence collection checklists
+✅ Timeline and cost tracking
+✅ Comprehensive references
+
+Everything you need to successfully complete the D7078E Lab!
+
+NEXT STEP: Read COMPLETE_GUIDE_TASKS_1-6.txt for overview, then proceed!
+
+Good luck! 🚀
+
+================================================================================

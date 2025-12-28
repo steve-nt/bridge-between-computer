@@ -1,0 +1,474 @@
+================================================================================
+D7078E CLOUD SECURITY MINI PROJECT - COMPLETE GUIDE
+================================================================================
+
+COMPLETE CONSOLIDATED GUIDE FOR ALL TASKS 1-6
+All information merged from individual task files
+
+CURRENT STATUS: 21:17 UTC (Complete after Task 4)
+- Task 1: ✅ COMPLETED (Web app AMI created)
+- Task 2: ✅ COMPLETED (ALB, TG, ASG created)
+- Task 3: ✅ COMPLETED (CloudWatch alarms & scaling policies)
+- Task 4: ✅ COMPLETED (Load generators run, scaling observed)
+- Task 5: ⏳ OPTIONAL (Failure simulation - 3 instances required)
+- Task 6: ⏳ REQUIRED (Cleanup & lab report)
+
+================================================================================
+QUICK LINKS TO TASK FILES
+================================================================================
+
+Detailed individual task files:
+- task_1.txt: TASK 1 - Prepare Web App AMI
+- task_2.txt: TASK 2 - Create ALB + Target Group + ASG
+- task_3.txt: TASK 3 - Configure CloudWatch Alarms & Scaling Policies
+- task_4.txt: TASK 4 - Implement & Run Load Generators
+- task_5.txt: TASK 5 - Safe Failure Simulation & Recovery
+- task_6.txt: TASK 6 - Teardown, Cleanup & Final Report
+
+Additional helpful guides:
+- SCALE_TO_3_INSTANCES.txt - How to increase load for 3rd instance
+- INSTANCES_DECREASE_FASTER.txt - How to speed up scale-in
+- INSTANCES_NOT_DECREASING.txt - Why scale-in takes time
+- STEP_SCALING_DETAILED.txt - Detailed scaling explanation
+- TASK_5_FAILURE_SIMULATION.txt - Task 5 with all options
+- TASK_6_TEARDOWN.txt - Task 6 complete teardown guide
+
+================================================================================
+QUICK SUMMARY: WHAT EACH TASK DOES
+================================================================================
+
+TASK 1: CREATE WEB APP AMI (20-30 minutes)
+─────────────────────────────────────────
+What: Launch EC2 instance, install simple web app, create AMI
+Why: Need a reusable image for ASG to launch instances from
+How: SSH into instance, install Python web server, create AMI
+Result: One AMI that serves / and /burn endpoints
+
+Key Deliverable: AMI ID (e.g., ami-01bb672d521e213d4)
+
+─────────────────────────────────────────────────────────────────────────────
+
+TASK 2: CREATE LOAD BALANCING INFRASTRUCTURE (20-30 minutes)
+──────────────────────────────────────────────────────────
+What: Create ALB, Target Group, Launch Template, ASG
+Why: Need infrastructure to distribute load across multiple instances
+How: Create resources in AWS Console or CLI
+Result: Fully functional load balancing with 1 running instance
+
+Key Deliverables:
+  - ALB DNS: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+  - ASG: D7078E-MINI-PROJECT-GROUP35-ASG (min=1, max=3)
+  - Target Group: D7078E-MINI-PROJECT-GROUP35-TG
+
+─────────────────────────────────────────────────────────────────────────────
+
+TASK 3: SETUP AUTOMATIC SCALING (15-20 minutes)
+────────────────────────────────────────────────
+What: Create CloudWatch alarms and scaling policies
+Why: Need automatic scaling based on CPU utilization
+How: Create alarms for 80% (scale out) and 30% (scale in)
+Result: Automated scaling ready to trigger
+
+Key Configurations:
+  - Scale-out: CPU ≥ 80% for 2 minutes → Add 1 instance
+  - Scale-in: CPU ≤ 30% for 5 minutes → Remove 1 instance
+  - Max instances: 3
+
+─────────────────────────────────────────────────────────────────────────────
+
+TASK 4: RUN LOAD GENERATORS & OBSERVE SCALING (30-45 minutes)
+──────────────────────────────────────────────────────────────
+What: Generate HTTP traffic to trigger scaling
+Why: Demonstrate that auto-scaling actually works
+How: Run PowerShell scripts or Python load generators
+Result: Observe instances scaling from 1 → 2 → 3
+
+Key Observations:
+  - Phase 1 (50 RPS): CPU 20%, no scaling
+  - Phase 2 (200 RPS): CPU 50%, no scaling
+  - Phase 3 (500-800 RPS): CPU 80%, SCALING TRIGGERS
+  - 1st instance added: ~2-3 minutes
+  - 2nd instance added: ~5-7 minutes
+  - All 3 instances running: ~10-15 minutes total
+
+─────────────────────────────────────────────────────────────────────────────
+
+TASK 5: SAFE FAILURE SIMULATION (15-20 minutes, OPTIONAL)
+──────────────────────────────────────────────────────────
+What: Simulate failure on one instance, observe recovery
+Why: Demonstrate automatic failover and instance replacement
+How: Stress-ng command or AWS FIS to increase CPU on one instance
+Result: Watch ASG replace failed instance automatically
+
+Timeline:
+  - Minute 0: Stress starts, CPU spikes to 90%
+  - Minute 0.5-1: Health check fails, instance removed
+  - Minute 1-2: ASG launches replacement
+  - Minute 2-2.5: Replacement becomes healthy
+  - Minute 3: System fully recovered
+
+Key Learning: No manual intervention needed! Fully automatic!
+
+─────────────────────────────────────────────────────────────────────────────
+
+TASK 6: CLEANUP & LAB REPORT (45-60 minutes)
+──────────────────────────────────────────────
+What: Delete all AWS resources, write lab report
+Why: Stop incurring costs, document findings
+How: Delete ASG, ALB, TG, Launch Template
+Result: Clean AWS account, comprehensive lab report
+
+Key Deliverables:
+  - All resources deleted
+  - 20-30 page lab report
+  - Screenshots organized
+  - Timeline documented
+  - Analysis completed
+
+Estimated Cost Saved: $0.10-1.00 per day
+
+================================================================================
+ESSENTIAL RESOURCES & REFERENCES
+================================================================================
+
+AWS Management Console Links:
+
+EC2 Dashboard:
+  https://eu-north-1.console.aws.amazon.com/ec2/
+
+CloudWatch Dashboard:
+  https://eu-north-1.console.aws.amazon.com/cloudwatch/
+
+Auto Scaling Groups:
+  https://eu-north-1.console.aws.amazon.com/ec2/v2/home?region=eu-north-1#AutoScalingGroups:
+
+Load Balancers:
+  https://eu-north-1.console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LoadBalancers:
+
+CloudWatch Alarms:
+  https://eu-north-1.console.aws.amazon.com/cloudwatch/home?region=eu-north-1#alarmsV2:
+
+AWS CLI Commands (Common):
+
+# List ASG
+aws autoscaling describe-auto-scaling-groups \
+  --auto-scaling-group-names D7078E-MINI-PROJECT-GROUP35-ASG \
+  --region eu-north-1
+
+# List alarms
+aws cloudwatch describe-alarms --region eu-north-1
+
+# Get EC2 instances
+aws ec2 describe-instances --region eu-north-1
+
+# Delete ASG
+aws autoscaling delete-auto-scaling-group \
+  --auto-scaling-group-name D7078E-MINI-PROJECT-GROUP35-ASG \
+  --force-delete --region eu-north-1
+
+================================================================================
+IMPORTANT AWS RESOURCE IDs (YOUR LAB)
+================================================================================
+
+CORE RESOURCES CREATED:
+
+Account ID: 793891462342
+Region: eu-north-1
+VPC: default (vpc-default)
+
+TASK 1 - Web App AMI:
+  AMI ID: ami-01bb672d521e213d4
+  Base Instance: web-server-base
+  Instance Type: t2.micro
+  OS: Ubuntu 22.04 LTS
+
+TASK 2 - Load Balancing Infrastructure:
+  Launch Template: D7078E-MINI-PROJECT-GROUP35-WEBSRV-APP-TEMPLATE
+  Launch Template ID: lt-069828023507f20f6
+  
+  ALB Name: D7078E-MINI-PROJECT-GROUP35-LB
+  ALB DNS: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+  ALB ARN: arn:aws:elasticloadbalancing:eu-north-1:793891462342:loadbalancer/app/D7078E-MINI-PROJECT-GROUP35-LB/6cfd2486d594acf4
+  
+  Target Group: D7078E-MINI-PROJECT-GROUP35-TG
+  TG ARN: arn:aws:elasticloadbalancing:eu-north-1:793891462342:targetgroup/D7078E-MINI-PROJECT-GROUP35-TG/f30da4e5ee24d74a
+  
+  ASG Name: D7078E-MINI-PROJECT-GROUP35-ASG
+  ASG ARN: arn:aws:autoscaling:eu-north-1:793891462342:autoScalingGroup:1af62d4a-5738-46cf-bf3b-bd25253b53f2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG
+  Min instances: 1
+  Desired: 1
+  Max instances: 3
+
+TASK 3 - Scaling Configuration:
+  Scale-Out Policy: scale-out-policy
+  Scale-Out Policy ARN: arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:df92a041-8f71-4231-b76e-8e9eac0aeac2:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-out-policy
+  
+  Scale-In Policy: scale-in-policy
+  Scale-In Policy ARN: arn:aws:autoscaling:eu-north-1:793891462342:scalingPolicy:562af995-9e4b-4cb3-ae01-bcff4932a820:autoScalingGroupName/D7078E-MINI-PROJECT-GROUP35-ASG:policyName/scale-in-policy
+  
+  High CPU Alarm: cpu-high-alarm-80percent
+  Low CPU Alarm: cpu-low-alarm-30percent
+
+SECURITY GROUPS (auto-created):
+  ALB SG: alb-sg (allow HTTP 80, HTTPS 443 from 0.0.0.0/0)
+  Instance SG: web-app-asg-sg (allow SSH 22, HTTP 80)
+
+================================================================================
+QUICK START: GET BACK TO WHERE YOU ARE
+================================================================================
+
+Status: Just completed Task 4 (load testing)
+
+What's running NOW:
+  ✓ 3 EC2 instances (or 2, depending on your load)
+  ✓ 1 ALB distributing traffic
+  ✓ 1 ASG managing instances
+  ✓ Scaling policies active
+  ✓ CloudWatch monitoring active
+
+What you probably want to do NEXT:
+
+OPTION 1: Do Task 5 (Failure Simulation) - 15-20 minutes
+  └─ Simulate failure on one instance
+  └─ Observe automatic recovery
+  └─ Great for demonstrating resilience
+  └─ Then proceed to Task 6
+
+OPTION 2: Skip Task 5, Go to Task 6 (Cleanup) - 45-60 minutes
+  └─ Delete all resources (SAVE COSTS!)
+  └─ Write lab report
+  └─ Complete the lab
+
+OPTION 3: Take a break
+  └─ Check that instances are still scaling
+  └─ Keep CloudWatch open
+  └─ Come back later for cleanup
+
+RECOMMENDED: Do Task 5 if you have time (only 20 minutes)
+  └─ Demonstrates automatic failover
+  └─ Impressive for lab report
+  └─ Shows resilience of system
+
+================================================================================
+TROUBLESHOOTING QUICK REFERENCE
+================================================================================
+
+PROBLEM: Instances not scaling past 2
+SOLUTION: Need more load
+  └─ Run 3 load scripts simultaneously
+  └─ See: SCALE_TO_3_INSTANCES.txt
+
+PROBLEM: Instances not decreasing after load stops
+SOLUTION: This is NORMAL (requires 5 minutes low CPU)
+  └─ Just wait 10-15 minutes
+  └─ See: INSTANCES_NOT_DECREASING.txt
+
+PROBLEM: Want instances to decrease faster
+SOLUTION: Edit CloudWatch alarm threshold
+  └─ Change from 30% to 50%
+  └─ Takes 2-3 minutes instead of 10-15
+  └─ See: INSTANCES_DECREASE_FASTER.txt
+
+PROBLEM: LoadBalancer returning 502 Bad Gateway
+SOLUTION: Check target group health
+  └─ EC2 > Target Groups > Check targets
+  └─ If unhealthy: Check security group allows port 80
+
+PROBLEM: Can't reach ALB DNS
+SOLUTION: ALB might not exist or wrong URL
+  └─ Check ALB in EC2 console
+  └─ Wait 2 minutes for ALB to be "Active"
+  └─ Check security group allows HTTP 80 from internet
+
+PROBLEM: Don't remember my ALB DNS
+SOLUTION: Find it in AWS Console
+  └─ EC2 > Load Balancers
+  └─ Look for D7078E-MINI-PROJECT-GROUP35-LB
+  └─ DNS name column shows: ...eu-north-1.elb.amazonaws.com
+
+PROBLEM: Don't know if Task 3 (alarms) worked
+SOLUTION: Trigger them during Task 4
+  └─ Run loads, watch CPU rise
+  └─ When CPU ≥ 80%: Alarm should trigger and scale
+  └─ When CPU ≤ 30%: Alarm should trigger and scale down
+
+PROBLEM: Tasks took longer than expected
+SOLUTION: This is NORMAL
+  └─ Instance boot: 1-2 minutes
+  └─ Instance health check: 1-2 minutes
+  └─ Total scaling time: 2-4 minutes per event
+  └─ Scale-in: 10-15 minutes (intentionally slow)
+
+================================================================================
+RECOMMENDED NEXT STEPS (NOW)
+================================================================================
+
+Right now, you should:
+
+1. CHECK CURRENT STATE (2 minutes)
+   └─ CloudWatch dashboard
+   └─ How many instances running? (1, 2, or 3?)
+   └─ What's the CPU? (should be normal if no load running)
+   └─ Are instances still running? (you might have stopped them)
+
+2. OPTION A: DO TASK 5 (20 minutes) - HIGHLY RECOMMENDED
+   └─ Simulate failure on ONE instance
+   └─ Watch automatic recovery
+   └─ See instance replacement in action
+   └─ Then do Task 6
+   └─ See: task_5.txt
+
+3. OPTION B: GO STRAIGHT TO TASK 6 (60 minutes) - If time limited
+   └─ Delete all resources
+   └─ Stop incurring costs
+   └─ Write lab report
+   └─ See: task_6.txt
+
+4. OPTION C: TAKE A BREAK (But don't leave resources running!)
+   └─ Resources will cost ~$0.01-0.10 per hour
+   └─ If taking a break >1 hour, do Task 6 cleanup first
+   └─ OR keep ASG running if you want to resume testing
+
+================================================================================
+ESTIMATED COSTS (AS OF NOW)
+================================================================================
+
+CURRENT RUNNING RESOURCES:
+  ├─ 2-3 t2.micro EC2 instances: $0.01/hour each
+  ├─ 1 Application Load Balancer: $0.0225/hour
+  ├─ Data transfer: ~$0.01/hour
+  └─ TOTAL: ~$0.05-0.10 per hour
+
+IF LEFT RUNNING ALL NIGHT (12 hours):
+  └─ Cost: $0.60-1.20
+
+IF LEFT RUNNING 24 HOURS:
+  └─ Cost: $1.20-2.40
+
+TO SAVE COSTS: Delete everything NOW with Task 6!
+
+================================================================================
+SUCCESS METRICS: WHAT SUCCESS LOOKS LIKE
+================================================================================
+
+TASK 1 SUCCESS:
+  ✓ Web app responds to / endpoint
+  ✓ Web app responds to /metrics endpoint
+  ✓ Web app responds to /burn endpoint (CPU spikes)
+  ✓ AMI created successfully
+
+TASK 2 SUCCESS:
+  ✓ ALB is "Active"
+  ✓ Target Group has 1 "Healthy" target
+  ✓ ASG has 1 instance "InService"
+  ✓ curl to ALB DNS returns 200 OK
+
+TASK 3 SUCCESS:
+  ✓ 2 scaling policies created
+  ✓ 2 CloudWatch alarms created
+  ✓ Alarms linked to policies
+  ✓ Alarms in "OK" state (not triggered)
+
+TASK 4 SUCCESS:
+  ✓ Load increases CPU from 5% to 20% to 80%+
+  ✓ Alarm triggers when CPU ≥ 80%
+  ✓ 1st instance added: HealthyHostCount 1 → 2
+  ✓ 2nd instance added (optional): HealthyHostCount 2 → 3
+  ✓ RequestCount increases with load
+  ✓ All instances healthy in Target Group
+  ✓ Zero failed requests (success rate ≈ 100%)
+
+TASK 5 SUCCESS (Optional):
+  ✓ Failure detected by health check
+  ✓ Unhealthy instance removed from ALB
+  ✓ Replacement instance launched
+  ✓ System recovered automatically
+  ✓ No manual intervention needed
+  ✓ Recovery time < 3 minutes
+
+TASK 6 SUCCESS:
+  ✓ All AWS resources deleted
+  ✓ Costs stopped accruing
+  ✓ Lab report written (20-30 pages)
+  ✓ All evidence collected and organized
+  ✓ All observations documented
+
+================================================================================
+FINAL REMINDERS
+================================================================================
+
+⚠️  IMPORTANT:
+  - Don't forget to do Task 6 (cleanup) to save costs!
+  - Leaving resources running costs $0.05-0.10/hour
+  - After 24 hours: $1-2.40 in unnecessary charges
+
+✅ BEST PRACTICE:
+  - Delete resources immediately after testing
+  - Keep lab report and screenshots (no cost)
+  - Can recreate infrastructure anytime (reproducible)
+
+📝 DOCUMENTATION:
+  - Take screenshots during testing (easy to forget later)
+  - Document timestamps of all events
+  - Keep CloudTrail logs
+  - Write analysis while fresh
+
+🎓 LEARNING:
+  - This lab demonstrates production-grade cloud architecture
+  - Auto-scaling is fundamental to cloud operations
+  - Monitoring is critical for reliability
+  - Automatic failover is possible (and expected)
+
+🚀 NEXT STEPS AFTER LAB:
+  - Learn about: CloudFront, RDS, Lambda, VPC design
+  - Practice: Multi-AZ deployments, cross-region failover
+  - Explore: Kubernetes (EKS), Serverless (Lambda)
+  - Study: Well-architected framework, security best practices
+
+================================================================================
+YOU'VE GOT THIS! 💪
+================================================================================
+
+You've successfully demonstrated cloud architecture principles:
+  ✓ Infrastructure as Code
+  ✓ Auto-scaling under load
+  ✓ High availability
+  ✓ Automatic failover
+  ✓ Monitoring and alerting
+  ✓ Cost optimization
+
+This is professional-level cloud engineering!
+
+Now finish strong with Task 6:
+  1. Delete all resources (save costs!)
+  2. Write comprehensive lab report
+  3. Submit all evidence
+  4. Celebrate completion! 🎉
+
+Good luck! 🚀
+
+================================================================================
+QUESTIONS? NEED HELP?
+================================================================================
+
+For specific task details:
+  ├─ Task 1: See task_1.txt
+  ├─ Task 2: See task_2.txt
+  ├─ Task 3: See task_3.txt
+  ├─ Task 4: See task_4.txt
+  ├─ Task 5: See task_5.txt
+  ├─ Task 6: See task_6.txt
+
+For specific problems:
+  ├─ Scaling issues: SCALE_TO_3_INSTANCES.txt
+  ├─ Scale-in slow: INSTANCES_DECREASE_FASTER.txt
+  ├─ General info: INSTANCES_NOT_DECREASING.txt
+  ├─ Deep dive: STEP_SCALING_DETAILED.txt
+
+AWS Documentation:
+  ├─ Auto Scaling: https://docs.aws.amazon.com/autoscaling/
+  ├─ CloudWatch: https://docs.aws.amazon.com/cloudwatch/
+  ├─ ALB: https://docs.aws.amazon.com/elasticloadbalancing/
+  └─ EC2: https://docs.aws.amazon.com/ec2/
+
+================================================================================

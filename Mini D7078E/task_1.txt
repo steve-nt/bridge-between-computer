@@ -264,5 +264,25 @@ DELIVERABLES FOR TASK 1:
 AMI ID FOR NEXT TASK: ami-01bb672d521e213d4
 
 ================================================================================
+IMPORTANT NOTES & TIPS
+================================================================================
+
+TIPS FOR TASK 1:
+- Keep the web-server-base instance running for now (you'll terminate in Task 6)
+- Test all endpoints before creating the AMI
+- Note down the AMI ID - you'll need it for Task 2
+- The /burn endpoint should make CPU spike to 80%+ (useful for testing alarms later)
+
+TROUBLESHOOTING:
+- If SSH times out: Check security group allows port 22 from your IP
+- If curl returns 403/401: Check ALB security group allows HTTP 80
+- If /burn endpoint times out: App is computing heavy, wait or reduce iterations
+
+SUCCESS CRITERIA:
+✓ Web app responds to all 3 endpoints (/, /metrics, /burn)
+✓ AMI created and available
+✓ AMI can be used to launch new instances
+
+================================================================================
 NEXT TASK: Task 2 - Create ALB + Target Group + ASG + Launch Template
 ================================================================================
