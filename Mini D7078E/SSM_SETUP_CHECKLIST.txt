@@ -1,0 +1,392 @@
+================================================================================
+SSM SETUP CHECKLIST - WITH YOUR INSTANCE IDs
+================================================================================
+
+YOUR INSTANCES:
+  1. i-03b3951e1cff6aa9b
+  2. i-0a6b2c4bdce290dd0
+  3. i-0d91bf046fcb0be90
+
+REGION: eu-north-1
+ASG: D7078E-MINI-PROJECT-GROUP35-ASG
+STATUS: Ready to add SSM support
+
+TOTAL TIME: ~10 minutes
+
+================================================================================
+STEP 1: CREATE IAM ROLE (2 minutes)
+================================================================================
+
+☐ 1.1 Go to AWS Console → IAM → Roles
+    URL: https://console.aws.amazon.com/iam/
+
+☐ 1.2 Click "Create role" (orange button, top-right)
+
+☐ 1.3 Select trusted entity type:
+    → Service
+
+☐ 1.4 Select service:
+    → EC2
+
+☐ 1.5 Click "Next"
+
+☐ 1.6 Add permissions:
+    Search: "AmazonSSMManagedInstanceCore"
+    ✓ Check the box
+    
+    (Optional) Also add:
+    Search: "AmazonSSMPatchAssociation"
+    ✓ Check the box
+
+☐ 1.7 Click "Next"
+
+☐ 1.8 Name the role:
+    Role name: D7078E-EC2-SSM-Role
+    Description: Role for EC2 instances in D7078E mini project to use SSM
+
+☐ 1.9 Click "Create role"
+
+☐ 1.10 Verify: You see green banner "Role D7078E-EC2-SSM-Role created successfully"
+
+✓ STEP 1 COMPLETE - IAM role created!
+
+================================================================================
+STEP 2: UPDATE LAUNCH TEMPLATE (2 minutes)
+================================================================================
+
+☐ 2.1 Go to AWS Console → EC2 → Launch Templates
+    URL: https://eu-north-1.console.aws.amazon.com/ec2/
+
+☐ 2.2 Find your Launch Template:
+    Name: D7078E-MINI-PROJECT-GROUP35-LT (or similar)
+
+☐ 2.3 Click on the Launch Template name
+
+☐ 2.4 Click "Actions" dropdown (top-right)
+
+☐ 2.5 Select: "Create new version"
+    (This creates Version 2 without modifying Version 1)
+
+☐ 2.6 Scroll down to "Advanced Details" section
+
+☐ 2.7 Find "IAM instance profile" field
+
+☐ 2.8 Click the dropdown
+
+☐ 2.9 Search for: "D7078E-EC2-SSM-Role"
+    (The role you just created)
+
+☐ 2.10 Select it
+
+☐ 2.11 Scroll to bottom
+
+☐ 2.12 Click "Create launch template version" (green button)
+
+☐ 2.13 Verify: You see "Launch Template Version 2 created successfully"
+
+☐ 2.14 Go back to Launch Templates list
+
+☐ 2.15 Click on your Launch Template name again
+
+☐ 2.16 Find Version 2
+
+☐ 2.17 Right-click Version 2 → "Set as default"
+    (OR select it and use Actions dropdown)
+
+☐ 2.18 Verify: Version 2 is now marked as default
+
+✓ STEP 2 COMPLETE - Launch Template updated!
+
+================================================================================
+STEP 3: TERMINATE OLD INSTANCES (1 minute)
+================================================================================
+
+⚠ CRITICAL: You MUST terminate these 3 old instances so ASG launches new ones
+             with the SSM role!
+
+☐ 3.1 Go to AWS Console → EC2 → Instances
+
+☐ 3.2 Find and select BOTH instances:
+    ☑ i-03b3951e1cff6aa9b
+    ☑ i-0a6b2c4bdce290dd0
+    ☑ i-0d91bf046fcb0be90
+    
+    (Tip: Use Ctrl+Click to select multiple)
+
+☐ 3.3 Click "Instance State" dropdown (top menu)
+
+☐ 3.4 Select: "Terminate instances"
+
+☐ 3.5 Confirmation popup appears
+
+☐ 3.6 Click "Terminate" button
+
+☐ 3.7 Watch instances change state:
+    → shutting-down
+    → terminated
+
+✓ STEP 3 COMPLETE - Old instances terminating!
+
+WHAT HAPPENS NEXT (Automatic - no action needed):
+  1. All 3 instances terminate (~30 seconds)
+  2. ASG detects: "We have 0 instances, but need 3"
+  3. ASG launches 3 NEW instances using:
+     → Launch Template Version 2 (with SSM role!)
+     → Same configuration as before
+  4. New instances boot (takes ~5-7 minutes)
+
+================================================================================
+STEP 4: WAIT FOR NEW INSTANCES TO BOOT (5-7 minutes)
+================================================================================
+
+⏳ What to do while waiting:
+  • Get coffee ☕
+  • Watch EC2 Instances tab
+  • See new instances in "Pending" state → "Running" state
+
+☐ 4.1 Go to EC2 → Instances
+
+☐ 4.2 Refresh page (F5) every 30 seconds
+
+☐ 4.3 You should see 3 NEW instances appearing:
+    State: Pending → Running
+    
+    (New instance IDs will be different from the old ones!)
+
+☐ 4.4 Wait until all 3 show:
+    ├─ State: "running" (green)
+    ├─ Status checks: "Initializing..." → "2/2 checks passed"
+    └─ All 3 instances visible
+
+✓ STEP 4 COMPLETE - New instances running!
+
+================================================================================
+STEP 5: VERIFY SSM ROLE ATTACHED (1 minute)
+================================================================================
+
+☐ 5.1 Go to EC2 → Instances
+
+☐ 5.2 Click on one of the new instances
+
+☐ 5.3 Scroll down to "Details" tab
+
+☐ 5.4 Look for: "IAM role"
+
+☐ 5.5 Verify it shows: D7078E-EC2-SSM-Role ✓
+
+☐ 5.6 Check the other 2 instances similarly
+    ☑ Instance 2: IAM role = D7078E-EC2-SSM-Role
+    ☑ Instance 3: IAM role = D7078E-EC2-SSM-Role
+
+✓ STEP 5 COMPLETE - All 3 instances have SSM role!
+
+================================================================================
+STEP 6: VERIFY SSM CONNECTIVITY (2 minutes)
+================================================================================
+
+☐ 6.1 Go to AWS Console → Systems Manager → Fleet Manager
+    URL: https://eu-north-1.console.aws.amazon.com/systems-manager/
+
+☐ 6.2 You should see your 3 instances listed
+
+☐ 6.3 Check status of each:
+    Instance 1: Status = "Online" (green) ✓
+    Instance 2: Status = "Online" (green) ✓
+    Instance 3: Status = "Online" (green) ✓
+    
+    (If showing "Offline": wait 2-3 more minutes and refresh)
+
+✓ STEP 6 COMPLETE - All instances managed by SSM!
+
+================================================================================
+STEP 7: TEST SSM CONNECTION (Optional - 1 minute)
+================================================================================
+
+☐ 7.1 Still in Systems Manager, go to "Session Manager"
+
+☐ 7.2 Click "Start session"
+
+☐ 7.3 Select one of your instances
+
+☐ 7.4 Click "Start session"
+
+☐ 7.5 You should see a terminal prompt
+
+☐ 7.6 Type: uptime
+
+☐ 7.7 You should see system uptime output
+
+☐ 7.8 Type: exit (to close session)
+
+✓ STEP 7 COMPLETE - SSM connection works!
+
+================================================================================
+STEP 8: RETRY FIS EXPERIMENT (5 minutes)
+================================================================================
+
+NOW YOUR INSTANCES ARE READY FOR FIS!
+
+☐ 8.1 Go to AWS Console → Fault Injection Simulator
+    URL: https://eu-north-1.console.aws.amazon.com/fis/
+
+☐ 8.2 Create new experiment
+
+☐ 8.3 Configure:
+    Name: D7078E-Task5-CPU-Stress
+    Service: EC2
+
+☐ 8.4 Actions section:
+    Action type: Stress CPU
+    Duration: 120 seconds
+    CPU: 90%
+
+☐ 8.5 Targets section:
+    Target type: EC2 Instances
+    
+    Method: Specify instances (or use tags if they match)
+    
+    Select your 3 instances:
+    ☑ i-03b3951e1cff6aa9b (or the new instance ID)
+    ☑ i-0a6b2c4bdce290dd0 (or the new instance ID)
+    ☑ i-0d91bf046fcb0be90 (or the new instance ID)
+
+☐ 8.6 IAM role section:
+    Create role if needed, or select existing FIS role
+
+☐ 8.7 Click "Create experiment"
+
+☐ 8.8 Review and click "Start experiment"
+
+✓ EXPECTED: Experiment starts successfully! NO "InvalidTarget" error! ✓
+
+================================================================================
+WHAT TO EXPECT DURING FIS EXPERIMENT (2-3 minutes)
+================================================================================
+
+Timeline:
+
+Minute 0:
+  ├─ Experiment starts
+  ├─ FIS injects CPU stress on selected instance(s)
+  └─ Instance(s) CPU spikes to 90%
+
+Minute 0-1:
+  ├─ CloudWatch: CPU graph shows spike
+  ├─ Health check may detect high CPU
+  ├─ ALB may mark instance as unhealthy
+  └─ Request count may drop
+
+Minute 1-2:
+  ├─ ASG detects unhealthy instance
+  ├─ ASG launches replacement instance
+  ├─ Old instance terminates or recovers
+  └─ New instance boots
+
+Minute 2:
+  ├─ Stress command stops (120 seconds up)
+  ├─ CPU drops back to normal
+  ├─ Replacement instance becomes healthy
+  └─ HealthyHostCount back to 3
+
+Minute 3+:
+  ├─ System fully recovered
+  ├─ All metrics normalized
+  └─ Experiment complete!
+
+================================================================================
+SCREENSHOTS TO COLLECT FOR TASK 5
+================================================================================
+
+During the FIS experiment, take screenshots of:
+
+☐ CloudWatch Dashboard (before failure):
+  └─ CPU normal, HealthyHostCount = 3
+
+☐ CloudWatch Dashboard (during stress):
+  └─ One instance CPU = 90%
+  └─ HealthyHostCount = 2 (dropping)
+
+☐ Target Group (during failure):
+  └─ One instance marked "Unhealthy"
+
+☐ ASG Activity (during replacement):
+  └─ "Launching 1 instance" message
+
+☐ CloudWatch Dashboard (during recovery):
+  └─ New instance becoming healthy
+  └─ HealthyHostCount = 3 again
+
+☐ CloudWatch Dashboard (after recovery):
+  └─ All metrics normalized
+
+(These screenshots are deliverables for your lab report!)
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+❌ Problem: Instances not showing in Fleet Manager (Step 6)
+   Solution:
+     1. Wait 5 more minutes (SSM agent takes time to register)
+     2. Verify IAM role attached (EC2 → Instances → Details → IAM role)
+     3. Refresh Fleet Manager page (F5)
+     4. If still offline: terminate instance, wait for ASG to relaunch
+
+❌ Problem: FIS still shows "InvalidTarget" error (Step 8)
+   Solution:
+     1. Verify all 3 instances show "Online" in Fleet Manager
+     2. In FIS, use "Specify instances" (not tags)
+     3. Manually select instances from dropdown
+     4. Make sure instances are in "Running" state (not Pending)
+
+❌ Problem: ASG didn't launch new instances (Step 4)
+   Solution:
+     1. Check ASG desired capacity: should be 3
+     2. Check ASG Activity tab for errors
+     3. Wait 10 minutes (sometimes takes longer)
+     4. If still nothing: manually set desired capacity to 3
+
+================================================================================
+SUMMARY
+================================================================================
+
+What you did:
+  ✓ Created IAM role: D7078E-EC2-SSM-Role
+  ✓ Updated Launch Template to use this role
+  ✓ Terminated old instances (without SSM role)
+  ✓ ASG launched 3 new instances (with SSM role)
+  ✓ Verified instances are managed by SSM
+  ✓ Retried FIS experiment (SUCCESS!)
+
+Result:
+  ✓ FIS can now target your instances
+  ✓ No more "InvalidTarget" errors
+  ✓ Ready to complete Task 5 failure simulation
+  ✓ Instances properly configured for production
+
+Time spent: ~10 minutes
+Value gained: Full SSM/FIS capability for future cloud experiments!
+
+================================================================================
+NEXT: COMPLETE TASK 5
+================================================================================
+
+After verifying SSM works (Step 6), you're ready for Task 5:
+
+1. ✓ Three instances with SSM role: READY
+2. ✓ FIS can target them: READY
+3. → Run FIS experiment (Step 8)
+4. → Observe failure and recovery
+5. → Collect evidence (screenshots, logs, timeline)
+6. → Document findings for lab report
+
+Task 5 is the main objective - show that:
+  ✓ Health checks detect failures
+  ✓ ALB removes failed instances
+  ✓ ASG replaces them automatically
+  ✓ System recovers without manual intervention
+  ✓ This is high availability in action!
+
+Good luck! You're almost at the finish line! 🚀
+
+================================================================================

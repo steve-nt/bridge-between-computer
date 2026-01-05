@@ -1,0 +1,170 @@
+================================================================================
+DISK SPACE FIX - INSTALL STRESS-NG
+================================================================================
+
+PROBLEM:
+"E: You don't have enough free space in /var/cache/apt/archives/"
+
+CAUSE:
+Instance disk is too full. Need to free up space before installing stress-ng.
+
+SOLUTION:
+Clean up unused packages and cache, then retry installation.
+
+================================================================================
+STEP 1: CLEAN PACKAGE CACHE
+================================================================================
+
+Run these commands IN YOUR SSH SESSION (one at a time):
+
+Command 1: Clean apt cache
+───────────────────────────
+
+  sudo apt-get clean
+
+  This removes downloaded package files.
+  Frees up ~100-200 MB
+
+Command 2: Remove partial packages
+───────────────────────────────────
+
+  sudo apt-get autoclean
+
+  This removes old package files.
+  Frees up ~50-100 MB
+
+Command 3: Remove unused packages
+──────────────────────────────────
+
+  sudo apt-get autoremove -y
+
+  This removes packages no longer needed.
+  Frees up ~100-300 MB
+
+Command 4: Check disk space
+────────────────────────────
+
+  df -h
+
+  Shows:
+    Filesystem     Size Used Avail Use%
+    /dev/root      xx   xx   xx   xx%
+  
+  Look at "Avail" column - should now show more free space
+
+================================================================================
+STEP 2: RETRY STRESS-NG INSTALLATION
+================================================================================
+
+Now try installing stress-ng again:
+
+  sudo apt-get install -y stress-ng
+
+Should succeed now! ✓
+
+================================================================================
+ALTERNATIVE: LIGHTWEIGHT STRESS TOOL
+================================================================================
+
+If stress-ng still fails, use built-in Linux command (no install needed):
+
+Run CPU stress for 120 seconds:
+
+  yes > /dev/null &
+  PID=$!
+  sleep 120
+  kill $PID
+
+This:
+  ✓ Uses built-in 'yes' command (no install)
+  ✓ Burns CPU continuously
+  ✓ Runs for 120 seconds
+  ✓ Automatically stops
+
+Or use 'yes' for 2 minutes directly:
+
+  timeout 120 yes > /dev/null
+
+(This does the same thing as stress-ng!)
+
+================================================================================
+STEP-BY-STEP: RUN THE CLEANUP
+================================================================================
+
+Your SSH session should look like:
+
+  ubuntu@ip-172-31-17-195:~$ sudo apt-get clean
+  ubuntu@ip-172-31-17-195:~$ sudo apt-get autoclean
+  ubuntu@ip-172-31-17-195:~$ sudo apt-get autoremove -y
+  
+  (Wait for each to complete)
+  
+  ubuntu@ip-172-31-17-195:~$ df -h
+  
+  (Check "Avail" - should be higher now)
+  
+  ubuntu@ip-172-31-17-195:~$ sudo apt-get install -y stress-ng
+  
+  (Should succeed this time!)
+
+================================================================================
+QUICK FIX: JUST USE 'YES' COMMAND
+================================================================================
+
+Don't waste time on cleanup - just use what's already on the system!
+
+In your SSH session, run:
+
+  timeout 120 yes > /dev/null
+
+This:
+  ✓ Starts immediately (no install needed)
+  ✓ Burns CPU to 100%
+  ✓ Runs for 120 seconds exactly
+  ✓ Automatically stops after 2 minutes
+  ✓ Returns to prompt: ubuntu@ip-172-31-17-195:~$
+
+Then watch CloudWatch for:
+  • CPU spike on this instance
+  • Health check failure
+  • ASG replacement launching
+  • Recovery complete
+
+Same result as stress-ng, no installation needed!
+
+================================================================================
+RECOMMENDED: USE 'YES' FOR TASK 5
+================================================================================
+
+Since you're already SSH'd in and stress-ng won't install:
+
+1. Open CloudWatch dashboard in browser
+2. Open Target Group in another tab
+3. Open ASG Activity in another tab
+4. In SSH session, run:
+
+   timeout 120 yes > /dev/null
+
+5. Watch failure and recovery in real-time!
+6. Take screenshots
+7. Exit SSH when done
+
+This is FASTER and SIMPLER than fixing disk space!
+
+================================================================================
+EITHER WAY WORKS
+================================================================================
+
+Option A: Clean disk + install stress-ng
+  Time: 5 min (cleanup) + 2 min (stress) = 7 min total
+  
+Option B: Use 'yes' command immediately  
+  Time: 2 min (stress only)
+  Result: Identical - same CPU stress, same failure/recovery
+
+Recommend: Option B (faster!)
+
+Go with whichever you prefer. You're already connected via SSH - just run
+the command and watch the failure simulation happen! 🚀
+
+================================================================================

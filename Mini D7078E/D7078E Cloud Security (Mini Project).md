@@ -183,3 +183,5 @@ Deliverables:
 6. A timeline of events (ramp up → scale out → failure → recovery).
 7. Reflections: what worked, what failed, potential production risks,
 mitigation steps.
+
+stress-ng -c 0 -l 81 -t 6000s

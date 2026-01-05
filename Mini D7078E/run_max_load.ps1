@@ -3,7 +3,7 @@
 
 $projectDir = "C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E"
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-$ALB_URL = "http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/"
+$ALB_URL = "http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com"
 
 Set-Location $projectDir
 
