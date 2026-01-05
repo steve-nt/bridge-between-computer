@@ -1,0 +1,388 @@
+================================================================================
+D7078E CLOUD SECURITY - TASKS 5 & 6 START HERE
+================================================================================
+
+You asked: "How should we implement Tasks 5 & 6?"
+
+This document tells you EXACTLY where to start and what to do.
+
+================================================================================
+YOUR MISSION
+================================================================================
+
+TASK 5: Demonstrate automatic failover
+  ✓ Scale ASG to 3 instances (from Task 4 load)
+  ✓ Trigger failure on one instance
+  ✓ Observe automatic health check failure detection
+  ✓ Watch ASG automatically launch replacement
+  ✓ Document recovery with screenshots
+  
+TASK 6: Prove all actions are auditable
+  ✓ Export SSM/FIS command logs
+  ✓ Export CloudTrail audit trail
+  ✓ Export ASG activity history
+  ✓ Export CloudWatch metrics
+  ✓ Create timeline with exact timestamps
+
+Result: Complete lab report showing automatic resilience and auditability
+
+Estimated time: 30-35 minutes total
+
+================================================================================
+4-DOCUMENT QUICK START GUIDE
+================================================================================
+
+I've created 4 new comprehensive documents for you:
+
+1. GUIDE_SUMMARY.txt ← START HERE FIRST
+   └─ 5-minute overview of what you need to do
+   └─ Quick execution steps
+   └─ Success criteria
+   └─ "TLDR" version
+
+2. IMPLEMENTATION_TASKS_GUIDE.md ← DETAILED REFERENCE
+   └─ Complete 20,000+ word guide
+   └─ Architecture diagrams
+   └─ Step-by-step instructions
+   └─ All success criteria explained
+   └─ Troubleshooting section
+
+3. TASK_5_6_QUICK_CHECKLIST.md ← EXECUTION CHECKLIST
+   └─ Pre-flight checks
+   └─ Step-by-step checklist format
+   └─ Screenshot checklist
+   └─ Timing estimates
+   └─ Final deliverables
+
+4. COMMANDS_READY_TO_USE.md ← COPY-PASTE COMMANDS
+   └─ All AWS CLI commands ready to use
+   └─ No need to write commands from scratch
+   └─ Just replace bracketed values
+   └─ Includes explanations for each command
+
+5. VISUAL_ARCHITECTURE_DIAGRAMS.txt ← UNDERSTAND THE FLOW
+   └─ Detailed ASCII diagrams showing failure→recovery
+   └─ Timeline visualization
+   └─ CloudWatch metrics graphs
+   └─ What to capture for lab report
+
+================================================================================
+QUICK START: 5 STEPS
+================================================================================
+
+STEP 1: Read GUIDE_SUMMARY.txt (5 minutes)
+─────────────────────────────────────────
+
+Read this file:
+  C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\GUIDE_SUMMARY.txt
+
+Why: Get overview of what you need to do
+What you'll learn: Tasks 5 & 6 summary, success criteria, file references
+Time: 5 minutes
+
+STEP 2: Review VISUAL_ARCHITECTURE_DIAGRAMS.txt (5 minutes)
+──────────────────────────────────────────────────────────
+
+Read section: "SYSTEM ARCHITECTURE - BEFORE FAILURE" through "RECOVERY COMPLETE"
+
+Why: Understand what happens during failure/recovery
+What you'll learn: Timeline of events, metrics changes, what to expect
+Time: 5 minutes
+
+STEP 3: Use TASK_5_6_QUICK_CHECKLIST.md (1 minute)
+───────────────────────────────────────────────────
+
+Open this file:
+  C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\TASK_5_6_QUICK_CHECKLIST.md
+
+Why: Have checklist ready for execution
+What you'll have: Step-by-step checklist to follow during Tasks 5 & 6
+Time: 1 minute (just to open and review)
+
+STEP 4: Execute Task 5 using COMMANDS_READY_TO_USE.md (15-20 minutes)
+──────────────────────────────────────────────────────────────────────
+
+Follow these sections from COMMANDS_READY_TO_USE.md:
+  1. "Pre-Flight Check"
+  2. "Get Instance ID to Stress"
+  3. "Method A: Trigger Failure via SSM" (recommended)
+  4. "Monitor Failure in Real-Time" (keep CloudWatch open)
+
+Why: Execute failure simulation with ready-to-use commands
+What you'll do: Trigger failure, watch recovery, take screenshots
+Time: 15-20 minutes (includes waiting for recovery)
+
+STEP 5: Execute Task 6 using COMMANDS_READY_TO_USE.md (10-15 minutes)
+──────────────────────────────────────────────────────────────────────
+
+Follow these sections from COMMANDS_READY_TO_USE.md:
+  1. "1. Export SSM Command Log"
+  2. "2. Export CloudTrail SSM Events"
+  3. "3. Export CloudTrail ASG/Launch Events"
+  4. "4. Export ASG Activity History"
+  5. "5. Export CloudWatch Metrics"
+  6. "8. Verify All Evidence Files"
+
+Why: Collect all audit evidence
+What you'll have: 6+ JSON files documenting failure→recovery
+Time: 10-15 minutes
+
+================================================================================
+RECOMMENDED READING ORDER
+================================================================================
+
+For Quick Execution (30 minutes):
+1. GUIDE_SUMMARY.txt (5 min) - Get overview
+2. TASK_5_6_QUICK_CHECKLIST.md (follow along) - Execute
+3. COMMANDS_READY_TO_USE.md (copy commands) - Run commands
+
+For Deep Understanding (60 minutes):
+1. GUIDE_SUMMARY.txt (5 min) - Overview
+2. VISUAL_ARCHITECTURE_DIAGRAMS.txt (10 min) - Understand flow
+3. IMPLEMENTATION_TASKS_GUIDE.md (20 min) - Read main sections
+4. TASK_5_6_QUICK_CHECKLIST.md (follow along) - Execute
+5. COMMANDS_READY_TO_USE.md (copy commands) - Run
+
+For Complete Understanding (120 minutes):
+1. GUIDE_SUMMARY.txt (5 min)
+2. VISUAL_ARCHITECTURE_DIAGRAMS.txt (15 min)
+3. IMPLEMENTATION_TASKS_GUIDE.md (40 min - read all)
+4. TASK_5_6_QUICK_CHECKLIST.md (follow along)
+5. COMMANDS_READY_TO_USE.md (reference as needed)
+6. Original guides if clarification needed
+
+================================================================================
+BEFORE YOU START - CHECKLIST
+================================================================================
+
+Make sure you have:
+
+Infrastructure Ready:
+  ☐ 3 instances running in ASG (check EC2 console)
+  ☐ All 3 "Healthy" in Target Group (check Target Group)
+  ☐ Load generators running (docker-compose running in terminal)
+  ☐ CloudWatch dashboard showing metrics (ALB traffic visible)
+  ☐ Region: eu-north-1 selected
+
+SSM/FIS Setup:
+  ☐ IAM role D7078E-EC2-SSM-Role created
+  ☐ Instances have SSM role attached
+  ☐ Instances show "Online" in Systems Manager > Fleet Manager
+  ☐ SSM send-command tested on one instance (works)
+
+Tools Ready:
+  ☐ AWS CLI installed and configured
+  ☐ Access to AWS Console
+  ☐ Text editor for notes/timeline
+  ☐ Screenshot tool (Windows: Snip & Sketch)
+  ☐ Terminal with AWS CLI working
+
+Reference Materials:
+  ☐ Original project document: D7078E Cloud Security (Mini Project).md
+  ☐ Previous guides: TASK_5_FAILURE_SIMULATION.txt, SSM_SETUP_DETAILED.txt
+  ☐ New guides: All 5 documents listed above
+
+If anything is missing, refer to:
+  → SSM_SETUP_DETAILED.txt (if SSM setup needed)
+  → task_4.txt (if need to reach 3 instances)
+  → IMPLEMENTATION_TASKS_GUIDE.md (Troubleshooting section)
+
+================================================================================
+QUICK REFERENCE - FILE PURPOSES
+================================================================================
+
+GUIDE_SUMMARY.txt
+  ├─ What: High-level overview of Tasks 5 & 6
+  ├─ Why: Quick understanding of what to do
+  ├─ Length: 2 pages
+  ├─ Reading time: 5 minutes
+  └─ Use: First document to read
+
+IMPLEMENTATION_TASKS_GUIDE.md
+  ├─ What: Complete detailed guide with all information
+  ├─ Why: Comprehensive reference with architecture and details
+  ├─ Length: 20+ pages
+  ├─ Reading time: 30-40 minutes for full read
+  └─ Use: Main reference for understanding
+
+TASK_5_6_QUICK_CHECKLIST.md
+  ├─ What: Step-by-step checklist format
+  ├─ Why: Follow checklist during actual execution
+  ├─ Length: 12 pages, checklist format
+  ├─ Use time: While executing Tasks 5 & 6
+  └─ Use: Execution guide with checkboxes
+
+COMMANDS_READY_TO_USE.md
+  ├─ What: All AWS CLI commands ready to copy-paste
+  ├─ Why: Execute commands without writing them
+  ├─ Length: 12 pages, command templates
+  ├─ Use: Open this when actually running commands
+  └─ Use: Command reference for Task 6 execution
+
+VISUAL_ARCHITECTURE_DIAGRAMS.txt
+  ├─ What: ASCII diagrams + timeline + metrics graphs
+  ├─ Why: Understand what happens during failure/recovery
+  ├─ Length: 15 pages, visual format
+  ├─ Reading time: 15 minutes
+  └─ Use: Understand before executing, reference during
+
+================================================================================
+TASK 5 EXECUTION (15-20 minutes)
+================================================================================
+
+What you'll do:
+
+1. Pre-flight (2 min)
+   ├─ Verify 3 instances healthy
+   ├─ Confirm load generators running
+   ├─ Open CloudWatch dashboard
+   └─ Take "before" screenshots
+
+2. Trigger failure (1 min)
+   ├─ Copy command from COMMANDS_READY_TO_USE.md
+   ├─ Get instance ID
+   ├─ Run SSM send-command
+   └─ Note exact timestamp
+
+3. Monitor failure (7 min)
+   ├─ Watch HealthyHostCount drop (3→2)
+   ├─ Watch ASG launch replacement
+   ├─ Watch new instance boot
+   ├─ Watch HealthyHostCount rise (2→3)
+   └─ Take screenshots at each step
+
+4. Document timeline (2 min)
+   ├─ Write down exact timestamps
+   ├─ Note key events
+   └─ Calculate recovery time
+
+Result: Complete failure→recovery cycle documented with screenshots
+
+================================================================================
+TASK 6 EXECUTION (10-15 minutes)
+================================================================================
+
+What you'll do:
+
+1. Copy commands (1 min)
+   └─ Open COMMANDS_READY_TO_USE.md Task 6 section
+
+2. Run command sequences (5-10 min)
+   ├─ Export SSM command log
+   ├─ Export CloudTrail events (3 commands)
+   ├─ Export ASG activity
+   ├─ Export CloudWatch metrics
+   └─ Each command takes ~5-10 seconds
+
+3. Verify files (2 min)
+   ├─ Check all JSON files created
+   ├─ Verify file sizes reasonable
+   └─ Quick content check
+
+4. Create summary (2-5 min)
+   ├─ Write analysis of what evidence shows
+   ├─ Summarize key findings
+   └─ Prepare for lab report
+
+Result: 6+ JSON files + timeline document proving all actions auditable
+
+================================================================================
+WHAT SUCCESS LOOKS LIKE
+================================================================================
+
+After Task 5:
+  ✓ Screenshots showing failure→recovery cycle
+  ✓ CloudWatch metrics showing HealthyHostCount: 3→2→3
+  ✓ CloudWatch showing CPU spike and recovery
+  ✓ Timeline document with exact timestamps
+  ✓ Proof that system recovered automatically (~4 minutes)
+  ✓ Proof that no manual intervention was needed
+
+After Task 6:
+  ✓ ssm_command_log.json (proves stress was applied)
+  ✓ cloudtrail_ssm_logs.json (proves SSM action logged)
+  ✓ cloudtrail_asg_logs.json (proves ASG action logged)
+  ✓ asg_activity_log.json (proves health failure detected)
+  ✓ cloudwatch_cpu.json (proves CPU spike occurred)
+  ✓ cloudwatch_healthy_hosts.json (proves recovery timeline)
+
+Combined:
+  ✓ Complete audit trail of failure→recovery
+  ✓ Timestamps prove everything was automatic
+  ✓ Evidence proves system is production-ready
+  ✓ Demonstrates cloud infrastructure resilience
+  ✓ Suitable for compliance/audit review
+
+================================================================================
+COMMON QUESTIONS ANSWERED
+================================================================================
+
+Q: Do I need to do Tasks 1-4 first?
+A: Yes, you need 3 running instances in ASG from Tasks 1-4. If you don't 
+   have these, complete Tasks 1-4 first (using task_1.txt, task_2.txt, etc.)
+
+Q: What if I only have 2 instances?
+A: Tasks 5-6 work with 2 instances, but the exercise is designed for 3.
+   Best to scale to 3 first using Task 4 load generators.
+
+Q: Do I need to set up SSM first?
+A: Yes, SSM role must be attached to instances before using SSM send-command.
+   Follow SSM_SETUP_DETAILED.txt (30 minutes) to set up.
+   If you already did this, you're ready!
+
+Q: Can I use FIS instead of SSM?
+A: Yes! Both work. SSM is simpler, FIS is more enterprise-grade.
+   Follow IMPLEMENTATION_TASKS_GUIDE.md Method B for FIS setup.
+
+Q: How long do Tasks 5 & 6 take?
+A: Task 5 (execution): 15-20 minutes
+   Task 6 (evidence): 10-15 minutes
+   Total: 30-35 minutes
+   Plus reading/understanding: 10-20 minutes first time
+
+Q: What if health check doesn't fail?
+A: Increase CPU stress load (change -l 90 to -l 95 in command)
+   Or wait longer for health check to cycle
+   See IMPLEMENTATION_TASKS_GUIDE.md Troubleshooting
+
+Q: What if ASG doesn't launch replacement?
+A: Check desired capacity is still 3 in ASG settings
+   Check ASG activity log for error messages
+   Check instance has sufficient IAM permissions
+   See IMPLEMENTATION_TASKS_GUIDE.md Troubleshooting
+
+Q: Where do I put my evidence files?
+A: Create folder: Task_5_6_Evidence/
+   Put all JSON files there
+   Put all screenshots there
+   Put timeline and analysis docs there
+   Zip and submit to instructor
+
+Q: How do I know recovery is complete?
+A: HealthyHostCount returns to 3 and stays there
+   CPU normalizes to pre-failure levels
+   RequestCount returns to pre-failure rates
+   All 3 instances show "Healthy" in Target Group
+   Old stressed instance is completely terminated
+
+================================================================================
+READY? GO!
+================================================================================
+
+Start here:
+
+1. Open: GUIDE_SUMMARY.txt (5 minutes)
+2. Open: VISUAL_ARCHITECTURE_DIAGRAMS.txt (5-10 minutes)
+3. Open: TASK_5_6_QUICK_CHECKLIST.md (prepare for execution)
+4. Open: COMMANDS_READY_TO_USE.md (for command copying)
+5. Execute Task 5 (15-20 minutes)
+6. Execute Task 6 (10-15 minutes)
+7. Create lab report (collect all evidence)
+8. Submit to instructor
+
+Total time: ~45-60 minutes from start to completion
+
+You've got this! The infrastructure is ready, the guides are complete, 
+the commands are ready. All you need to do is execute! 🚀
+
+================================================================================
