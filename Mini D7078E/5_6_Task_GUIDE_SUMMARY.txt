@@ -1,0 +1,359 @@
+================================================================================
+D7078E CLOUD SECURITY - IMPLEMENTATION GUIDE SUMMARY
+================================================================================
+
+You asked: "How should we implement the following tasks?"
+
+ANSWER: Complete Tasks 5 & 6 to demonstrate automatic failover and recovery
+        with full audit trail.
+
+================================================================================
+TASK 5: ASG Activity Log Screenshot (Scale-out to 3 + Replacements)
+================================================================================
+
+WHAT TO DO:
+1. Wait until ASG reaches 3 instances (from Task 4 load generators)
+2. Trigger controlled failure simulation on one instance
+3. Observe automatic health check failure detection
+4. Watch ASG automatically launch replacement instance
+5. Document recovery with screenshots and metrics
+
+HOW TO TRIGGER FAILURE (Pick One):
+
+  OPTION A (RECOMMENDED): SSM Stress Command
+  ──────────────────────────────────────────
+  Run: aws ssm send-command --instance-ids i-xxxxx \
+         --document-name "AWS-RunShellScript" \
+         --parameters 'commands=["stress-ng -c 0 -l 90 -t 120s"]'
+  
+  Why: Simple, safe, time-limited (120 seconds), fully auditable
+
+  OPTION B: AWS FIS Experiment
+  ─────────────────────────────
+  Use: AWS Console > Fault Injection Simulator > Create Experiment
+  
+  Why: Enterprise-grade, designed for chaos testing, reversible
+
+EXPECTED TIMELINE:
+  Minute 0:     Stress command starts → CPU spikes to 90%
+  Minute 0-1:   Health check fails → Instance marked unhealthy
+  Minute 1:     ASG detects unhealthy instance
+  Minute 1-2:   ASG launches replacement instance
+  Minute 2:     Stress command ends (120s timeout)
+  Minute 2-3:   Replacement instance boots and joins Target Group
+  Minute 3+:    Old instance terminates, system recovered
+  
+  Total recovery: ~4 minutes, automatic, no manual intervention
+
+WHAT TO CAPTURE (Screenshots):
+  ☐ Before: 3 instances healthy, normal CPU
+  ☐ During health failure: HealthyHostCount drops 3→2
+  ☐ During replacement: New instance in "Pending" state
+  ☐ During recovery: New instance passing health checks
+  ☐ After recovery: HealthyHostCount back to 3, old instance terminated
+
+================================================================================
+TASK 6: FIS/SSM Command Logs + CloudTrail Evidence
+================================================================================
+
+WHAT TO COLLECT:
+
+1. SSM Command Log
+   File: ssm_command_log.json
+   How:  aws ssm get-command-invocation --command-id <ID> --instance-id <ID>
+   Shows: Command execution, timestamps, success/failure
+
+2. CloudTrail Events (AWS Audit Trail)
+   Files: cloudtrail_ssm_logs.json, cloudtrail_asg_logs.json
+   How:   aws cloudtrail lookup-events --lookup-attributes ...
+   Shows: Who executed what, when, from where, with what parameters
+
+3. ASG Activity History
+   File: asg_activity_log.json or .csv
+   How:  aws autoscaling describe-scaling-activities ... 
+         OR: AWS Console > ASG > Activity tab > Export
+   Shows: Health failures, instance launches, terminations, timestamps
+
+4. CloudWatch Metrics
+   Files: cloudwatch_cpu.json, cloudwatch_healthy_hosts.json
+   How:   aws cloudwatch get-metric-statistics ... (for time range during failure)
+   Shows: CPU spike, HealthyHostCount drops/recovers, RequestCount changes
+
+5. Timeline Document
+   File: Your custom document with exact timestamps
+   Shows: Complete failure→recovery timeline with all key events
+
+WHY COLLECT THIS EVIDENCE?
+  ✓ Proves failure was simulated (SSM/FIS logs)
+  ✓ Proves all actions are auditable (CloudTrail)
+  ✓ Proves ASG responded automatically (Activity logs)
+  ✓ Proves system recovered (CloudWatch metrics)
+  ✓ Demonstrates compliance & auditability (CloudTrail + timestamps)
+
+================================================================================
+YOUR DELIVERABLES CHECKLIST
+================================================================================
+
+TASK 5 DELIVERABLES:
+  ☐ 5+ screenshots showing:
+    ├─ Before: All 3 instances healthy
+    ├─ During: Health failure, replacement launching
+    ├─ After: Recovery complete, all 3 healthy again
+    └─ CloudWatch showing CPU spike and recovery
+  
+  ☐ Timeline document with exact timestamps:
+    ├─ When stress started
+    ├─ When health check failed
+    ├─ When ASG launched replacement
+    ├─ When recovery completed
+    └─ Total recovery time (should be ~4 minutes)
+
+TASK 6 DELIVERABLES:
+  ☐ SSM command log (JSON file)
+  ☐ CloudTrail logs (JSON files):
+    ├─ SSM SendCommand event
+    ├─ ASG Launch event
+    └─ EC2 Terminate event
+  ☐ ASG Activity history (JSON or CSV)
+  ☐ CloudWatch metrics (JSON or CSV):
+    ├─ CPU timeline
+    └─ HealthyHostCount timeline
+  ☐ Analysis document explaining what the evidence shows
+
+================================================================================
+KEY FILES YOU HAVE
+================================================================================
+
+Main Implementation Guides:
+  1. IMPLEMENTATION_TASKS_GUIDE.md
+     → Complete detailed guide with architecture diagrams
+     → Step-by-step instructions for Tasks 5 & 6
+     → Success criteria and troubleshooting
+
+  2. TASK_5_6_QUICK_CHECKLIST.md
+     → Quick checklist format for fast execution
+     → Pre-flight checks
+     → Screenshot checklist
+     → Timing estimates
+
+  3. COMMANDS_READY_TO_USE.md
+     → Copy-paste ready AWS CLI commands
+     → All templates with explanations
+     → No need to write commands from scratch
+
+Existing Guides:
+  4. TASK_5_FAILURE_SIMULATION.txt (original)
+     → 3 failure simulation methods explained
+     → Timeline and expectations
+     
+  5. SSM_SETUP_DETAILED.txt
+     → Complete IAM role setup for SSM access
+     → Required before FIS/SSM commands work
+
+================================================================================
+QUICK EXECUTION STEPS
+================================================================================
+
+STEP 1: Verify Setup (2 minutes)
+────────────────────────────────
+✓ Confirm 3 instances running in ASG
+✓ Confirm all 3 instances "Healthy" in Target Group
+✓ Confirm load generators running (traffic flowing)
+✓ Confirm SSM role attached to instances (Fleet Manager shows "Online")
+✓ Open CloudWatch dashboard for real-time monitoring
+
+STEP 2: Execute Failure Simulation (2 minutes)
+───────────────────────────────────────────────
+Use COMMANDS_READY_TO_USE.md:
+
+  Method A (Simpler):
+    Run: aws ssm send-command (with stress-ng command)
+    Note: Command ID and timestamp
+    Open: CloudWatch dashboard to watch failure
+
+  Method B (Enterprise):
+    Go to: Fault Injection Simulator
+    Create: CPU stress experiment targeting your instances
+    Start: Experiment, note timestamp
+    Open: CloudWatch dashboard to watch failure
+
+STEP 3: Monitor Failure & Recovery (7 minutes)
+───────────────────────────────────────────────
+Watch in CloudWatch:
+  0-1 min:  CPU spikes to 90%, HealthyHostCount drops 3→2
+  1-2 min:  ASG Activity shows "Launching 1 instances"
+  2-3 min:  New instance boots and joins (HealthyHostCount: 2→3)
+  3-5 min:  Old instance terminates, system normalized
+
+Take screenshots at each major milestone.
+
+STEP 4: Collect Evidence (10 minutes)
+──────────────────────────────────────
+Use COMMANDS_READY_TO_USE.md Task 6 section:
+
+  1. Export SSM command log
+  2. Export CloudTrail events (3 exports)
+  3. Export ASG activity
+  4. Export CloudWatch metrics (2 exports)
+  5. Verify all files
+
+STEP 5: Create Analysis Document (5 minutes)
+──────────────────────────────────────────────
+Write: What the evidence proves
+  ✓ System is resilient (survived single instance failure)
+  ✓ Recovery is automatic (no manual intervention)
+  ✓ Timeline is fast (~4 minutes)
+  ✓ All actions are auditable (CloudTrail proves it)
+  ✓ Meets production requirements
+
+TOTAL TIME: ~30-35 minutes for both tasks
+
+================================================================================
+WHAT PROVES TASK 5 SUCCESS
+================================================================================
+
+Screenshots showing:
+  ✓ ASG Activity log with "Launching 1 instances" entry
+  ✓ "Health check failure detected" message
+  ✓ Instance count going from 3 → 2 → 3
+  ✓ New instance appearing in EC2 Instances
+  ✓ Old instance getting terminated
+
+CloudWatch graphs showing:
+  ✓ CPU spike on one instance (90%+)
+  ✓ HealthyHostCount dropping (3 → 2)
+  ✓ HealthyHostCount recovering (2 → 3)
+  ✓ RequestCount dropping slightly then recovering
+  ✓ Complete timeline visible in one dashboard view
+
+Timeline document showing:
+  ✓ Exact start time of failure
+  ✓ Exact time of health check failure
+  ✓ Exact time ASG launched replacement
+  ✓ Exact time recovery completed
+  ✓ Total recovery time: ~4 minutes
+
+================================================================================
+WHAT PROVES TASK 6 SUCCESS
+================================================================================
+
+SSM Command Log shows:
+  ✓ Command ID (proves command was sent)
+  ✓ Timestamp (proves when stress started)
+  ✓ Status: "Success" (proves command executed)
+  ✓ Output showing stress-ng executed
+
+CloudTrail logs show:
+  ✓ SendCommand API call (SSM action)
+  ✓ Timestamp matching failure start
+  ✓ Username and source IP (who ran it)
+  ✓ RunInstances API call (ASG launching)
+  ✓ TerminateInstances API call (ASG cleanup)
+  ✓ Complete audit trail with signatures
+
+ASG Activity shows:
+  ✓ Health check failure entry with timestamp
+  ✓ Instance removal entry
+  ✓ "Launching 1 instances" entry
+  ✓ "Successfully launched" entry
+  ✓ Exact timestamps matching timeline
+
+CloudWatch metrics show:
+  ✓ CPU data points during failure window
+  ✓ HealthyHostCount data showing 3→2→3 transition
+  ✓ Timestamps matching all other evidence
+  ✓ Exportable as CSV for analysis
+
+================================================================================
+SUCCESS DEFINITION
+================================================================================
+
+You're done when:
+
+TASK 5 COMPLETE:
+  ✓ 3 instances healthy in ASG
+  ✓ Failure triggered on one instance
+  ✓ Health check detected failure within 1 minute
+  ✓ ASG automatically launched replacement
+  ✓ System recovered to 3 healthy instances in ~4 minutes
+  ✓ Demonstrated with screenshots showing entire cycle
+
+TASK 6 COMPLETE:
+  ✓ SSM command log exported
+  ✓ CloudTrail events exported (3+ files)
+  ✓ ASG activity exported
+  ✓ CloudWatch metrics exported
+  ✓ Timeline document created with exact timestamps
+  ✓ Analysis document explaining what evidence proves
+
+BOTH TASKS COMPLETE:
+  ✓ Lab report includes all deliverables
+  ✓ Screenshots show failure→recovery→recovery complete
+  ✓ Logs prove all actions are auditable
+  ✓ Timestamps prove recovery was fast and automatic
+  ✓ Ready to submit to instructor
+
+================================================================================
+WHERE TO START RIGHT NOW
+================================================================================
+
+1. READ THIS FIRST:
+   → IMPLEMENTATION_TASKS_GUIDE.md (main guide)
+
+2. THEN USE THIS:
+   → TASK_5_6_QUICK_CHECKLIST.md (execute step-by-step)
+
+3. FOR COMMANDS, USE THIS:
+   → COMMANDS_READY_TO_USE.md (copy-paste ready)
+
+4. IF YOU GET STUCK:
+   → TASK_5_FAILURE_SIMULATION.txt (original detailed guide)
+   → SSM_SETUP_DETAILED.txt (if SSM setup needed)
+
+================================================================================
+TLDR - COMPLETE IN 5 STEPS
+================================================================================
+
+1. Verify 3 instances healthy (2 min)
+2. Run SSM stress command on one instance (1 min)
+3. Watch failure & recovery in CloudWatch (7 min)
+4. Take screenshots during failure/recovery (automatic)
+5. Export logs with AWS CLI commands (10 min)
+
+Total: 30 minutes, demonstrates:
+  ✓ Auto-scaling works (Tasks 1-4)
+  ✓ Failure detection works
+  ✓ Auto-recovery works
+  ✓ System is resilient
+  ✓ All actions auditable
+
+Result: Impressive lab report showing production-grade infrastructure!
+
+================================================================================
+FINAL TIPS
+================================================================================
+
+DO:
+  ✓ Keep CloudWatch dashboard open during Task 5
+  ✓ Note exact timestamps as events happen
+  ✓ Take many screenshots (can't have too many)
+  ✓ Collect all evidence right after (while fresh)
+  ✓ Review timeline document for accuracy
+  ✓ Explain in lab report why this proves resilience
+
+DON'T:
+  ✗ Skip SSM setup (required for failure simulation)
+  ✗ Stop load generators during failure test
+  ✗ Terminate ASG manually (let it auto-recover)
+  ✗ Lose the evidence files (save backup copies)
+  ✗ Ignore timestamps (they're critical)
+
+Questions?
+  → See IMPLEMENTATION_TASKS_GUIDE.md (Troubleshooting section)
+  → See TASK_5_FAILURE_SIMULATION.txt (original guide)
+  → See COMMANDS_READY_TO_USE.md (command examples)
+
+================================================================================
+You're ready to go! Pick up IMPLEMENTATION_TASKS_GUIDE.md and start with
+Task 5 execution. You've got this! 🚀
+================================================================================

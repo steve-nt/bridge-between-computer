@@ -1,0 +1,655 @@
+================================================================================
+TASK 5 & 6 - VISUAL ARCHITECTURE & FLOW DIAGRAMS
+================================================================================
+
+This document shows the visual flow of failure detection and recovery.
+
+================================================================================
+SYSTEM ARCHITECTURE - BEFORE FAILURE
+================================================================================
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Continuous)   │
+                     │  Agents generating 500+ RPS     │
+                     │  via docker-compose containers  │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │    Application Load Balancer    │
+                     │   D7078E-MINI-PROJECT-GROUP35   │
+                     │          (DNS Active)           │
+                     └────┬───────────────────────┬────┘
+                          │                       │
+                    ┌─────▼─────┐         ┌─────▼─────┐
+                    │           │         │           │
+                ┌──▼──────┐ ┌──▼──────┐ ┌──▼──────┐
+                │EC2 Inst1│ │EC2 Inst2│ │EC2 Inst3│
+                │  i-xxx1 │ │  i-xxx2 │ │  i-xxx3 │
+                │ Running │ │ Running │ │ Running │
+                │ Healthy │ │ Healthy │ │ Healthy │
+                │ CPU 70% │ │ CPU 72% │ │ CPU 68% │
+                └─────────┘ └─────────┘ └─────────┘
+
+Status:
+  ✓ ASG HealthyHostCount = 3
+  ✓ All instances passing health checks
+  ✓ Load distributed evenly
+  ✓ CPU ~70% across all (from load)
+  ✓ RequestCount: 500-600 RPS
+  ✓ Target Group Status: All HEALTHY
+
+Time: T+0 seconds (Beginning of failure simulation)
+
+================================================================================
+FAILURE TRIGGERED - STRESS COMMAND STARTS
+================================================================================
+
+Command:
+  aws ssm send-command \
+    --instance-ids i-xxx2 \
+    --document-name "AWS-RunShellScript" \
+    --parameters 'commands=["stress-ng -c 0 -l 90 -t 120s"]'
+
+Effect:
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Still Running)│
+                     │  Agents generating 500+ RPS     │
+                     │  No interruption to traffic      │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │    Application Load Balancer    │
+                     │      Still distributing traffic │
+                     └────┬───────────────────────┬────┘
+                          │                       │
+                    ┌─────▼─────┐         ┌─────▼─────┐
+                    │           │         │           │
+                ┌──▼──────┐ ┌──▼──────┐ ┌──▼──────┐
+                │EC2 Inst1│ │EC2 Inst2│ │EC2 Inst3│
+                │  i-xxx1 │ │  i-xxx2 │ │  i-xxx3 │
+                │ Running │ │ Running │ │ Running │
+                │ Healthy │ │ STRESSED│ │ Healthy │
+                │ CPU 71% │ │CPU 90%+ │ │ CPU 69% │
+                └─────────┘ └─────┬───┘ └─────────┘
+                                  │
+                            stress-ng running
+                            100% CPU utilization
+                            on single core
+
+Status:
+  ✓ Instance 2 CPU spiked to 90%+
+  ✓ Stress-ng process consuming CPU
+  ✓ Health checks about to fail
+  ✓ ALB still sending traffic to instance 2
+  ✓ No impact yet on traffic (ALB still routes there)
+
+Time: T+0 to T+30 seconds (Stress starting, health checks running)
+
+================================================================================
+HEALTH CHECK FAILURE DETECTED
+================================================================================
+
+Event: ALB health check fails on Instance 2
+
+What happens:
+  1. Health check GET request sent to Instance 2 every 30 seconds
+  2. Instance 2 is now overloaded (CPU 90%+)
+  3. HTTP response timeout or delayed response
+  4. ALB marks instance as "Unhealthy"
+  5. ALB deregisters instance from Target Group
+  6. HealthyHostCount changes: 3 → 2
+
+Result:
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Still Running)│
+                     │  Still generating 500+ RPS      │
+                     │  But now only 2 instances can   │
+                     │  receive requests (instance 2   │
+                     │  is deregistered)               │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │  Application Load Balancer      │
+                     │  Deregistered: Instance 2       │
+                     │  Only routing to: Inst 1 & 3    │
+                     └────┬──────────────────────┬────┘
+                          │                      │
+                    ┌─────▼─────┐           ┌─────▼─────┐
+                    │           │           │           │
+                ┌──▼──────┐ ┌──▼──────┐ ┌──▼──────┐
+                │EC2 Inst1│ │EC2 Inst2│ │EC2 Inst3│
+                │  i-xxx1 │ │  i-xxx2 │ │  i-xxx3 │
+                │ Running │ │ Running │ │ Running │
+                │ Healthy │ │UNHEALTHY│ │ Healthy │
+                │ CPU 80% │ │CPU 90%+ │ │ CPU 80% │
+                │         │ │DEREGIST.│ │         │
+                └─────────┘ └────┬────┘ └─────────┘
+                                 │
+                            ⚠️ NOT RECEIVING TRAFFIC
+                            (ALB deregistered it)
+
+Status:
+  ✗ ASG HealthyHostCount = 2 (dropped from 3)
+  ✗ Instance 2 marked UNHEALTHY
+  ✗ ALB no longer sends traffic to Instance 2
+  ✗ RequestCount drops (2 instances instead of 3)
+  ✓ Instances 1 & 3 still healthy and receiving traffic
+  ✓ Load redistributed to 2 instances
+
+Traffic Impact:
+  Before: 500 RPS distributed: ~167 each → ~150 → ~183
+  During: 500 RPS distributed: ~250 each (2 instances)
+  Requests per instance: INCREASED (more load per instance)
+
+Time: T+30 to T+45 seconds (Health check detection)
+
+================================================================================
+ASG DETECTS UNHEALTHY INSTANCE & LAUNCHES REPLACEMENT
+================================================================================
+
+Event: ASG detects instance is unhealthy, initiates replacement
+
+What ASG does:
+  1. Detects instance marked unhealthy by health check
+  2. Initiates termination of unhealthy instance (eventually)
+  3. Launches NEW instance from Launch Template
+  4. New instance takes time to boot and pass health checks
+
+CloudTrail event:
+  EventName: RunInstances
+  EventTime: 2026-01-05T16:31:00Z (example)
+  InstanceId: i-yyy1 (new instance)
+
+ASG Activity log shows:
+  "Launching 1 instances"
+  "Attempting to launch 1 instances"
+
+Result:
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Still Running)│
+                     │  Still generating 500+ RPS      │
+                     │  Now hitting Inst 1, 2, & 3     │
+                     │  But 2 still deregistered       │
+                     │  New instance (4) is booting    │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │  Application Load Balancer      │
+                     │  Still routing to: Inst 1 & 3   │
+                     │  Inst 2: Deregistered           │
+                     │  Inst 4: Not ready yet (pending)│
+                     └────┬──────────────────────┬────┘
+                          │                      │
+                    ┌─────▼─────┐           ┌─────▼─────┐
+                    │           │           │           │
+                ┌──▼──────┐ ┌──▼──────┐ ┌──▼──────┐
+                │EC2 Inst1│ │EC2 Inst2│ │EC2 Inst3│
+                │  i-xxx1 │ │  i-xxx2 │ │  i-xxx3 │
+                │ Running │ │ Running │ │ Running │
+                │ Healthy │ │UNHEALTHY│ │ Healthy │
+                │ CPU 80% │ │CPU 90%+ │ │ CPU 80% │
+                │RECEIVING│ │DEREGIST.│ │RECEIVING│
+                └─────────┘ └────┬────┘ └─────────┘
+                                 │
+                    ┌────────────▼───────────┐
+                    │   EC2 Inst 4 (NEW)     │
+                    │  i-yyy1 (Replacement)  │
+                    │  State: Pending        │
+                    │  Status: Initializing  │
+                    │  CPU: Low (booting)    │
+                    │  NOT YET HEALTHY       │
+                    │  NOT RECEIVING TRAFFIC │
+                    └────────────────────────┘
+
+Status:
+  ✗ Instance 2 still unhealthy and deregistered
+  ⏳ Instance 4 launching (Pending state)
+  ✓ Instances 1 & 3 still handling traffic
+  ✓ HealthyHostCount still = 2 (new instance not ready)
+  ✗ RequestCount still at 2-instance level
+  ⏳ System at 2/3 capacity, waiting for recovery
+
+ASG Desired vs Actual:
+  Desired: 3
+  Actual: 3 (Inst 1, 2, 3 + new Inst 4 launching)
+  Healthy: 2 (only Inst 1 & 3)
+
+Time: T+45 to T+60 seconds (ASG response, instance 4 launching)
+
+================================================================================
+NEW INSTANCE BOOTS & PASSES HEALTH CHECKS - RECOVERY BEGINS
+================================================================================
+
+Event: New instance transitions to Running, passes health checks
+
+What happens:
+  1. Instance 4 finishes initialization (state: Running)
+  2. Target Group health checks start
+  3. Instance 4 responds successfully to health checks
+  4. ALB registers Instance 4 and starts sending traffic
+  5. HealthyHostCount changes: 2 → 3
+  6. System back to full capacity
+
+CloudTrail event:
+  EventName: DescribeTargetHealth (health checks passing)
+  Status: Healthy
+  InstanceId: i-yyy1
+
+CloudWatch metrics:
+  HealthyHostCount: 2 → 3
+  RequestCount: Increases (3 instances handling traffic)
+  CPU per instance: Drops (load redistributed)
+
+Result:
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Still Running)│
+                     │  Generating 500+ RPS            │
+                     │  Now distributed to Inst 1,3,4  │
+                     │  (Instance 2 still deregistered)│
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │  Application Load Balancer      │
+                     │  Now routing to: Inst 1, 3, & 4 │
+                     │  Instance 2: Still deregistered │
+                     └────┬──────────┬───────────┬────┘
+                          │          │           │
+                    ┌─────▼────┐ ┌───▼────┐ ┌──▼─────┐
+                    │          │ │        │ │        │
+                ┌───▼────┐ ┌───▼─┐  ┌───▼──┐
+                │ Inst 1 │ │Inst2│ │ Inst3│
+                │ i-xxx1 │ │ TBD │ │i-xxx3│
+                │Running │ │TERM.│ │Running│
+                │Healthy │ │SOON │ │Healthy│
+                │ CPU 67%│ │ xxx │ │ CPU66%│
+                │RECEIV. │ │GONE │ │RECEIV.│
+                └────────┘ └─────┘ └───────┘
+
+                        ┌──────────────────┐
+                        │   Inst 4 (NEW)   │
+                        │  i-yyy1          │
+                        │  Running         │
+                        │  Healthy ✓       │
+                        │  CPU 68%         │
+                        │  RECEIVING ✓     │
+                        └──────────────────┘
+
+Status:
+  ✓ ASG HealthyHostCount = 3 (RECOVERED!)
+  ✓ All new instance healthy and receiving traffic
+  ✓ Load redistributed evenly: ~167 RPS per instance
+  ✓ RequestCount back to normal (500+ RPS)
+  ✓ CPU per instance dropped (~67% from ~80%)
+  ⏳ Instance 2 will terminate soon (still running but deregistered)
+
+Recovery achieved: HealthyHostCount: 2 → 3
+
+Time: T+60 to T+90 seconds (New instance healthy and receiving traffic)
+
+================================================================================
+STRESS COMMAND ENDS - OLD INSTANCE TERMINATES
+================================================================================
+
+Event: stress-ng times out (120 seconds), instance 2 terminates
+
+Timeline:
+  - T+120: stress-ng command timeout (120 second limit)
+  - Instance 2 CPU drops back to normal
+  - But instance 2 still marked unhealthy (takes time to recover)
+  - ASG detects old instance is no longer needed (we have 3 healthy)
+  - ASG terminates instance 2
+
+What happens:
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Still Running)│
+                     │  Generating 500+ RPS            │
+                     │  Distributed to Inst 1, 3, 4    │
+                     │  Instance 2 is gone             │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │  Application Load Balancer      │
+                     │  Routing to: Inst 1, 3, & 4     │
+                     │  Instance 2: TERMINATED         │
+                     └────┬──────────┬───────────┬────┘
+                          │          │           │
+                    ┌─────▼────┐ ┌───▼────┐ ┌──▼─────┐
+                    │          │ │        │ │        │
+                ┌───▼────┐ ┌───▼─┐  ┌───▼──┐
+                │ Inst 1 │ │ xxx │ │ Inst3│
+                │ i-xxx1 │ │ gone│ │i-xxx3│
+                │Running │ │     │ │Running│
+                │Healthy │ │TERM.│ │Healthy│
+                │ CPU 67%│ │     │ │ CPU67%│
+                │RECEIV. │ │     │ │RECEIV.│
+                └────────┘ └─────┘ └───────┘
+
+                        ┌──────────────────┐
+                        │   Inst 4 (NEW)   │
+                        │  i-yyy1          │
+                        │  Running         │
+                        │  Healthy ✓       │
+                        │  CPU 66%         │
+                        │  RECEIVING ✓     │
+                        └──────────────────┘
+
+EC2 Instances view:
+  Instance 1: Running ✓
+  Instance 2: Terminated ✗
+  Instance 3: Running ✓
+  Instance 4: Running ✓
+
+Status:
+  ✓ ASG HealthyHostCount = 3 (maintained)
+  ✓ System fully recovered
+  ✓ Old stressed instance completely removed
+  ✓ New instance handling production traffic
+  ✓ All metrics normalized
+  ✓ RequestCount: 500+ RPS (normal)
+  ✓ CPU: 66-67% per instance (normal)
+  ✓ No service interruption
+
+Comparison:
+  Before failure: Inst 1, 2, 3
+  After failure:  Inst 1, 3, 4 (Instance 2 replaced by 4)
+  Change:         1 instance swapped out
+  Service impact: Zero downtime (load rerouted during failure)
+
+Time: T+120 seconds (Stress ends, instance 2 terminates)
+
+================================================================================
+SYSTEM FULLY RECOVERED - BACK TO NORMAL OPERATION
+================================================================================
+
+Final state:
+
+                     ┌─────────────────────────────────┐
+                     │  Load Generators (Continuous)   │
+                     │  Agents generating 500+ RPS     │
+                     │  All traffic flowing normally   │
+                     └────────────┬────────────────────┘
+                                  │
+                                  ▼
+                     ┌─────────────────────────────────┐
+                     │  Application Load Balancer      │
+                     │  Healthy and balanced           │
+                     └────┬──────────┬───────────┬────┘
+                          │          │           │
+                    ┌─────▼────┐ ┌───▼────┐ ┌──▼─────┐
+                    │          │ │        │ │        │
+                ┌───▼────┐ ┌───▼─┐  ┌───▼──┐
+                │ Inst 1 │ │Inst3│ │ Inst4│
+                │ i-xxx1 │ │i-xxx│ │ i-yyy│
+                │Running │ │ 3   │ │  1   │
+                │Healthy │ │Runn.│ │ Runn.│
+                │ CPU 66%│ │ OK  │ │ OK   │
+                │ ✓ OK   │ │ ✓✓  │ │ ✓✓   │
+                └────────┘ └─────┘ └──────┘
+
+Status:
+  ✓ ASG Configuration: Min=1, Desired=3, Max=3, Current=3
+  ✓ All 3 instances HEALTHY
+  ✓ All 3 instances RUNNING
+  ✓ All 3 instances receiving TRAFFIC
+  ✓ HealthyHostCount = 3
+  ✓ RequestCount = 500+ RPS (normal)
+  ✓ CPU per instance = 66-67% (normal)
+  ✓ No errors or dropped requests
+  ✓ Service fully operational
+
+Recovery Summary:
+  Detection time:     45 seconds (health check interval)
+  Response time:      15 seconds (ASG decision + launch)
+  Replacement time:   60 seconds (new instance boot + health checks)
+  Total recovery:     ~120 seconds (2 minutes) ← Fast!
+  Service impact:     Zero downtime (traffic rerouted)
+  Manual intervention: None (fully automatic)
+  Audit trail:        Complete (CloudTrail logged all actions)
+
+Time: T+180+ seconds and beyond (System fully recovered, back to normal)
+
+================================================================================
+CLOUDWATCH METRICS TIMELINE
+================================================================================
+
+CPU Utilization (All Instances Average):
+
+  100% ┤
+   95% ┤
+   90% ┤                  ╭─────╮ Instance 2 stressed
+   85% ┤                 ╭┘     ╰─╮
+   80% ┤       ╭─────────╯        ╰────╮
+   75% ┤     ╭─╯                       ╰──────────
+   70% ┤   ╭─╯                                   ╰──
+   65% ┤ ╭─╯
+      └─┴────────┬─────────────┬─────────────┬──────
+        0       60s          120s           180s
+        
+        0-60s:  Stress-ng running, CPU spikes
+        60-120s: New instance booting, stress ending
+        120s+:   System normalized, stress ended
+
+HealthyHostCount:
+
+      4 ┤
+      3 ┤   ╭────╭────────────╮
+      2 ┤   │   ╭╯            ╰────
+      1 ┤─╭─╯
+      0 ┼─
+        └─┴────────┬─────────────┬─────────────┬──────
+        0       60s          120s           180s
+        
+        0-60s:   Drops 3→2 (health check failure)
+        60-120s: Rises 2→3 (new instance healthy)
+        120s+:   Stays at 3 (fully recovered)
+
+RequestCount (RPS):
+
+    600┤   ╭────────────╮
+    550┤ ╭─╯            ╰──╮
+    500┤─╯                 ╰────────
+    450┤
+    400┤
+      └─┴────────┬─────────────┬─────────────┬──────
+        0       60s          120s           180s
+        
+        0-60s:   Dips as load concentrates on 2 instances
+        60-120s: Recovers as 3rd instance joins
+        120s+:   Stable at 500+ RPS
+
+================================================================================
+KEY EVIDENCE POINTS
+================================================================================
+
+What the graphs prove:
+
+1. FAILURE DETECTED ✓
+   Evidence: HealthyHostCount drops 3→2 at T+45s
+   What it shows: Health check system working correctly
+
+2. AUTOMATIC RECOVERY INITIATED ✓
+   Evidence: New instance launches between T+45-60s
+   What it shows: ASG reacts automatically, no manual action
+
+3. RECOVERY COMPLETE ✓
+   Evidence: HealthyHostCount rises 2→3 at T+60s
+   What it shows: System self-heals within 2 minutes
+
+4. SERVICE AVAILABILITY MAINTAINED ✓
+   Evidence: RequestCount stays above 450 RPS throughout
+   What it shows: No service downtime, requests continue
+
+5. AUTOMATIC FAILOVER ✓
+   Evidence: Load redistributes between instances
+   What it shows: ALB handles traffic rerouting automatically
+
+6. FULLY AUDITABLE ✓
+   Evidence: CloudTrail logs every action with timestamps
+   What it shows: Complete compliance trail for regulators
+
+================================================================================
+WHAT TO CAPTURE FOR LAB REPORT
+================================================================================
+
+Screenshots to take:
+
+1. Before failure (T=-60s):
+   - 3 instances all healthy
+   - CPU stable at 66-70%
+   - HealthyHostCount = 3
+   - ASG Activity showing no recent changes
+
+2. During failure detection (T=45s):
+   - HealthyHostCount dropping to 2
+   - One instance marked "Unhealthy"
+   - CPU spike visible on one instance
+
+3. During replacement (T=60-90s):
+   - New instance in EC2 console (Pending state)
+   - ASG Activity showing "Launching 1 instances"
+   - HealthyHostCount still = 2
+
+4. During recovery (T=90-120s):
+   - New instance in Running state
+   - New instance joining Target Group
+   - HealthyHostCount rising from 2 to 3
+
+5. After recovery (T=180s+):
+   - All 3 instances healthy again
+   - Metrics normalized
+   - CPU stable
+   - HealthyHostCount = 3
+
+6. CloudWatch dashboard showing:
+   - CPU graph with spike and recovery
+   - HealthyHostCount graph with 3→2→3 transition
+   - RequestCount showing no service loss
+
+7. CloudTrail events showing:
+   - SendCommand event (stress triggered)
+   - RunInstances event (ASG launched)
+   - TerminateInstances event (old instance cleanup)
+
+8. ASG Activity log showing:
+   - Health check failure entry
+   - "Launching 1 instances" entry
+   - "Successfully launched 1 instances" entry
+
+================================================================================
+TIMELINE OF COMPLETE FAILURE-TO-RECOVERY CYCLE
+================================================================================
+
+T+0s    │ Failure simulation triggered
+        │ SSM stress-ng command sent to Instance 2
+        │ CloudTrail event: SendCommand
+        
+T+5s    │ stress-ng starts on Instance 2
+        │ CPU begins rising
+        
+T+15s   │ Instance 2 CPU reaches 80%
+        │ CloudWatch metrics update
+        
+T+30s   │ Instance 2 CPU peaks at 90%+
+        │ Health check still passing (luck of timing)
+        │ First clear failure in metrics
+        
+T+45s   │ ✗ HEALTH CHECK FAILS
+        │ Instance 2 marked UNHEALTHY
+        │ ALB deregisters Instance 2
+        │ HealthyHostCount: 3 → 2
+        │ RequestCount drops (load on 2 instances)
+        │ CloudWatch metrics show HealthyHostCount drop
+        
+T+50s   │ ASG detects unhealthy instance
+        │ ASG decision made: Launch replacement
+        
+T+60s   │ ✓ ASG LAUNCHES REPLACEMENT
+        │ CloudTrail event: RunInstances
+        │ New instance enters "Pending" state
+        │ ASG Activity: "Launching 1 instances"
+        
+T+75s   │ New instance transitions to "Running"
+        │ EC2 status checks running
+        
+T+90s   │ New instance passes health checks
+        │ New instance registers with Target Group
+        │ ✓ HEALTH CHECK PASSES on new instance
+        │ ALB starts sending traffic to new instance
+        │ HealthyHostCount: 2 → 3
+        │ RequestCount rises (load on 3 instances again)
+        
+T+100s  │ Load fully redistributed
+        │ CPU per instance drops (more capacity)
+        │ CloudWatch shows HealthyHostCount = 3
+        
+T+120s  │ ✓ STRESS COMMAND TIMEOUT
+        │ stress-ng stops after 120 seconds
+        │ Instance 2 CPU drops back to normal
+        │ But Instance 2 still deregistered
+        
+T+130s  │ ASG decides old instance no longer needed
+        │ Instance 2 still running but deregistered
+        
+T+150s  │ ✗ INSTANCE 2 TERMINATES
+        │ CloudTrail event: TerminateInstances
+        │ Instance 2 transitions to "shutting-down"
+        │ ASG Activity: Instance termination event
+        
+T+180s  │ ✓ RECOVERY COMPLETE
+        │ Instance 2: Terminated
+        │ Instances 1, 3, 4: Running and Healthy
+        │ HealthyHostCount = 3 (maintained)
+        │ All metrics normalized
+        │ System fully recovered
+
+Total recovery time: ~135 seconds (~2.25 minutes)
+
+Key observations:
+  - Detection: 45 seconds (health check interval)
+  - Response: 15 seconds (ASG action)
+  - Replacement boot: 45 seconds (new instance to healthy)
+  - Cleanup: 60 seconds (old instance termination)
+  - Total: ~135 seconds (fully automatic, no manual action)
+
+================================================================================
+WHAT THIS DEMONSTRATES
+================================================================================
+
+✓ Automatic failure detection works
+  → Health checks detected unhealthy instance within 45 seconds
+  → ALB immediately deregistered the instance
+  → No manual action required
+
+✓ Automatic instance replacement works
+  → ASG automatically launched replacement instance
+  → New instance booted and configured identically
+  → New instance passed health checks and received traffic
+
+✓ Service remains available during failure
+  → Traffic automatically rerouted to healthy instances
+  → No requests lost (load redistributed)
+  → Users see no downtime
+
+✓ System is resilient
+  → Survived loss of 1/3 instances
+  → Continued operating at 66% capacity during failure
+  → Recovered to 100% capacity automatically
+  → No manual intervention needed
+
+✓ All actions are auditable
+  → CloudTrail logged every action
+  → Exact timestamps for compliance
+  → Proves system behaved as designed
+  → Suitable for production environments
+
+================================================================================
