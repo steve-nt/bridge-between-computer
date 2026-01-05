@@ -1,0 +1,685 @@
+================================================================================
+SSH STRESS TESTING GUIDE - TASK 5 ALTERNATIVE
+================================================================================
+
+OBJECTIVE:
+Connect to your EC2 instances via SSH and run stress-ng to simulate CPU failure
+for Task 5 (failure simulation).
+
+YOUR INSTANCES:
+  1. i-03b3951e1cff6aa9b
+  2. i-0a6b2c4bdce290dd0
+  3. i-0d91bf046fcb0be90
+
+REGION: eu-north-1
+AMI: Amazon Linux 2 or Ubuntu (pre-configured with web app)
+
+ADVANTAGE OF SSH:
+  ✓ Doesn't require SSM
+  ✓ Doesn't require IAM role configuration
+  ✓ Direct access to instance
+  ✓ Full control over stress command
+  ✓ Simpler than FIS/SSM
+  ✓ Immediate results
+
+TOTAL TIME: ~5 minutes (SSH setup + stress test)
+
+================================================================================
+PART 1: PREPARE SSH - GET KEY PAIR AND INSTANCE IPs
+================================================================================
+
+Step 1.1: Find Your SSH Key Pair
+─────────────────────────────────
+
+  Your key file should be named:
+    → D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem
+  
+  Location (likely):
+    → C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\
+    → (Same directory as this file)
+  
+  If you can't find it:
+    1. AWS Console → EC2 → Key Pairs
+    2. Look for: D7078E-MINI-PROJECT-GROUP35-WEBSRV (or similar)
+    3. Download the .pem file if missing
+    4. Save to: C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\
+
+Step 1.2: Get Instance Public IP Addresses
+────────────────────────────────────────────
+
+  1. AWS Console → EC2 → Instances
+  
+  2. For each of your 3 instances, note:
+     ├─ Instance ID
+     ├─ Public IPv4 address (this is what you'll SSH to)
+     └─ Private IPv4 address (backup option)
+  
+  Example:
+    Instance 1: i-03b3951e1cff6aa9b
+      ├─ Public IP: 13.50.XXX.XXX
+      └─ Private IP: 172.31.X.X
+    
+    Instance 2: i-0a6b2c4bdce290dd0
+      ├─ Public IP: 13.51.XXX.XXX
+      └─ Private IP: 172.31.X.X
+    
+    Instance 3: i-0d91bf046fcb0be90
+      ├─ Public IP: 13.52.XXX.XXX
+      └─ Private IP: 172.31.X.X
+
+Step 1.3: Verify Security Group Allows SSH
+────────────────────────────────────────────
+
+  1. Click on one instance
+  
+  2. Go to "Security" tab
+  
+  3. Look at "Security groups" section
+  
+  4. Click on the security group link
+  
+  5. Check "Inbound rules":
+     ├─ Type: SSH
+     ├─ Port: 22
+     ├─ Source: 0.0.0.0/0 (or your IP)
+     └─ Status: ✓ Should exist
+  
+  If SSH rule doesn't exist:
+    1. Security group → Edit inbound rules
+    2. Add rule:
+       ├─ Type: SSH
+       ├─ Port: 22
+       ├─ Source: 0.0.0.0/0 (or your IP)
+    3. Save
+  
+  (This allows your machine to SSH to the instance)
+
+================================================================================
+PART 2: SSH INTO INSTANCE (WINDOWS PowerShell)
+================================================================================
+
+Step 2.1: Open PowerShell
+──────────────────────────
+
+  1. Press Windows key + R
+  
+  2. Type: powershell
+  
+  3. Press Enter
+  
+  You should see a PowerShell prompt:
+    PS C:\Users\snten>
+
+Step 2.2: Navigate to Key Pair Directory
+──────────────────────────────────────────
+
+  Type this command:
+  
+    cd "C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E"
+  
+  Press Enter
+  
+  Verify you're in the right directory:
+    PS C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E>
+
+Step 2.3: List Your Files (Verify Key Exists)
+───────────────────────────────────────────────
+
+  Type: ls
+  
+  You should see:
+    → D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem (the key file)
+  
+  If you don't see it:
+    1. Download from AWS Console → EC2 → Key Pairs
+    2. Save to this directory
+    3. Retry ls command
+
+Step 2.4: Fix Key Permissions (CRITICAL!)
+────────────────────────────────────────────
+
+  ⚠ Windows doesn't handle .pem permissions well. Fix this:
+
+  Type this command:
+  
+    icacls "D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem" /reset
+    icacls "D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem" /grant:r "$($env:USERNAME):(F)" /inheritance:r
+  
+  This:
+    ✓ Removes inherited permissions
+    ✓ Gives only you read access
+    ✓ Makes the key usable for SSH
+
+Step 2.5: SSH to Your Instance
+────────────────────────────────
+
+  Replace <PUBLIC_IP> with actual IP address!
+
+  Type:
+  
+    ssh -i "D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem" ec2-user@<PUBLIC_IP>
+  
+  Example (with real IP):
+  
+    ssh -i "D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem" ec2-user@13.50.123.45
+
+  Press Enter
+
+Step 2.6: Accept Host Key
+──────────────────────────
+
+  You'll see:
+    "The authenticity of host... can't be established. Are you sure you want to continue?"
+  
+  Type: yes
+  
+  Press Enter
+
+Step 2.7: Verify SSH Connection
+─────────────────────────────────
+
+  You should now see a prompt like:
+    [ec2-user@ip-172-31-X-X ~]$
+  
+  This means:
+    ✓ SSH connection successful!
+    ✓ You're logged into the instance!
+
+================================================================================
+PART 3: PREPARE INSTANCE FOR STRESS TEST
+================================================================================
+
+Step 3.1: Update Package Manager
+─────────────────────────────────
+
+  Type:
+  
+    sudo apt-get update -y
+  
+  Or if Amazon Linux 2:
+  
+    sudo yum update -y
+  
+  Press Enter
+  
+  Wait for it to complete (takes ~30 seconds)
+
+Step 3.2: Install stress-ng Tool
+──────────────────────────────────
+
+  Type:
+  
+    sudo apt-get install -y stress-ng
+  
+  Or if Amazon Linux 2:
+  
+    sudo yum install -y stress-ng
+  
+  Press Enter
+  
+  Wait for installation (takes ~1-2 minutes)
+
+Step 3.3: Verify Installation
+───────────────────────────────
+
+  Type:
+  
+    stress-ng --version
+  
+  You should see version info, like:
+    stress-ng: info: [1234] stress-ng 0.XX.XX
+  
+  This confirms stress-ng is installed ✓
+
+================================================================================
+PART 4: START MONITORING IN AWS CONSOLE
+================================================================================
+
+Before you run the stress test, set up monitoring:
+
+☐ 4.1 Open CloudWatch Dashboard in browser
+    URL: https://eu-north-1.console.aws.amazon.com/cloudwatch/
+    
+    Dashboard: D7078E-Mini-Project-Dashboard
+    
+    Set auto-refresh: 10 seconds
+
+☐ 4.2 Open Target Group in another browser tab
+    URL: https://eu-north-1.console.aws.amazon.com/ec2/
+    
+    EC2 → Target Groups → D7078E-MINI-PROJECT-GROUP35-TG
+    
+    Watch for health status changes
+
+☐ 4.3 Open ASG Activity in another browser tab
+    URL: https://eu-north-1.console.aws.amazon.com/ec2/
+    
+    EC2 → Auto Scaling Groups → D7078E-MINI-PROJECT-GROUP35-ASG
+    
+    Activity tab - watch for new instance launches
+
+Now you have:
+  ✓ SSH session open in PowerShell
+  ✓ CloudWatch dashboard open (ready to monitor)
+  ✓ Target Group page open (ready to monitor)
+  ✓ ASG Activity page open (ready to monitor)
+  ✓ Ready to run stress test!
+
+================================================================================
+PART 5: RUN STRESS-NG COMMAND (120 SECONDS)
+================================================================================
+
+⏰ TIMING: You have 2-3 minutes to observe failure and recovery
+
+Step 5.1: Take a Screenshot of Normal State
+─────────────────────────────────────────────
+
+  BEFORE running stress:
+  
+  ☐ Take screenshot of CloudWatch dashboard
+    ├─ CPU should be normal (~5-10%)
+    ├─ HealthyHostCount should be 3
+    ├─ RequestCount should be normal
+    └─ All metrics stable
+  
+  Label it: "BEFORE_FAILURE.png"
+
+Step 5.2: Run Stress-ng on Instance
+─────────────────────────────────────
+
+  Back in your SSH session, type:
+  
+    stress-ng -c 0 -l 90 -t 120s
+  
+  Explanation:
+    -c 0   → Use all CPU cores
+    -l 90  → Stress to 90% load average
+    -t 120s → Run for 120 seconds (2 minutes)
+  
+  Press Enter
+
+Step 5.3: Stress Command Output
+─────────────────────────────────
+
+  You'll see output like:
+  
+    stress-ng: info: [PID] stress-ng version 0.XX.XX
+    stress-ng: info: [PID] dispatching hogs: [CPU cores] cpu
+    stress-ng: info: [PID] successful run completed in 120.00s
+  
+  The command runs for 120 seconds, then stops automatically.
+  
+  ⚠ DO NOT INTERRUPT (Ctrl+C) - let it run the full 2 minutes!
+
+Step 5.4: Monitor During Stress (CRITICAL!)
+──────────────────────────────────────────────
+
+  While stress-ng runs (next 2 minutes), watch your browser tabs:
+  
+  CloudWatch Dashboard:
+    ✓ Watch CPU on this instance spike to 90%+
+    ✓ Watch overall CPU change
+    ✓ Watch HealthyHostCount (may drop if health check fails)
+    ✓ Watch RequestCount (may drop during stress)
+  
+  Target Group:
+    ✓ Watch health status of instances
+    ✓ This instance may show "Unhealthy" if CPU too high
+    ✓ ALB will stop sending traffic to it
+  
+  ASG Activity:
+    ✓ Watch for "Launching 1 instance" message
+    ✓ ASG detects unhealthy instance and replaces it
+    ✓ New instance starts booting
+  
+  Take Screenshots During Stress:
+    ☐ CPU spiking to 90% (DURING_STRESS.png)
+    ☐ Health check failing (HEALTH_CHECK_FAILING.png)
+    ☐ ASG replacing instance (REPLACEMENT_LAUNCHING.png)
+
+Step 5.5: Stress Ends (After 120 Seconds)
+───────────────────────────────────────────
+
+  After 120 seconds, you'll see:
+  
+    [PID] successful run completed in 120.00s
+  
+  And the SSH prompt returns:
+  
+    [ec2-user@ip-172-31-X-X ~]$
+  
+  At this point:
+    ✓ Stress command finished
+    ✓ CPU dropping back to normal
+    ✓ System begins recovery
+    ✓ ASG replacement instance becoming healthy
+
+Step 5.6: Observe Recovery (Next 2-3 Minutes)
+───────────────────────────────────────────────
+
+  Keep watching CloudWatch:
+  
+  Minute 2:
+    ├─ Stressed instance recovering
+    ├─ Replacement instance still booting
+    ├─ HealthyHostCount still low (2)
+    └─ RequestCount still reduced
+  
+  Minute 2-3:
+    ├─ Replacement instance passes health checks
+    ├─ HealthyHostCount rises back to 3
+    ├─ RequestCount normalizes
+    ├─ Old stressed instance may terminate
+    └─ System fully RECOVERED!
+  
+  Take Screenshots During Recovery:
+    ☐ HealthyHostCount rising back (RECOVERY_PROGRESS.png)
+    ☐ All metrics normalizing (AFTER_RECOVERY.png)
+    ☐ Final state: 3 healthy, all normal (FINAL_STATE.png)
+
+================================================================================
+PART 6: DISCONNECT SSH AND COLLECT EVIDENCE
+================================================================================
+
+Step 6.1: Exit SSH Session
+────────────────────────────
+
+  Type: exit
+  
+  Press Enter
+  
+  You should return to your local PowerShell prompt:
+    PS C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E>
+
+Step 6.2: Collect Screenshots
+───────────────────────────────
+
+  You should have taken:
+  
+  ☐ BEFORE_FAILURE.png
+    └─ Normal state: 3 healthy, normal CPU
+  
+  ☐ DURING_STRESS.png
+    └─ CPU spiked to 90%
+  
+  ☐ HEALTH_CHECK_FAILING.png
+    └─ Instance marked unhealthy
+  
+  ☐ REPLACEMENT_LAUNCHING.png
+    └─ ASG launching new instance
+  
+  ☐ RECOVERY_PROGRESS.png
+    └─ New instance becoming healthy
+  
+  ☐ AFTER_RECOVERY.png
+    └─ All metrics back to normal
+  
+  ☐ FINAL_STATE.png
+    └─ 3 healthy instances, all normal
+
+Step 6.3: Document Timeline
+─────────────────────────────
+
+  Record exact times:
+  
+    Start time (stress started): ____:____ (HH:MM)
+    Health check failed: ____:____ (HH:MM)
+    Instance marked unhealthy: ____:____ (HH:MM)
+    Replacement launched: ____:____ (HH:MM)
+    Stress ended (120s): ____:____ (HH:MM)
+    Replacement became healthy: ____:____ (HH:MM)
+    System fully recovered: ____:____ (HH:MM)
+    
+    Total recovery time: ____ minutes
+
+Step 6.4: Save Evidence
+────────────────────────
+
+  Create a folder:
+    C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\Task5_Evidence\
+  
+  Save all screenshots there:
+    ├─ BEFORE_FAILURE.png
+    ├─ DURING_STRESS.png
+    ├─ HEALTH_CHECK_FAILING.png
+    ├─ REPLACEMENT_LAUNCHING.png
+    ├─ RECOVERY_PROGRESS.png
+    ├─ AFTER_RECOVERY.png
+    ├─ FINAL_STATE.png
+    └─ Timeline.txt (with timestamps)
+
+================================================================================
+EXPECTED TIMELINE
+================================================================================
+
+Minute 0:00
+  ├─ You run: stress-ng -c 0 -l 90 -t 120s
+  ├─ Instance CPU: 0% → 90%
+  ├─ CloudWatch shows spike immediately
+  └─ Stressed instance receiving full load
+
+Minute 0:30
+  ├─ ALB health check runs (every 30 seconds)
+  ├─ Instance doesn't respond quickly (too busy)
+  ├─ Health check FAILS
+  ├─ Target status: Healthy → Unhealthy
+  ├─ ALB stops sending traffic to this instance
+  └─ HealthyHostCount: 3 → 2
+
+Minute 1:00
+  ├─ ASG detects unhealthy instance
+  ├─ ASG launches REPLACEMENT instance
+  ├─ ASG Activity: "Launching 1 instance"
+  ├─ Old instance still running (not receiving traffic)
+  ├─ Only 2 healthy instances getting traffic
+  └─ RequestCount: reduced (2 instances instead of 3)
+
+Minute 1:30
+  ├─ Replacement instance boots (Pending → Running)
+  ├─ Status checks: Initializing → Passed
+  ├─ Health check: not yet passed
+  ├─ Still only 2 instances getting traffic
+  └─ RequestCount: still reduced
+
+Minute 2:00
+  ├─ Stress-ng STOPS (120 seconds complete)
+  ├─ Stressed instance CPU: 90% → 5% (drops rapidly)
+  ├─ Replacement instance: still passing health checks
+  ├─ System recovery starting
+  └─ SSH command prompt returns to you
+
+Minute 2:30
+  ├─ Replacement instance health check: PASSES
+  ├─ Target status: Unhealthy → Healthy
+  ├─ HealthyHostCount: 2 → 3 (recovery complete!)
+  ├─ ALB sends traffic to replacement instance
+  ├─ RequestCount: rising back to normal
+  └─ Old stressed instance: may terminate
+
+Minute 3:00+
+  ├─ HealthyHostCount: 3 (all healthy)
+  ├─ CPU: normalized
+  ├─ RequestCount: back to normal
+  ├─ All metrics: stable
+  └─ SYSTEM FULLY RECOVERED! ✓
+
+TOTAL RECOVERY TIME: ~2-3 minutes
+
+================================================================================
+WHAT YOU'VE DEMONSTRATED
+================================================================================
+
+By completing this SSH stress test, you've shown:
+
+✓ Health checks work correctly
+  └─ Detected failure within 30 seconds
+  └─ Removed unhealthy instance from traffic
+
+✓ ALB load balancing works
+  └─ Automatically removed failed instance
+  └─ Redirected traffic to healthy instances
+  └─ Kept system partially available (2/3 healthy)
+
+✓ ASG auto-replacement works
+  └─ Detected unhealthy instance immediately
+  └─ Launched replacement instance
+  └─ No manual intervention needed
+
+✓ System is resilient
+  └─ Survived single instance failure
+  └─ Maintained service availability
+  └─ Recovered automatically
+
+This is HIGH AVAILABILITY in action! 🎯
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: Can't find public IP
+──────────────────────────────
+
+  Solution:
+    1. Make sure instance is in "Running" state
+    2. AWS Console → EC2 → Instances
+    3. Click instance
+    4. In Details tab, look for "Public IPv4 address"
+    5. If empty, instance may not have internet access
+       - Check security group allows outbound traffic
+       - Instance may need elastic IP
+
+Problem: SSH connection denied
+────────────────────────────────
+
+  Solution:
+    1. Verify key file exists in current directory
+    2. Verify key permissions are correct (Step 2.4)
+    3. Verify security group allows SSH port 22
+    4. Try using private IP instead of public IP
+    5. Try different instance (verify one works first)
+
+Problem: stress-ng command not found
+──────────────────────────────────────
+
+  Solution:
+    1. Try installation again: sudo apt-get install -y stress-ng
+    2. If apt doesn't work, try yum (Amazon Linux 2)
+    3. Alternative: Use built-in 'yes' command: yes > /dev/null
+
+Problem: Can't see CPU spike in CloudWatch
+────────────────────────────────────────────
+
+  Solution:
+    1. Make sure CloudWatch dashboard is set to refresh every 10 seconds
+    2. Make sure you're watching the right instance
+    3. CPU metrics may take 30-60 seconds to update
+    4. Try increasing refresh rate manually (refresh button)
+
+Problem: Health check doesn't fail
+──────────────────────────────────
+
+  Solution:
+    1. CPU stress might not be high enough
+    2. Try: stress-ng -c 0 -l 95 -t 120s (95% instead of 90%)
+    3. Or extend duration: -t 180s (3 minutes instead of 2)
+    4. Check ALB health check timeout (EC2 → Target Groups)
+
+================================================================================
+ALTERNATIVE: MULTIPLE INSTANCES
+================================================================================
+
+You have 3 instances. Want to stress multiple at once?
+
+Option 1: Stress them sequentially
+───────────────────────────────────
+
+  1. SSH to instance 1 → run stress-ng → observe
+  2. After recovery, SSH to instance 2 → run stress-ng → observe
+  3. Then SSH to instance 3 → run stress-ng → observe
+  
+  Total time: ~15-20 minutes for all 3
+
+Option 2: Stress them in parallel (advanced)
+──────────────────────────────────────────────
+
+  1. Open 3 PowerShell windows
+  2. SSH to instance 1 in window 1
+  3. SSH to instance 2 in window 2
+  4. SSH to instance 3 in window 3
+  5. In each window, run: stress-ng -c 0 -l 90 -t 120s
+  6. All 3 run simultaneously
+  7. Watch ASG replace all 3 instances at once
+  
+  Total time: ~5 minutes (but all 3 instances fail)
+  
+  ⚠ Only do this if you want to test full failure scenario
+     (not recommended for this task - test one at a time)
+
+For Task 5: Test ONE instance at a time. Easier to observe and document.
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+After completing SSH stress test:
+
+1. ✓ Stress test completed
+2. ✓ Failure observed in CloudWatch
+3. ✓ Recovery observed and documented
+4. ✓ Screenshots collected
+
+Now for Task 5 deliverables:
+
+  □ 5-6 screenshots showing timeline
+  □ CloudWatch metrics (full timeline)
+  □ ASG Activity log (showing instance replacement)
+  □ Timeline with exact timestamps
+  □ Analysis: What happened, how long, observations
+  □ Lessons learned: What this demonstrates
+
+For Task 6 (final task):
+
+  □ Stop load generators (if still running)
+  □ Terminate all instances
+  □ Delete ASG, ALB, Target Group, Launch Template
+  □ Delete AMI
+  □ Verify cleanup complete
+  □ Collect all logs and metrics
+  □ Create final lab report
+
+You're almost at the finish line! 🚀
+
+================================================================================
+REFERENCE COMMANDS
+================================================================================
+
+SSH Connection:
+  ssh -i "KEY_FILE.pem" ec2-user@<PUBLIC_IP>
+
+Stress-ng variations:
+  stress-ng -c 0 -l 90 -t 120s      (90% load for 2 min - standard)
+  stress-ng -c 0 -l 95 -t 120s      (95% load - stronger stress)
+  stress-ng -c 0 -l 90 -t 180s      (90% load for 3 min - longer)
+  stress-ng -c 0 -l 100 -t 60s      (100% load for 1 min - extreme)
+
+Check system:
+  uptime                             (see system load)
+  top -b -n 1                        (see CPU usage)
+  iostat -x 1 5                      (see I/O stats)
+
+System info:
+  uname -a                           (OS info)
+  nproc                              (number of CPUs)
+  free -h                            (memory)
+
+================================================================================
+GOOD LUCK! 🎯
+================================================================================
+
+This SSH method is simpler, doesn't require SSM or FIS, and gives you
+direct control over the stress test. You'll clearly see the failure
+and recovery in CloudWatch.
+
+Complete Task 5, collect evidence, and you're done! 🚀
+
+================================================================================
