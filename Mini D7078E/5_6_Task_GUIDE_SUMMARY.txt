@@ -22,7 +22,7 @@ HOW TO TRIGGER FAILURE (Pick One):
 
   OPTION A (RECOMMENDED): SSM Stress Command
   ──────────────────────────────────────────
-  Run: aws ssm send-command --instance-ids i-xxxxx \
+  Run: aws ssm send-command --instance-ids i-0f9087a79628fd056 \
          --document-name "AWS-RunShellScript" \
          --parameters 'commands=["stress-ng -c 0 -l 90 -t 120s"]'
   

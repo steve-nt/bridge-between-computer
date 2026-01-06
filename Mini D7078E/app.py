@@ -22,6 +22,7 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 <p>Instance: {}</p>
                 <p>Time: {}</p>
                 <hr>
+                <p><a href="/metrics">/metrics</a> - View server metrics</p>
                 <p><a href="/burn">/burn</a> - CPU-intensive endpoint (5s load)</p>
             </body>
             </html>

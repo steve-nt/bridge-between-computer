@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# D7078E MAXIMUM LOAD GENERATOR - 4x BIGGER THAN STANDARD
+# D7078E LOAD GENERATOR 
 
 $projectDir = "C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E"
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -8,7 +8,7 @@ $ALB_URL = "http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazona
 Set-Location $projectDir
 
 Write-Host "======================================================================" -ForegroundColor Green
-Write-Host "TASK 4: MAXIMUM LOAD GENERATOR - 4x BIGGER!" -ForegroundColor Green
+Write-Host "TASK 4: LOAD GENERATOR" -ForegroundColor Green
 Write-Host "Start: $timestamp" -ForegroundColor Green
 Write-Host "======================================================================" -ForegroundColor Green
 Write-Host ""
@@ -51,7 +51,7 @@ Write-Host "Phase 2: 800 RPS  (original: 200 RPS)  - 4x bigger" -ForegroundColor
 Write-Host "Phase 3: 2000 RPS (original: 500 RPS)  - 4x bigger" -ForegroundColor Cyan
 Write-Host ""
 
-# Phase 1 - 200 RPS (4x original 50 RPS)
+# Phase 1 - 200 RPS
 Write-Host "======================================================================" -ForegroundColor Yellow
 Write-Host "PHASE 1: HEAVY LOAD TEST" -ForegroundColor Yellow
 Write-Host "======================================================================" -ForegroundColor Yellow
@@ -66,9 +66,9 @@ Write-Host ""
 Write-Host "Phase 1 complete" -ForegroundColor Green
 Write-Host ""
 
-# Phase 2 - 800 RPS (4x original 200 RPS)
+# Phase 2 - 800 RPS
 Write-Host "======================================================================" -ForegroundColor Yellow
-Write-Host "PHASE 2: VERY HEAVY LOAD TEST" -ForegroundColor Yellow
+Write-Host "PHASE 2: HEAVIER LOAD TEST" -ForegroundColor Yellow
 Write-Host "======================================================================" -ForegroundColor Yellow
 Write-Host "Load: 800 RPS (160 workers x 5 RPS)" -ForegroundColor Cyan
 Write-Host "Duration: 5 minutes" -ForegroundColor Cyan
