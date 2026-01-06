@@ -1,0 +1,500 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf-8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+
+% Header and Footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{D7078E Cloud Security Mini Project}
+\lhead{Abbreviations and Acronyms}
+\cfoot{\thepage}
+
+\onehalfspacing
+
+\title{
+    \LARGE \textbf{Abbreviations and Acronyms} \\
+    \large D7078E Cloud Security Mini Project
+}
+\author{Group 35}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\section{Overview}
+
+This document provides a comprehensive list of all abbreviations and acronyms used throughout the D7078E Cloud Security Mini Project assignment. This reference guide is intended to ensure clarity and consistency in terminology across all project documentation.
+
+\section{AWS Services and Cloud Computing}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{AWS} & Amazon Web Services --- A comprehensive cloud computing platform offering virtual machines, storage, networking, databases, and managed services \\
+
+\textbf{EC2} & Elastic Compute Cloud --- AWS service providing scalable virtual computing resources (instances) on demand \\
+
+\textbf{ALB} & Application Load Balancer --- AWS service that distributes incoming traffic across multiple EC2 instances based on application-level metrics and rules \\
+
+\textbf{ASG} & Auto Scaling Group --- AWS service that automatically launches or terminates EC2 instances based on defined scaling policies and metrics \\
+
+\textbf{TG} & Target Group --- AWS Elastic Load Balancing component that defines a logical grouping of instances for health checking and traffic distribution \\
+
+\textbf{AMI} & Amazon Machine Image --- A pre-configured template containing the operating system, applications, and configurations needed to launch EC2 instances \\
+
+\textbf{VPC} & Virtual Private Cloud --- AWS service providing isolated network environments with customizable IP addressing, subnets, and security controls \\
+
+\textbf{CloudWatch} & AWS monitoring and observability service that collects metrics, logs, and events from AWS resources and applications \\
+
+\textbf{SSM} & Systems Manager --- AWS service enabling remote command execution, configuration management, and operational insights across EC2 instances \\
+
+\textbf{CloudTrail} & AWS service that logs all API calls and user actions for audit, compliance, and troubleshooting purposes \\
+
+\textbf{IAM} & Identity and Access Management --- AWS service for managing users, roles, permissions, and access control to AWS resources \\
+
+\textbf{RPS} & Requests Per Second --- A metric measuring HTTP request throughput; used to quantify load generator intensity \\
+
+\bottomrule
+\caption{AWS Services and Cloud Computing Abbreviations}
+\end{longtable}
+
+\section{Infrastructure Components}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{CPU} & Central Processing Unit --- The primary processor in an instance; CPU utilization percentage is a key metric for auto-scaling decisions \\
+
+\textbf{HTTP} & HyperText Transfer Protocol --- Unsecured application-layer protocol used for web communication \\
+
+\textbf{HTTPS} & HyperText Transfer Protocol Secure --- Secured version of HTTP using SSL/TLS encryption \\
+
+\textbf{SSH} & Secure Shell --- Encrypted protocol for remote command-line access to instances (port 22) \\
+
+\textbf{JSON} & JavaScript Object Notation --- Lightweight data format used for API responses and configuration files \\
+
+\textbf{HTML} & HyperText Markup Language --- Standard markup language for web pages \\
+
+\textbf{DNS} & Domain Name System --- System for translating domain names to IP addresses \\
+
+\textbf{IP} & Internet Protocol --- Network layer protocol for routing data packets; includes IPv4 and IPv6 \\
+
+\textbf{AZ} & Availability Zone --- A physically isolated location within an AWS region providing redundancy and fault isolation \\
+
+\bottomrule
+\caption{Infrastructure Components Abbreviations}
+\end{longtable}
+
+\section{Metrics and Monitoring}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{CPU Utilization} & Average CPU usage percentage across instances; threshold values are 80\% (scale-out) and 30\% (scale-in) in this project \\
+
+\textbf{HealthyHostCount} & Number of instances currently passing health checks and receiving traffic from the ALB \\
+
+\textbf{UnhealthyHostCount} & Number of instances failing health checks and no longer receiving traffic \\
+
+\textbf{RequestCount} & Total number of HTTP requests received by the ALB per time period; correlates with load intensity \\
+
+\textbf{SLA} & Service Level Agreement --- Contractual commitment specifying minimum availability, uptime, and performance guarantees \\
+
+\textbf{P95} & 95th Percentile --- Performance metric indicating response time at which 95\% of requests complete faster \\
+
+\textbf{QoS} & Quality of Service --- Measures of service performance including latency, throughput, and reliability \\
+
+\bottomrule
+\caption{Metrics and Monitoring Abbreviations}
+\end{longtable}
+
+\section{Technologies and Tools}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{Python} & High-level programming language used for the load generator agent and web application in this project \\
+
+\textbf{Docker} & Containerization platform enabling consistent deployment of applications across environments \\
+
+\textbf{CLI} & Command-Line Interface --- Text-based interface for executing AWS and system commands \\
+
+\textbf{API} & Application Programming Interface --- Set of protocols and tools for software components to communicate \\
+
+\textbf{yaml/yml} & YAML Ain't Markup Language --- Human-readable data serialization format used in docker-compose files \\
+
+\textbf{aiohttp} & Python library for asynchronous HTTP client/server operations used in the load generator \\
+
+\textbf{asyncio} & Python library for asynchronous I/O programming enabling concurrent operations \\
+
+\textbf{PowerShell} & Command-line shell and scripting language used for executing commands on Windows systems \\
+
+\textbf{bash} & Bourne-Again Shell --- Command-line shell for executing commands on Linux/Unix systems \\
+
+\textbf{stress-ng} & System stress testing tool used to deliberately create CPU load for failure simulation \\
+
+\bottomrule
+\caption{Technologies and Tools Abbreviations}
+\end{longtable}
+
+\section{Project-Specific Terms}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{Scale-Out} & Process of adding more instances to handle increased load (increasing capacity horizontally) \\
+
+\textbf{Scale-In} & Process of removing instances when load decreases (decreasing capacity horizontally) \\
+
+\textbf{Scaling Policy} & Defined rules and thresholds that determine when and how to add/remove instances automatically \\
+
+\textbf{Health Check} & Periodic test (typically HTTP request) to verify instance availability and responsiveness \\
+
+\textbf{Failover} & Automatic process of redirecting traffic from failed instances to healthy ones \\
+
+\textbf{Recovery Time} & Duration required for system to detect failure and restore full functionality \\
+
+\textbf{Load Generator} & Tool (Python agent in this project) that generates simulated HTTP traffic to test infrastructure \\
+
+\textbf{Chaos Engineering} & Practice of deliberately introducing controlled failures to test and validate system resilience \\
+
+\textbf{IaC} & Infrastructure as Code --- Practice of managing infrastructure through code/configuration files rather than manual processes \\
+
+\textbf{High Availability} & System design ensuring service remains operational during failures through redundancy and automatic recovery \\
+
+\bottomrule
+\caption{Project-Specific Terms Abbreviations}
+\end{longtable}
+
+\section{Configuration and Setup}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{Min Size} & Minimum number of instances the ASG maintains (set to 1 in this project) \\
+
+\textbf{Desired Capacity} & Target number of instances the ASG aims to maintain (set to 1 initially, scales to 3) \\
+
+\textbf{Max Size} & Maximum number of instances the ASG is allowed to create (set to 3 in this project) \\
+
+\textbf{Cooldown Period} & Time interval before another scaling action can occur after the current one completes \\
+
+\textbf{Warmup Period} & Time allowed for new instances to initialize before being included in scaling decisions \\
+
+\textbf{Threshold} & Metric value that triggers alarm state change and scaling actions (80\% for scale-out, 30\% for scale-in) \\
+
+\textbf{Evaluation Period} & Number of consecutive measurements required before alarm state changes (2 for scale-out, 5 for scale-in) \\
+
+\textbf{Period} & Time interval between metric measurements (60 seconds in this project) \\
+
+\textbf{Statistic} & Type of aggregation applied to metric data (Average, Sum, Maximum, Minimum, etc.) \\
+
+\textbf{Comparison Operator} & Logic used to evaluate metrics against thresholds (GreaterThanOrEqualToThreshold, LessThanOrEqualToThreshold) \\
+
+\bottomrule
+\caption{Configuration and Setup Abbreviations}
+\end{longtable}
+
+\section{Performance Metrics}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{ms} & Milliseconds --- Unit of time used for measuring response latency \\
+
+\textbf{sec} & Seconds --- Unit of time \\
+
+\textbf{min} & Minutes --- Unit of time \\
+
+\textbf{Mbps} & Megabits per second --- Unit of bandwidth/throughput measurement \\
+
+\textbf{T+0 min} & Time zero; start of a test or measurement period \\
+
+\textbf{Latency} & Time delay between request and response; measure of responsiveness \\
+
+\textbf{Throughput} & Amount of data or number of requests processed per unit time \\
+
+\textbf{Error Rate} & Percentage of failed requests compared to total requests \\
+
+\bottomrule
+\caption{Performance Metrics Abbreviations}
+\end{longtable}
+
+\section{Security and Access}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation} & \textbf{Full Term / Definition} \\
+\midrule
+\endhead
+
+\textbf{Security Group} & AWS firewall feature controlling inbound and outbound traffic rules for instances \\
+
+\textbf{Port} & Numeric identifier (0-65535) for network services (e.g., 22 for SSH, 80 for HTTP) \\
+
+\textbf{CIDR} & Classless Inter-Domain Routing --- Notation for specifying IP address ranges (e.g., 0.0.0.0/0) \\
+
+\textbf{0.0.0.0/0} & CIDR notation allowing traffic from any IP address \\
+
+\textbf{WAF} & Web Application Firewall --- AWS service providing protection against web-based attacks \\
+
+\textbf{Shield} & AWS DDoS protection service \\
+
+\bottomrule
+\caption{Security and Access Abbreviations}
+\end{longtable}
+
+\section{Project-Specific Identifiers and Names}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Abbreviation/Name} & \textbf{Description} \\
+\midrule
+\endhead
+
+\textbf{D7078E} & Course or project code identifier for the Cloud Security Mini Project \\
+
+\textbf{Group 35} & Student group number for this project assignment \\
+
+\textbf{eu-north-1} & AWS region identifier for Stockholm, Sweden (used in this project) \\
+
+\textbf{eu-north-1a} & First availability zone in the eu-north-1 region \\
+
+\textbf{eu-north-1b} & Second availability zone in the eu-north-1 region \\
+
+\textbf{eu-north-1c} & Third availability zone in the eu-north-1 region (if available) \\
+
+\textbf{t2.micro} & EC2 instance type used in this project (small, eligible for free tier) \\
+
+\textbf{t3.small} & Recommended EC2 instance type for production (larger than t2.micro) \\
+
+\textbf{t3.medium} & Recommended EC2 instance type for production (larger than t3.small) \\
+
+\textbf{Ubuntu 22.04 LTS} & Linux distribution used as base AMI in this project \\
+
+\bottomrule
+\caption{Project-Specific Identifiers and Names}
+\end{longtable}
+
+\section{Key Thresholds and Parameters}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Parameter} & \textbf{Value and Description} \\
+\midrule
+\endhead
+
+\textbf{Scale-Out Threshold} & 80\% CPU utilization --- Triggers adding a new instance \\
+
+\textbf{Scale-In Threshold} & 30\% CPU utilization --- Triggers removing an instance \\
+
+\textbf{Scale-Out Evaluation} & 2 consecutive periods (2 minutes) --- Time before scaling action \\
+
+\textbf{Scale-In Evaluation} & 5 consecutive periods (5 minutes) --- Time before scaling action \\
+
+\textbf{Health Check Interval} & 30 seconds --- Frequency of ALB health checks \\
+
+\textbf{Health Check Timeout} & 5 seconds --- Maximum wait time for health check response \\
+
+\textbf{Healthy Threshold} & 2 consecutive checks --- Instances marked healthy after 2 passing checks \\
+
+\textbf{Unhealthy Threshold} & 3 consecutive checks --- Instances marked unhealthy after 3 failing checks \\
+
+\textbf{Instance Boot Time} & 60-90 seconds --- Estimated time for new instance to become healthy \\
+
+\textbf{Recovery Time} & 2-3 minutes --- Total time to recover from single instance failure \\
+
+\bottomrule
+\caption{Key Thresholds and Parameters}
+\end{longtable}
+
+\section{Testing and Load Phases}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{Phase} & \textbf{Description} \\
+\midrule
+\endhead
+
+\textbf{Phase 1} & Low Load Baseline --- 2 RPS, 2-3 minutes, CPU 20-30\%, No scaling expected \\
+
+\textbf{Phase 2} & Medium Load --- 6 RPS, 3-5 minutes, CPU 50-70\%, No scaling yet \\
+
+\textbf{Phase 3} & High Load (Scaling Trigger)} --- 10+ RPS, 10-15 minutes, CPU 80\%+, Scaling to 3 instances \\
+
+\textbf{Phase 4} & Scale-In Observation --- Low load, 5+ minutes, CPU $<$30\%, Instances removed \\
+
+\bottomrule
+\caption{Testing and Load Phases}
+\end{longtable}
+
+\section{File and Script Naming}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+\textbf{File/Script Name} & \textbf{Description} \\
+\midrule
+\endhead
+
+\textbf{agent.py} & Python load generator script used to create HTTP traffic \\
+
+\textbf{docker-compose.yml} & Configuration file for orchestrating multiple load generator containers \\
+
+\textbf{Dockerfile} & Configuration file for building Docker image containing the load generator \\
+
+\textbf{app.py} & Python web application running on EC2 instances \\
+
+\textbf{run\_high\_load.ps1} & PowerShell script for executing high-load test phases \\
+
+\textbf{run\_max\_load.ps1} & PowerShell script for executing maximum-load test phase \\
+
+\bottomrule
+\caption{File and Script Naming}
+\end{longtable}
+
+\newpage
+
+\section{Appendix: Alphabetical Index of All Abbreviations}
+
+\begin{longtable}{ll}
+\toprule
+\textbf{Abbreviation} & \textbf{See Section} \\
+\midrule
+\endhead
+
+\textbf{ALB} & AWS Services and Cloud Computing \\
+\textbf{AMI} & AWS Services and Cloud Computing \\
+\textbf{API} & Technologies and Tools \\
+\textbf{ASG} & AWS Services and Cloud Computing \\
+\textbf{AWS} & AWS Services and Cloud Computing \\
+\textbf{AZ} & Infrastructure Components \\
+\textbf{bash} & Technologies and Tools \\
+\textbf{CIDR} & Security and Access \\
+\textbf{CLI} & Technologies and Tools \\
+\textbf{CloudTrail} & AWS Services and Cloud Computing \\
+\textbf{CloudWatch} & AWS Services and Cloud Computing \\
+\textbf{CPU} & Infrastructure Components \\
+\textbf{D7078E} & Project-Specific Identifiers and Names \\
+\textbf{DNS} & Infrastructure Components \\
+\textbf{Docker} & Technologies and Tools \\
+\textbf{EC2} & AWS Services and Cloud Computing \\
+\textbf{Failover} & Project-Specific Terms \\
+\textbf{Group 35} & Project-Specific Identifiers and Names \\
+\textbf{Health Check} & Project-Specific Terms \\
+\textbf{HealthyHostCount} & Metrics and Monitoring \\
+\textbf{High Availability} & Project-Specific Terms \\
+\textbf{HTML} & Infrastructure Components \\
+\textbf{HTTP} & Infrastructure Components \\
+\textbf{HTTPS} & Infrastructure Components \\
+\textbf{IaC} & Project-Specific Terms \\
+\textbf{IAM} & AWS Services and Cloud Computing \\
+\textbf{IP} & Infrastructure Components \\
+\textbf{JSON} & Infrastructure Components \\
+\textbf{Load Generator} & Project-Specific Terms \\
+\textbf{Mbps} & Performance Metrics \\
+\textbf{ms} & Performance Metrics \\
+\textbf{P95} & Metrics and Monitoring \\
+\textbf{Port} & Security and Access \\
+\textbf{PowerShell} & Technologies and Tools \\
+\textbf{Python} & Technologies and Tools \\
+\textbf{QoS} & Metrics and Monitoring \\
+\textbf{Recovery Time} & Project-Specific Terms \\
+\textbf{RequestCount} & Metrics and Monitoring \\
+\textbf{RPS} & AWS Services and Cloud Computing \\
+\textbf{Scale-In} & Project-Specific Terms \\
+\textbf{Scale-Out} & Project-Specific Terms \\
+\textbf{Scaling Policy} & Project-Specific Terms \\
+\textbf{Security Group} & Security and Access \\
+\textbf{SLA} & Metrics and Monitoring \\
+\textbf{SSH} & Infrastructure Components \\
+\textbf{SSM} & AWS Services and Cloud Computing \\
+\textbf{stress-ng} & Technologies and Tools \\
+\textbf{TG} & AWS Services and Cloud Computing \\
+\textbf{Ubuntu 22.04 LTS} & Project-Specific Identifiers and Names \\
+\textbf{UnhealthyHostCount} & Metrics and Monitoring \\
+\textbf{VPC} & AWS Services and Cloud Computing \\
+\textbf{WAF} & Security and Access \\
+\textbf{yaml/yml} & Technologies and Tools \\
+\textbf{0.0.0.0/0} & Security and Access \\
+
+\bottomrule
+\caption{Alphabetical Index of All Abbreviations}
+\end{longtable}
+
+\newpage
+
+\section{Quick Reference: Most Important Abbreviations}
+
+The following abbreviations are the most critical for understanding this project:
+
+\subsection{The "Big Four" AWS Services}
+
+\begin{enumerate}
+    \item \textbf{EC2} --- Where applications run
+    \item \textbf{ALB} --- Routes traffic to instances
+    \item \textbf{ASG} --- Automatically scales instances
+    \item \textbf{CloudWatch} --- Monitors everything
+\end{enumerate}
+
+\subsection{The Core Scaling Values}
+
+\begin{enumerate}
+    \item \textbf{80\%} --- CPU threshold to scale OUT (add instance)
+    \item \textbf{30\%} --- CPU threshold to scale IN (remove instance)
+    \item \textbf{2 min} --- Time before scale-out triggers
+    \item \textbf{5 min} --- Time before scale-in triggers
+\end{enumerate}
+
+\subsection{The Key Metrics}
+
+\begin{enumerate}
+    \item \textbf{CPU Utilization} --- Drives scaling decisions
+    \item \textbf{HealthyHostCount} --- Shows available instances (1, 2, or 3)
+    \item \textbf{RequestCount} --- Shows load intensity
+    \item \textbf{RPS} --- Requests per second from load generator
+\end{enumerate}
+
+\newpage
+
+\section{Notes}
+
+This abbreviations document should be referenced whenever unfamiliar terminology appears in the main assignment document or supporting materials. All abbreviations are presented with their full definitions and context within the D7078E Cloud Security Mini Project.
+
+For additional information on any of these terms, please refer to:
+\begin{itemize}
+    \item AWS official documentation at https://docs.aws.amazon.com/
+    \item The main D7078E\_Assignment.tex document
+    \item Supporting task documentation files (task\_1.txt through task\_6.txt)
+\end{itemize}
+
+\end{document}

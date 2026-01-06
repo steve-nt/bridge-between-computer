@@ -61,3 +61,21 @@ EXECUTION ORDER
 5. Run the scale-in alarm command
 
 ================================================================================
+cd "Desktop\bridge-between-computer\Mini D7078E"
+
+ssh -i "D7078E-MINI-PROJECT-GROUP35-WEBSRV.pem" ubuntu@
+
+13.51.242.75
+13.51.146.203
+13.51.146.203
+16.171.23.241
+
+sudo apt install stress-ng
+
+stress-ng -c 0 -l 81 -t 12000s
+
+stress-ng -c 0 -l 95 -t 12000s
+
+13.60.228.125
+
+python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 400 --rps 10 --duration 120000
