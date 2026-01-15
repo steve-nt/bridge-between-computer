@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Primitives Test</title>
+</head>
+<body>
+    
+    <!-- Absolute (Windows example) -->
+    <!--<script src=""C:\Users\username\path\to\prim.js""></script> -->
+    <!-- Absolute (Linux example) -->
+    <!--<script src="/home/user/Desktop/prim.js"></script> -->
+    <!-- When the files are in the same fodler (Relative)-->
+    <script src="declarations.js"></script>
+    <script>
+        console.log('str:', str, typeof str);
+        console.log('num:', num, typeof num);
+        console.log('bool:', bool, typeof bool);
+        console.log('undef:', undef, typeof undef);
+    </script>
+</body>
+</html>
+
+<!--
+Same folder (project/index.html → prim.js): <script src="prim.js"></script>
+​
+Subfolder (project/sub/index.html → prim.js): <script src="../prim.js"></script> (one ../ goes up)
+​
+Deeper subfolder (project/sub/nested/index.html → prim.js): <script src="../../prim.js"></script> (two ../)
+​
+Sibling folder (project/sibling/page.html → prim.js): <script src="../prim.js"></script>
+​
+Parent folder (project/parent/index.html → prim.js): <script src="../prim.js"></script>
+​
+project/
+├── prim.js
+├── index.html (same folder)
+├── sub/
+│   └── index.html (subfolder)
+├── sibling/
+│   └── page.html (sibling folder)
+└── parent/
+    └── index.html (parent folder)
+
+-->
