@@ -1,0 +1,185 @@
+Abstract
+It is generally understood that an attacker with limited resources would not be able to carry out targeted attacks on Industrial Control Systems. Breaking this general notion, we present case studies of major attacks on Industrial Control Systems (ICSs) in the last 20 years. The attacks chosen are the most prominent ones in terms of the economic loss inflicted, the potential to damage physical equipment and to cause human casualties. For each of these attacks, we describe the attack methodology used and suggest possible solutions to prevent such attacks. We analyze each case study to provide a better insight into the development of future cybersecurity techniques for ICSs. Finally, we suggest some recommendations on the best practices for protecting ICSs.
+Previous article in issue
+Next article in issue
+Keywords
+Industrial Control Systems (ICSs)CyberattackCybersecuritySupervisory Control and Data Acquisition (SCADA)
+1. Introduction
+Industrial Control Systems (ICSs) monitor and control industrial processes. Supervisory Control and Data Acquisition (SCADA) is a type of ICS that uses Graphical User Interface (GUI), communication channels and computers to provide control of remote equipment. The Programmable Logic Controllers (PLCs) have been developed to control the industrial processes which require high reliability. If any of these components are compromised, the consequences can be disastrous and put the safety of many people at immediate risk. To safeguard ICSs, governments and research institutions all over the world have been focusing on various security aspects of ICSs and their vulnerabilities to various types of attacks.
+Most of the attacks on ICSs are launched by using Remote Access Trojans (RATs) such as 
+. These attacks are done in various ways such as by exploiting open USB ports which allow worms to penetrate the internal networks and through targeted spear-phishing (email spoofing attacks). A significant number of these attacks also exploit buffer overflow vulnerabilities when a process/program attempts to store data in a temporary location beyond which it exceeds the allocated storage space. A buffer overflow usually results in a Denial of Service (DoS), but in some scenarios, it may also allow arbitrary code execution, which can enable a hacker to take over a vulnerable process (e.g. an attacker can take control of critical industrial infrastructure). Currently, one of the greatest concerns associated with many traditional ICSs is that they use outdated software and Operating Systems (OSs) which have many vulnerabilities and most of them have autorun features, which can be easily targeted by malware. The Internet is the most preferred choice of attackers with emails delivering 92% of the malware through phishing. Recent attack trends have shown that the average impact of an attack on a company’s ICS costs the company around $5 million and 50 days of system downtime and IT losses. Additionally, it takes around 191 days for an organization to fully recover from such an attack. Based on the 2017 report on the state of industrial cybersecurity, around 54% of organizations in the world have experienced an ICS security breach in 2017 [1]. Despite the negative impact of these attacks, only 28% of these organizations consider their security strategy to be of utmost importance. With the integration of legacy industrial systems with IoT and the development of digital solutions, the risk of cyberattacks is likely to increase [2], [3], [4], especially in the ICS sector. The inability to maintain security and privacy in Industrial IoT applications can lead to huge business and financial losses. In the existing literature, several works are available which provide a broad outline of ICS attacks and recommend various defense solutions [5], [6], [7], [8]. Table 1 presents an overview of the various past surveys on cyberattacks on ICSs.
+Furthermore, Table 2 presents a list of various cyberattacks on the ICS infrastructure carried out in the last 20 years. In this work, we discuss seven out of these listed twelve attacks which had the largest impact characterized by the following specific criteria:
+Table 1. Comparison with other studies on cyberattacks on ICSs.
+
+S. No.	Year	Study	Feature	Ref.
+1	2004	The Myths and Facts behind Cyber Security Risks for Industrial Control Systems	Summarizes various types of incidents collected in the Industrial Security Incident Database (ISID) of the British Columbia Institute of Technology (BCIT). It describes events that directly affected the process control systems and discusses the lessons learned from them.	[9]
+2	2011	A Taxonomy of Cyber Attacks on SCADA Systems	Highlights the difference between SCADA systems and standard IT systems and presents a set of security property goals. It also classifies cyber-induced cyber–physical attacks on SCADA systems.	[10]
+3	2012	A Survey of SCADA and Critical Infrastructure Incidents	Selected set of attacks on ICSs which have been classified by factors such as source sector, impact, and so on, to understand their nature and how they can be mitigated in the future.	[11]
+4	2013	Industrial control systems security: What is happening?	Presents a broad overview of ICS security research with a focus on process control systems.	[12]
+5	2015	A survey of cyber security management on industrial control systems	Surveys approaches for measuring and managing ICS security and provides an agenda for future research on risk management activities in ICSs.	[13]
+6	2015	Analysis of cyber security for industrial control systems	Presents an overview and analysis on ICS architectures and communication protocols and what makes them different from IT and focuses on different threats and vulnerabilities.	[14]
+7	2015	A survey of approaches combining safety and security for industrial control systems	Comprehensive review of methods and techniques that consider both safety and security concerns that have been proposed in the literature, and provide a comparative analysis of these different approaches.	[15]
+8	2015	A Survey of Industrial Control System Testbeds	Surveys ICS testbeds that have been proposed for scientific research to facilitate vulnerability analysis, education and tests of defense mechanisms.	[16]
+9	2016	The Cybersecurity Landscape in Industrial Control Systems	Surveys general ICS cyber security landscape and discusses attacks and defenses at various levels of abstraction in an ICS from the hardware level to the process level.	[17]
+10	2018	A survey on security control and attack detection for industrial cyber-physical systems	Surveys cyber-attack schemes and defense strategies in industrial CPSs from the perspective of control theory and proposes several open research issues.	[18]
+11	2018	Designing Safe and Secure Industrial Control Systems: A Tutorial Review	Reviews current research trends in ICSs and presents a tutorial on the design of safe and secure ICSs.	[19]
+12	2019–20	This paper	Analyzes attacks on ICSs in last 20 years and discusses each attack in terms of its goal, description, impact, and potential solution to mitigate it.	
+Table 2. History of major ICS attacks.
+
+Year	ICS	Attack vector	Consequences
+2003	Davis–Besse nuclear power plant, US [11]	Slammer worm	Safety monitoring system was disabled for 5 h.
+2005	DaimlerChrysler automobile plants, US [20]	Zotob worm	Stopped production at several sites.
+2010	Natanz nuclear facility, Iran [21]	Stuxnet malware via USB drive	Destruction of centrifuge tubes at the Uranium enrichment facility.
+2014	German steel mill, Germany [22]	Email phishing/malware	Blast furnaces were inappropriately shutdown leading to Loss of Control (LoC) [22] for the plant operators which caused physical damage to the system and process interruption.
+2014	Energy companies in US and Europe [23]	Havex malware	Attackers compromised a number of strategically important organizations like energy grid operators, major electricity generation companies, petroleum pipeline operators for spying purposes and had capacity to disrupt the energy supplies in affected countries.
+2015	Kemuri Water treatment plant, US [24]	SQL injection and phishing	Personal information of 2.5 million customers leaked.
+2015	Power grid, Ukraine [25]	Spear phishing/ BlackEnergy3 malware	Power outage for around 225 thousand users, credentials stolen.
+2016	Power grid, Ukraine [26]	Industroyer malware	20% of Ukraine’s capital, Kiev was disconnected from the grid for 1 h.
+2017	Multiple businesses worldwide [27]	Notpetya ransomware	Starting from a Ukranian software firm it spread to the pharmaceutical company Merck, the snack company Mondelez and some other big industries worldwide, leading to a combined financial loss of over 10 billion dollars.
+2017	Petrochemical plant, Saudi Arabia [28]	Triton malware	Cripples safety systems in the plant
+2018	Taiwan chipmaker TSMC [29]	WannaCry ransomware	Shuts down several iPhone production plants.
+2019	Eyeglass lens manufacturer Hoya, Thailand [30]	Unnamed virus	Partial shutdown of its factory.
+i.
+Financial loss (e.g., the Notpetya attack caused a cumulative financial loss of 10 billion dollars to some of the major industries worldwide).
+ii.
+Capability to damage physical equipment (e.g., the German steel mill attack created unfavorable conditions in the steel plant by preventing the furnace from being shut down properly).
+iii.
+Potential for causing human casualties (e.g., the Triton malware attack crippled the safety systems of a petrochemical plant in Saudi Arabia putting the lives of many people at risk).
+We discuss the most relevant case studies in this paper based on the above three criteria. This study will highly benefit future initiatives of securing ICSs with state-of-the-art software technologies. We summarize the major contributions of this work as follows:
+i.
+We present and discuss case studies of major cybersecurity attacks on ICS infrastructures carried out in the last 20 years.
+ii.
+This consolidated list of attacks demonstrates to the research community working in the area of ICSs the need to address common security vulnerabilities and deploy security solutions that protect ICSs.
+iii.
+While the other surveys and reviews listed in Table 1 provided an overview of the attacks carried out on ICSs and suggested many generic solutions, in contrast, in this survey, we describe in detail each of the selected attacks in terms of the goal of the attack, description of the attack, and the consequences of the attack. We also recommend potential solutions to mitigate each attack in this survey. Table 1 presents a detailed comparison of this study with other past studies on cyberattacks on ICSs. We describe the case studies in the next section.
+2. Case studies of ICS attacks
+2.1. DoS attack on the servers at Davis-Besse nuclear power plant
+2.1.1. Goal of the attack
+The 
+ worm malware was responsible for the DoS attack that took place in 2003 on Davis–Besse nuclear power plant, USA [31]. Though not specifically intended to target the power plant, a backdoor entry into the plant’s network from the Internet provided an entry point for the attack on the plant.
+2.1.2. Description of the attack
+The plant had a safety monitoring system called the Safety Parameter Display System (SPDS) to monitor and control the safety equipment at the plant. The plant’s network to which the SPDS was connected had a firewall protecting it from the threats originating from the external networks. However, one of the consultants providing an application for the plant had a T1 bridge connection between them and the plant’s network bypassing the firewall. The 
+ worm entered the plant’s network through this T1 route by penetrating the consultant’s insecure network. It exploited a buffer overflow in the Microsoft SQL engine to slow down the servers, resulting in a DoS attack on the host servers. Microsoft had already released a patch for the issue six months before the attack but the plant’s servers were not updated. The attack is depicted pictorially in Fig. 1.
+2.1.3. Consequences
+After the worm penetrated the computer network at the plant, it disabled the SPDS for almost 5 h. Even though this attack did not pose any safety hazard (as the plant was offline), it demonstrated the fact that the computerized Nuclear Control and Monitoring Systems (NCMS) once compromised could have devastating consequences.
+2.1.4. Solution
+The 
+ worm penetrated an unsecured network of one of the contractors and tunneled through a T1 bridge into the plant’s corporate network. To prevent this, ICS should be kept isolated from the corporate network using firewalls. While it is understood that complete isolation of the ICS is impossible, one solution is to limit the number of entry points into the ICS from the corporate network and keep them monitored. The worm spread to the plant’s network and entered one of the unpatched Windows servers. This server was not updated with the patch that fixed a Microsoft SQL vulnerability exploited by the 
+ worm. It is recommended to update and run maintenance checks on the servers regularly to limit the possibility of such attacks. After this event, all the Microsoft SQL servers’ software in the power plant was updated and had patches installed.
+
+Download: Download high-res image (322KB)
+Download: Download full-size image
+Fig. 1. DoS attack on the servers at Davis-Besse nuclear power plant.
+
+
+Download: Download high-res image (327KB)
+Download: Download full-size image
+Fig. 2. Attack vectors in Stuxnet attack on Natanz facility.
+
+2.2. Stuxnet attack on Natanz nuclear facility
+2.2.1. Goal of the attack
+The 
+ malware was responsible for destroying the centrifuge tubes at the Uranium enrichment facility of Natanz, Iran in 2010 [32]. The main purpose of the attack was to reduce the lifecycle of centrifuges to cripple Iran’s nuclear program. It was carried out on the physical layer of the plant’s control system by exploiting the vulnerabilities of the centrifuge rotors by altering the rotor speed and the centrifuge pressure.
+2.2.2. Description of the attack
+After injecting the malware into the plant’s network layer through an infected USB drive, it took over the Programmable Logic Controllers (PLCs). It had a control logic implemented to record and replay the sensor values of the rotor vibration and pressure. The valves of the first and the last stage centrifuges were shut off along with the exhaust valve through a re-calibration of pressure sensors of the respective valves by the malware. A second vector was then used to attack the Centrifuge Drive System (CDS), which controlled the rotor speeds of the centrifuge system. The malware used copies of stolen digital certificates and posed as a legitimate driver software for the Windows Operating System (OS). The rotors are critical systems and when their operating speed is above the critical speed, the harmonics (distortions in power systems) are triggered which can damage the rotor walls. The centrifuges used for enrichment were fragile and their failure was tolerated by the in-built protection system called Cascade Protection System (CPS). The CPS helped in isolating the troubled centrifuge tubes through the vibration sensors, leading to an increase in pressure caused by the shutting-off of multiple isolated tubes. Once the rotors were damaged, the CPS isolated the centrifuges. Multiple rotor damages resulted in shutting down all the valves of a single-stage, resulting in many centrifuges breaking at once. The Supervisory Control and Data Acquisition (SCADA) software gets its information from the memory in the controllers which can be altered by the logic code. The operators working with the SCADA interface were thus unable to identify any problem with the rotor speeds. Fig. 2 shows the attack vectors.
+2.2.3. Consequences
+These attacks on CDS and CPS were repeated to disrupt the centrifuge system through overpressure and by altering the rotor speeds. The 
+ malware disrupted the nuclear program of Iran and demonstrated the impact of cyber-physical attacks.
+2.2.4. Solution
+By intercepting the interactions among the various entities such as sensors, PLCs, SCADA systems and the operators, the plant was rendered vulnerable to the attack. The control loops among these entities should be properly authenticated and the results of their feedback loops verified. To launch such an attack, they needed information regarding plant architecture. The attackers seem to have been engaged in reconnaissance and data collection about the plant’s systems through the data released by the Iranian government. This information was revealed through footage of the plant’s monitoring software which was broadcasted on a local news network. Such sensitive information should be safeguarded in the first place. Although network segregation using firewalls and air gaps helps prevent unauthorized access to the plant’s system, the attackers used a workaround method to bypass such solutions by infecting personal computers of the people who have legitimate physical access to the plant’s system. Personal hardware devices such as USB drives should be sanitized before allowing them to connect to the plant’s ICS. Antivirus software cannot always be trusted to prevent custom made malware because they work based on identifying and removing malware which is already present in their signature databases. The plant’s physical components should also be monitored to detect any unusual behavior of any component so that any compromise of the plant’s ICS can be detected as early as possible.
+2.3. German steel mill attack
+2.3.1. Goal of the attack
+In December 2014, a German steel mill was targeted by hackers who maliciously took control of the production software resulting in significant infrastructure damages to the mill’s production line [22]. BSI (the German Federal agency for digital security) had classified this attack as an Advanced Persistent Threat (APT), a highly targeted attack with strong funding and skilled personnel (as described by the National Institute of Standards and Technology (NIST)). Most APTs recorded in the past were associated with groups funded by sovereign states. The intention of the attack did not seem to be financial, i.e., neither to acquire confidential information nor to disrupt the production line because the damage caused by their malware could have been a lot worse, but instead, it was a warning to the business proprietors.
+2.3.2. Description of the attack
+The adversary infiltrated into the facility’s corporate network via phishing emails. The victims were sent fraudulent emails containing attached PDF files from spoofed email addresses. A malware had been inserted into these PDF files, which infected the corporate network software upon downloading and opening the files. The adversaries then worked their way up to the management software and into the ICS network of the plant, thereby taking control of its control systems. Once they had access to the control systems, they strategically destroyed the Human Machine Interface (HMI) components. Furthermore, they prevented the operation of the mill’s blast furnace by disabling the security settings and caused severe damage to the industrial infrastructure.
+2.3.3. Consequences
+The blast furnaces were shut down leading to significant damages to the system. This attack serves as an eye-opener to the ICS businesses. The cyberattack survived by the German steel mill shows that the adversaries can cause significant damage to the industry’s production-line infrastructure. The attackers have demonstrated their abilities.
+2.3.4. Solution
+Attackers gained entry into the ICS by using a connection between the corporate network and the Operational Technology (OT) network. To safeguard against such intrusions, the interconnections between the corporate network and the OT network should be protected by using tools such as firewalls and defense systems. Furthermore, the number of connection interfaces between the OT network and the corporate network should be minimized [33]. This would create checkpoints which can be monitored easily with Network Security Monitoring (NSM) utilities. NSM allows security personnel to actively monitor network communications to discover network anomalies. Along with creating checkpoints, certificate-based signature schemes and encryption schemes can also be deployed for interaction between the OT and corporate IT networks [34], [35].
+2.4. Cyberattack on the Ukrainian power grid
+2.4.1. Goal of the attack
+The cyberattack that occurred on the Ukranian power grid took place in 2015. In this attack, the attackers caused a temporary malfunction of the power distribution system, leading to a power outage in three provinces in Ukraine [36]. It is believed that this attack was part of a larger espionage operation carried out worldwide with the support of the Russian government, to destabilize the political atmosphere in Eastern Europe.
+2.4.2. Description of the attack
+It was a spear-phishing attack in which emails with Microsoft Word documents containing macros (tools used to automate frequently executed tasks) as attachments were sent out to the recipients, with the intention of installing the 
+ (BE3) malware on the recipients’ computers, as shown in Fig. 3. BE3 was then used to gather information about the network, thus providing a foothold for the attackers into the corporate network. Using the collected information, the attackers were able to gain access to the corporate user accounts’ credentials. They used these credentials to directly log into the ICS network from the external network through an encrypted tunnel. Furthermore, the attackers launched a Telephony Denial of Service (TDoS) attack that flooded the call centers to block the real customer calls from getting through. They also disabled the Uninterruptible Power Supplies (UPSs) and corrupted the firmware of several Remote Terminal Units (RTUs), which were meant to transmit data to the SCADA systems. Finally, they executed the 
+ utility to wipe out the control centers’ Human Machine Interface (HMI) systems and several other important workstations.
+
+Download: Download high-res image (411KB)
+Download: Download full-size image
+Fig. 3. Cyberattack on the Ukrainian power grid.
+
+2.4.3. Consequences
+It was a large scale attack that was directed at the distribution systems of six energy companies but was successful only in three of them. The attackers managed to penetrate the other three but were not able to compromise their operations. Approximately 225,000 customers were affected by this power outage. It was also reported that thousands of user credentials were stolen during this attack.
+2.4.4. Solution
+This attack involved email phishing, in which emails with malicious attachments were sent to different people within the organization. It is recommended to include user awareness training and whitelisting applications to prevent malware. Attackers can still use different types of social engineering methods to target the organization. Since these attacks use targeted emails and Internet-connected assets, communications with these assets should be segmented, monitored and controlled. Sandboxing technology can be used to test documents and emails coming into the network. Proxy systems can be deployed to control inbound and outbound communication paths. This attack used a malware called 
+ for establishing a foothold into the network and to steal credentials. Organizations can acquire YARA rules [37] (YARA rules are a way of identifying malware by creating rules that look for specific characteristics) for the latest indicators of compromise to counter the malware. To prevent attackers from getting remote access to ICS, there is a need for strong authentication and encrypted communication during remote access. In case the control system is compromised, we should quickly isolate the control system so that remote access can be temporarily disabled. Backups should be taken at regular intervals so that systems can be easily restored even after a utility such as 
+ is used to wipe the disks clean.
+
+Download: Download high-res image (385KB)
+Download: Download full-size image
+Fig. 4. Chemical mix changed at water treatment plant by hackers.
+
+2.5. Chemical mix changed at a water treatment plant
+2.5.1. Goal of the attack
+A water treatment plant in the USA was hacked in 2015 by a suspected Syrian hacktivist group [38]. As the plant’s specific location and name were not released due to safety reasons, we will use the pseudonym Kemuri Water Company (KWC) for the utility. The intention behind this attack is still unclear. Although personal data of the customers was exposed, there is no evidence that this information was misused.
+2.5.2. Description of the attack
+KWC’s plant had an old IBM AS/400-based SCADA system for managing the PLCs to regulate the flow of water and chemicals by managing valves and ducts in the plant. The attackers extracted login credentials for the system from the front-end web server to access the plant’s water control software which was also running on the same AS/400 system. As this system was central to most IT operations in this plant, access to this control system allowed hackers to control most of the other equipment in the plant. Fig. 4 shows the details of the attack.
+2.5.3. Consequences
+At least two instances were identified where hackers were able to use the PLC’s web interface to alter the quantity of some of the chemicals that were used in treating water, which in turn hampered the plant’s production and thus increased the recovery time to replenish the water supplies. Even though the attackers were able to manipulate the valves that control the chemical flow, there was no impact on the plant’s operation. The attackers did not seem to have much knowledge of the SCADA systems, else it could have been a critical security breach, leading to serious consequences to the plant as well as the surrounding areas which rely on water from this plant. Personal information of about 2.5 million customers was also reported to have been leaked from their database.
+2.5.4. Solution
+According to reports published by the security firm Vericlave [39] and other sources [40] the primary attack vectors used in the security breach of KWC’s internal AS/400 system could have been a Structured Query Language (SQL) injection attack and email phishing. The attackers hacked into the company’s system by exploiting a vulnerability on the company’s payment portal connected to the Internet. Executing basic network hygiene and best practices would lower the risk of such attacks being successful, but will not really prevent access to the critical systems if the attacker still figures out how to penetrate the business network. To address this situation, the Operational Technology systems (OT) must be separated from the external network. To ensure that OT-related applications are in an isolated zone we need to use a Firewall between the corporate network and the OT network. Regardless of whether the attacker figures out how to get access to the corporate network, the OT system would be unreachable to him/her because access to the OT system would be given to the users only after correct validation. Cybersecurity could be further improved by following the International Electrotechnical Commission (IEC) 62443 which is a global standard for the security of ICS networks. When ICS and OT networks co-exist in an enterprise, this standard suggests segmenting the networks into zones based on accessibility criterion. It also recommends steps to be followed by the industry operators for gathering data to be secured, assessment of network security, building countermeasures and solutions and deploying them in a phased manner.
+2.6. Watershed attack on Saudi Arabian petrochemical plant
+2.6.1. Goal of the attack
+In 2017, the safety system for industrial control units (known as Triconex industrial safety technology) was targeted by hackers at a petrochemical plant in Saudi Arabia [41]. Although the attackers intended to cause physical damage to the plant, a defect in their malware code inadvertently led to a shutdown of the operations.
+2.6.2. Description of the attack
+The hackers used a malware called Triton for gaining remote access to the Safety Instrumented System (SIS) and to alter its codebase, as shown in Fig. 5. SIS is responsible for maintaining operational safety in the industrial plant, with each controller having fallback failsafe modes. When the attack occurred, the devices went into the failsafe mode, causing operations to pause at multiple facilities and hence triggering a shutdown. Security alerts were sent to all the 
+ users, thus helping in detecting the attack.
+2.6.3. Consequences
+This attack is often called a Watershed attack, indicating possible future attacks on the ICS infrastructure across the globe. The attackers would learn the working of the safety systems to possibly launch large scale attacks in the future intended to disrupt or damage the plant’s operations.
+2.6.4. Solution
+One approach to prevent the above attack is to isolate the safety system networks from other networks such as the process control network and the information system networks. Workstations that are used for working with SIS, should have a single channel communication with the Distributed Control System (DCS) so that any vulnerability cannot be introduced into SIS using this channel. DCS is a specially designed computerized control system for the plant. Blockchain technology which is being widely adopted for distributed and decentralized applications can also be leveraged for control and data management in DCS [42]. Hardware features that provide the physical capability to program safety features on 
+ controllers should not be left in programming/debug mode when not in use [43]. Access control and application whitelisting must be implemented on any server that can reach the SIS system through the network. ICS network traffic must be regularly monitored for unpredictable communication streams and other anomalous activity.
+
+Download: Download high-res image (546KB)
+Download: Download full-size image
+Fig. 5. Watershed attack cripples safety systems in Saudi Arabian petrochemical plant.
+
+2.7. Notpetya cyberattack
+2.7.1. Goal of the attack
+Ukraine was hit by a series of cyberattacks in 2017 that disrupted many websites including those belonging to electricity firms and various Ukranian ministries [44]. Attackers used a variant of 
+ malware called 
+ to carry out the attack. It was found out later that the attack began with an update of a tax accounting software, 
+. Although Ukraine was the initial target in this politically-motivated attack, many other countries were also in the grip of this attack later on.
+2.7.2. Description of the attack
+ is a type of ransomware that encrypts the whole system so that it is not accessible by any means. It encrypts the Master File Table (MFT), reboots the computer and makes the Master Boot Record (MBR) unusable. MFT is a database containing information about every file and directory in the NTFS file system, while MBR is a type of boot sector responsible for locating and booting the operating system. As a result, the whole system including the operating system becomes inaccessible.
+2.7.3. Consequences
+From hospitals to manufacturers, a number of machines were infected around the world within hours of its appearance. This attack resulted in damages costing over 10 billion dollars. This attack has shown that organizations across the globe are not well prepared to tackle attacks from ransomware like 
+.
+2.7.4. Solution
+ uses 
+ (an exploit in the Server Message Block protocol of multiple Windows operating systems) of Microsoft Windows which was discovered and patched in its March 2017 update. It is recommended to update the OS with the latest patches to fix this issue. The malware was modified to use a variation of 
+ (an open-source credential dumping tool), which demonstrates that user passwords are stored in the computer memory, to spread across the network. The effects of 
+ can be limited by frequently updating the OS and setting up antivirus and antimalware utilities. If the system is infected by the malware, we can use decrypting tools for decrypting the MFT to recover files affected by the attack. Another good practice would be to perform regular backups of the system. In case of irreparable damage to the OS, we can safely revert back to the previously saved version.
+3. Lessons learned and protection measures for ICS
+3.0.1. Lessons learnt
+From the various case studies reviewed above, we observe that there are several types of attacks possible on ICS systems. Most of them involve injecting some kind of malware or ransomware into the control systems, hacking outdated networks and systems, and exploiting their inherent vulnerabilities. In most cases, the malware made its way into the core ICS network via phishing emails, insecure connections to the Internet or via untrusted and unsanitized USB drives. In the attack on KWC’s water treatment plant, the hackers exploited the non-isolation of OT/IT networks to gain access to the plant’s control system.
+3.0.2. Protection measures for ICS
+Based on the review of the above case studies, we recommend the following future protection measures for the ICSs:
+i.
+Regular updates to the firmware and software on the industry-grade computers should be carried out. Most vulnerabilities found in the above use cases were due to old and buggy versions of firmware or software.
+ii.
+We need to use at least two-factor authentication when logging into private ICS servers and SCADA systems. Password protection being the primary authentication factor should be used in conjunction with at least a secondary factor. In this regard, Physically Unclonable Functions (PUFs) are being extensively explored for using as a second factor of authentication [45].
+iii.
+We need to ensure that the passwords of critical systems are changed at regular intervals.
+iv.
+Employees who oversee and manage ICS servers must be trained on a regular basis to recognize phishing attacks.
+v.
+There should be a provision for manual overrides and fail-safe modes so that detection and shutdown of the system can occur as soon as the system is tampered with. This will prevent the ICSs from further damage.
+vi.
+We should not allow the use of USB drives on critical systems without stringent antivirus checks. State-of-the-art object detection techniques to detect suspicious objects can be implemented in the industrial sites [46].
+4. Conclusion
+Based on the above case studies we conclude that ICS security remains a challenging issue around the world. ICS is a vital component of many critical infrastructures that manage and provide basic services (such as electricity, water, gas and so on) to the society. As the influence of technology deepens in our lives, more and more industries such as pulp and paper mills, herbicides, petrochemicals, etc. which deal with hazardous chemicals are becoming equipped with software solutions. They need to be protected and equipped with the latest software security solutions. If gone unnoticed, these attacks can cause serious damages to many critical infrastructures which may lead to life-threatening situations and impact the lives of many citizens. After analyzing all the cases, we recommend that the owners of ICSs monitor and improve their security so that they can be protected against such attacks.
+Declaration of Competing Interest
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Acknowledgments
+We thank the anonymous reviewers for their valuable comments which helped us improve the content and presentation of this paper@
