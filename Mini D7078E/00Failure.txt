@@ -1,0 +1,872 @@
+================================================================================
+SAFE FAILURE SIMULATION GUIDE: SIMULATING SERVER CRASHES
+================================================================================
+Document: Step-by-Step Process for Beginners
+Date: 2026-01-08
+Version: 1.0
+
+This guide provides detailed instructions for safely simulating server crashes
+after 3 instances without performing network floods. Two approved methods are
+provided: AWS Fault Injection Simulator (FIS) and Controlled CPU Stress via SSM.
+
+================================================================================
+IMPORTANT SAFETY REMINDERS
+================================================================================
+
+1. ALWAYS test in non-production environments first
+2. ALWAYS set time limits on stress tests (maximum 120-180 seconds)
+3. ALWAYS have an exit strategy - know how to stop the test
+4. ALWAYS get approval before running on actual infrastructure
+5. ALWAYS monitor CloudWatch during and after tests
+6. NEVER send traffic floods or network attacks
+7. These methods are REVERSIBLE and AUDITABLE
+8. Both methods will be logged in AWS CloudTrail for compliance
+
+================================================================================
+PREREQUISITES (REQUIRED BEFORE STARTING)
+================================================================================
+
+Before using either method, you need:
+
+A. AWS CLI Installed and Configured
+   - Download: https://aws.amazon.com/cli/
+   - Configure with: aws configure
+   - You'll need: AWS Access Key ID, Secret Access Key, Region
+   
+B. IAM Permissions Required
+   - ec2:Describe* (view instance information)
+   - ssm:SendCommand (for Method B and FIS)
+   - fis:* (for Method A only)
+   - cloudwatch:GetMetricStatistics (to monitor results)
+   - iam:GetRole, iam:PassRole (if using service roles)
+
+C. EC2 Instances Ready
+   - Instances must have the SSM Agent running (usually pre-installed)
+   - Instances must have an IAM role with AmazonSSMManagedInstanceCore
+   - Note: Instance IDs change after each test run - save them beforehand
+
+D. Optional but Recommended
+   - CloudWatch Dashboard open for real-time monitoring
+   - Auto Scaling Group configured (to observe recovery behavior)
+   - At least 3 instances running (for this simulation)
+
+================================================================================
+FINDING YOUR INSTANCE IDs (CRITICAL FIRST STEP)
+================================================================================
+
+Your instance IDs will CHANGE between tests. Save them before running any test.
+
+Method 1: Using AWS Console
+1. Go to https://console.aws.amazon.com/ec2/
+2. Click "Instances" in left sidebar
+3. View list of running instances
+4. Copy the Instance ID (starts with "i-" followed by 17 characters)
+   Example: i-0abcd1234ef567890
+
+Method 2: Using AWS CLI
+   aws ec2 describe-instances \
+   --filters "Name=instance-state-name,Values=running" \
+   --query 'Reservations[*].Instances[*].[InstanceId,PrivateIpAddress,State.Name]' \
+   --output table
+
+Method 3: Using PowerShell (Windows)
+   $instances = aws ec2 describe-instances --query 'Reservations[*].Instances[*].InstanceId' --output text
+   Write-Host "Running instances: $instances"
+
+ACTION ITEM: Before proceeding to Method A or B, WRITE DOWN your instance IDs:
+   Instance 1: ____________________
+   Instance 2: ____________________
+   Instance 3: ____________________
+   (You'll need these for the steps below)
+
+================================================================================
+METHOD A: AWS FAULT INJECTION SIMULATOR (FIS) - PREFERRED METHOD
+================================================================================
+
+WHY CHOOSE METHOD A?
+✓ Auditable - all actions logged to CloudTrail
+✓ Reversible - experiments can be stopped at any time
+✓ Safe - built-in safeguards and IAM controls
+✓ Professional - designed for production testing
+✓ Controlled - can target specific instances and durations
+
+HOW IT WORKS:
+1. You create an "experiment template" (like a blueprint)
+2. You define which instances to target
+3. You set the duration and intensity of the failure
+4. You start the experiment
+5. FIS automatically applies CPU stress to the target instances
+6. After the duration expires, FIS automatically stops and cleans up
+
+STEP-BY-STEP PROCESS:
+
+================================================================================
+STEP A1: CREATE AN IAM ROLE FOR FIS (One-time setup)
+================================================================================
+
+If you haven't done this before, follow these steps:
+
+A1.1 Open AWS Console and navigate to IAM
+     - Go to https://console.aws.amazon.com/iam/
+     - Click "Roles" in left sidebar
+
+A1.2 Click "Create role" button
+     - Trusted entity type: AWS service
+     - Service: Fault Injection Simulator
+     - Click "Next"
+
+A1.3 Attach permissions
+     - Search for: "AmazonSSMManagedInstanceCore"
+     - Select checkbox
+     - Click "Next"
+
+A1.4 Name the role
+     - Role name: "FIS-Experiment-Role"
+     - Click "Create role"
+
+RESULT: You now have a service role for FIS to use.
+
+================================================================================
+STEP A2: CREATE FIS EXPERIMENT TEMPLATE
+================================================================================
+
+Using AWS Console (Easiest for Beginners):
+
+A2.1 Open FIS in AWS Console
+     - Go to https://console.aws.amazon.com/fis/
+     - Click "Experiment templates" in left sidebar
+
+A2.2 Click "Create experiment template" button
+
+A2.3 Configure Basic Details
+     - Name: "CPU-Stress-Crash-Simulation"
+     - Description: "Simulates server crash by increasing CPU load"
+     - Leave "CloudWatch Logs" unchecked for now
+
+A2.4 Configure Targets
+     - Click "Add target"
+     - Resource type: "EC2 Instances"
+     - Resource tags: Leave blank (or add if you have them)
+     - Selection mode: "Count"
+     - Instance count: "1" (for first test, increase to 3 for full test)
+     - Click "Add action"
+
+A2.5 Configure Action (This is the "crash simulation")
+     - Action: "aws:ec2:cpu-stress"
+     - Duration: "PT2M" (means 2 minutes - safe timeframe)
+     - CPU percentage: "95" (will stress CPU to 95%)
+     - Number of processors: "0" (use all available)
+     - Click "Save"
+
+A2.6 Configure Service Role
+     - Service role: Select "FIS-Experiment-Role" from dropdown
+     - (If not visible, ensure you created it in Step A1)
+
+A2.7 Review and Create
+     - Click "Create experiment template"
+     - You should see confirmation: "Template created successfully"
+
+RESULT: You now have an FIS experiment ready to use.
+
+Using AWS CLI (For Advanced Users):
+
+cat > fis-template.json << 'EOF'
+{
+  "description": "CPU stress to simulate server crash",
+  "targets": {
+    "Instances": {
+      "resourceType": "ec2:instance",
+      "resourceTags": {},
+      "filters": [
+        {
+          "path": "State.Name",
+          "values": ["running"]
+        }
+      ],
+      "selectionMode": "COUNT",
+      "selectionValue": "1"
+    }
+  },
+  "actions": {
+    "CPUStress": {
+      "actionId": "aws:ec2:cpu-stress",
+      "parameters": {
+        "duration": "PT2M",
+        "cpuLoad": "95"
+      },
+      "targets": {
+        "Instances": "Instances"
+      }
+    }
+  },
+  "roleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/FIS-Experiment-Role"
+}
+EOF
+
+aws fis create-experiment-template --cli-input-json file://fis-template.json
+
+================================================================================
+STEP A3: START THE FIS EXPERIMENT
+================================================================================
+
+Using AWS Console:
+
+A3.1 Return to FIS Experiment Templates
+     - Go to https://console.aws.amazon.com/fis/
+     - Click "Experiment templates"
+
+A3.2 Find Your Template
+     - Look for "CPU-Stress-Crash-Simulation" in the list
+     - Click on it
+
+A3.3 Start Experiment
+     - Click "Start experiment" button
+     - Review configuration (should show 1 instance, 2 minute duration)
+     - Click "Start experiment" to confirm
+
+A3.4 Monitor Execution
+     - Page will show "Status: Running"
+     - Watch the progress bar
+     - Duration: 2 minutes (120 seconds)
+
+RESULT: FIS is now applying CPU stress to your instance(s).
+
+Using AWS CLI:
+
+aws fis start-experiment \
+  --experiment-template-id eft-XXXXXXXXXXXXX \
+  --role-arn arn:aws:iam::YOUR_ACCOUNT_ID:role/FIS-Experiment-Role
+
+(Replace eft-XXXXXXXXXXXXX with your template ID from Step A2)
+
+================================================================================
+STEP A4: MONITOR DURING THE EXPERIMENT (2 MINUTES)
+================================================================================
+
+While FIS is running, you should observe:
+
+A4.1 CloudWatch Metrics (to see the stress)
+     - Go to https://console.aws.amazon.com/cloudwatch/
+     - Click "Metrics" → "EC2" → "Per-Instance Metrics"
+     - Select your target instance
+     - Look for "CPUUtilization" graph - should spike to ~95%
+
+A4.2 Expected Behavior
+     - CPU will jump to high load (95%)
+     - Application may become slow or unresponsive
+     - If Auto Scaling enabled: new instances may be added
+     - Connection attempts to the instance may timeout
+
+A4.3 EARLY STOP (if needed)
+     - If something goes wrong, you CAN stop the experiment:
+     - Go back to FIS console
+     - Click "Stop experiment" button
+     - Select "Stop now"
+     - This immediately stops the stress and returns CPU to normal
+
+DO NOT WORRY: The 2-minute timer ensures automatic cleanup!
+
+================================================================================
+STEP A5: OBSERVE RESULTS AFTER EXPERIMENT COMPLETES
+================================================================================
+
+After 2 minutes, FIS automatically cleans up:
+
+A5.1 Status Check
+     - FIS page shows "Status: Stopped"
+     - CPU should return to normal levels
+
+A5.2 View Metrics
+     - CloudWatch graph should show CPU spike, then drop back
+     - This proves the test worked and cleaned up properly
+
+A5.3 Check Auto Scaling (if configured)
+     - Go to EC2 → Auto Scaling Groups
+     - See if scale-down happened
+     - Termination should respect cool-down period
+
+A5.4 Check CloudWatch Alarms (if configured)
+     - Any alarms you set should have triggered
+     - Verify your alerting system worked
+
+RESULT: Complete cycle documented in CloudTrail (audit trail).
+
+================================================================================
+METHOD A SUMMARY
+================================================================================
+
+Advantages:
+✓ Enterprise-grade, fully auditable
+✓ Safe built-in timeouts (automatic cleanup)
+✓ IAM-controlled and reversible
+✓ Can target multiple instances
+✓ Professional for production testing
+✓ Logged for compliance
+
+Best For:
+- Production-like testing
+- When audit trail is required
+- High-security environments
+- Teams with AWS best practices
+
+Common Issues:
+Q: "Experiment not starting"
+A: Ensure IAM role was created correctly and has right permissions
+
+Q: "CPU not increasing"
+A: Verify instances have SSM Agent running and proper IAM role
+
+Q: "Alarms not triggering"
+A: Check alarm thresholds - set them lower than 95%
+
+================================================================================
+METHOD B: CONTROLLED CPU STRESS VIA SSM - SIMPLER ALTERNATIVE
+================================================================================
+
+WHY CHOOSE METHOD B?
+✓ More direct control - you're running the command directly
+✓ Simpler setup - no experiment template needed
+✓ Familiar commands - uses standard stress-ng tool
+✓ Quick to execute - less setup overhead
+✓ Good for learning - see exactly what's running
+
+HOW IT WORKS:
+1. You use AWS SSM to send a command to your instance
+2. The command installs stress-ng tool (if not present)
+3. stress-ng runs for exactly 120 seconds at 90% CPU
+4. After 120 seconds, the command stops automatically
+5. Your instance returns to normal
+
+IMPORTANT: This method also requires SSM Agent on instances!
+
+STEP-BY-STEP PROCESS:
+
+================================================================================
+STEP B1: VERIFY SSM AGENT STATUS
+================================================================================
+
+Before sending commands, ensure SSM Agent is running.
+
+Using AWS Console:
+
+B1.1 Go to Systems Manager
+     - https://console.aws.amazon.com/systems-manager/
+
+B1.2 Click "Fleet Manager" or "Managed nodes"
+
+B1.3 Look for your instances in the list
+     - Status should show "Online"
+     - If "Offline" or not listed, instance needs SSM Agent setup
+
+B1.4 If Status is "Online", you're ready for Step B2
+     - If Status is "Offline", you need to fix the instance first
+     - (Contact your AWS administrator)
+
+Using AWS CLI:
+
+aws ssm describe-instance-information \
+  --query 'InstanceInformationList[*].[InstanceId,PingStatus]' \
+  --output table
+
+Expected output shows your instances with PingStatus "Online"
+
+================================================================================
+STEP B2: SAVE YOUR INSTANCE IDs AGAIN
+================================================================================
+
+You MUST have the exact instance ID before running the stress command.
+
+Get your instance IDs:
+
+aws ec2 describe-instances \
+  --filters "Name=instance-state-name,Values=running" \
+  --query 'Reservations[*].Instances[*].InstanceId' \
+  --output text
+
+Write down the IDs you want to stress:
+   Instance 1: ____________________
+   Instance 2: ____________________
+   Instance 3: ____________________
+
+================================================================================
+STEP B3: RUN CPU STRESS ON SINGLE INSTANCE (Test First)
+================================================================================
+
+ALWAYS test with 1 instance first. After confirming it works, test with 3.
+
+For Linux Instances (Ubuntu, Amazon Linux 2):
+
+aws ssm send-command \
+  --instance-ids "i-0abcd1234ef567890" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+
+EXPLANATION OF THIS COMMAND:
+- --instance-ids: ID of the instance to stress
+- AWS-RunShellScript: The type of command (runs shell script)
+- commands parameter has 3 parts:
+  1. "sudo apt-get update -y || true" - Update package manager
+  2. "sudo apt-get install -y stress-ng || true" - Install stress-ng tool
+  3. "stress-ng -c 0 -l 90 -t 120s" - Run stress for 120 seconds at 90% CPU
+     * -c 0: Use all CPU cores
+     * -l 90: Load to 90%
+     * -t 120s: Duration 120 seconds (2 minutes)
+
+IMPORTANT: Replace "i-0abcd1234ef567890" with YOUR actual instance ID!
+
+Expected Response:
+{
+    "Command": {
+        "CommandId": "abc1234d-5678-9101-112e-131415aabbcc",
+        "Status": "Pending"
+    }
+}
+
+SAVE the CommandId - you'll use it to check progress!
+
+Using PowerShell (Windows):
+
+$instanceId = "i-0abcd1234ef567890"  # Replace with your instance ID
+
+$response = aws ssm send-command `
+  --instance-ids $instanceId `
+  --document-name "AWS-RunShellScript" `
+  --parameters 'commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]'
+
+Write-Host "Command sent. CommandId: $($response.Command.CommandId)"
+
+================================================================================
+STEP B4: MONITOR COMMAND EXECUTION
+================================================================================
+
+The stress test is now running! Monitor its progress:
+
+Check Command Status:
+
+aws ssm get-command-invocation \
+  --command-id "abc1234d-5678-9101-112e-131415aabbcc" \
+  --instance-id "i-0abcd1234ef567890"
+
+Expected outputs:
+- Status: "InProgress" (while running, 0-120 seconds)
+- Status: "Success" (after 120 seconds complete)
+- Status: "Failed" (if there's an error)
+
+Monitor CloudWatch Metrics Simultaneously:
+
+1. Go to https://console.aws.amazon.com/cloudwatch/
+2. Click "Metrics" → "EC2"
+3. Select your instance
+4. Watch CPUUtilization graph:
+   - Should spike to ~90% when command starts
+   - Should hold at ~90% for ~2 minutes
+   - Should return to normal after 120 seconds
+
+Expected Timeline:
+- T+0s: Command sent, installation starting
+- T+10-30s: stress-ng installed, stress begins
+- T+30-120s: CPUUtilization ~90% (constant)
+- T+120s: stress-ng stops automatically
+- T+125s: CPU returns to normal (< 5%)
+
+================================================================================
+STEP B5: CHECK COMMAND OUTPUT
+================================================================================
+
+After 2-3 minutes, check the results:
+
+View Full Output:
+
+aws ssm get-command-invocation \
+  --command-id "abc1234d-5678-9101-112e-131415aabbcc" \
+  --instance-id "i-0abcd1234ef567890" \
+  --query 'StandardOutputContent'
+
+You should see output similar to:
+   stress-ng: info: [PID] starting 4 worker processes
+   stress-ng: info: CPU load: 90%
+   (... stress output ...)
+   stress-ng: info: completed in 120.00s
+
+Success Indicators:
+✓ Status shows "Success"
+✓ Output shows "stress-ng" running
+✓ CloudWatch CPU graph shows spike
+✓ Command completed after ~120 seconds
+
+Error Indicators:
+✗ Status shows "Failed"
+✗ Output shows "command not found"
+✗ Output shows "Permission denied"
+✗ Instance status shows "Offline"
+
+If you see errors, the instance may not have SSM Agent running properly.
+
+================================================================================
+STEP B6: SCALE TO THREE INSTANCES (After Single Test Works)
+================================================================================
+
+Once you've confirmed Method B works with 1 instance, test with 3:
+
+Option 1: Run Sequential (One at a time)
+
+# Instance 1
+aws ssm send-command \
+  --instance-ids "i-0abcd1111111111a" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+
+# Wait for Instance 1 to complete (check status above)
+# After Instance 1 shows "Success", run Instance 2
+
+aws ssm send-command \
+  --instance-ids "i-0abcd2222222222b" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+
+# Wait for Instance 2 to complete
+# Then run Instance 3
+
+aws ssm send-command \
+  --instance-ids "i-0abcd3333333333c" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+
+Timeline: 2 + 2 + 2 = ~6 minutes for all three
+
+Option 2: Run Parallel (All at once)
+
+aws ssm send-command \
+  --instance-ids "i-0abcd1111111111a" "i-0abcd2222222222b" "i-0abcd3333333333c" \
+  --document-name "AWS-RunShellScript" \
+  --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+
+Timeline: ~2 minutes (all three stress simultaneously)
+
+RECOMMENDED: Use parallel approach for realistic "3 servers crash" scenario.
+
+================================================================================
+STEP B7: OBSERVE AUTO-SCALING RESPONSE
+================================================================================
+
+If your instances are in an Auto Scaling Group:
+
+B7.1 Watch CloudWatch Metrics
+     - All 3 instances should show CPU spike to ~90%
+     - ASG should detect unhealthy instances
+     - If termination is configured, instances may be replaced
+
+B7.2 Check ASG Activity
+     - Go to EC2 → Auto Scaling Groups
+     - Click on your ASG
+     - View "Activity history" tab
+     - You should see scale-up (new instances added)
+     - Then scale-down (old instances terminated)
+
+B7.3 Verify Recovery
+     - After ~5-10 minutes, system should stabilize
+     - New healthy instances should be serving traffic
+     - This demonstrates the failure simulation worked!
+
+================================================================================
+METHOD B SUMMARY
+================================================================================
+
+Advantages:
+✓ Simpler setup - no templates needed
+✓ Direct control - you see exactly what's running
+✓ Fast execution - less overhead
+✓ Good for learning - understand stress testing
+✓ Fully reversible - automatic cleanup after 120s
+
+Best For:
+- Learning and testing
+- Quick validation scenarios
+- When FIS is unavailable
+- Single command testing
+
+Common Issues:
+Q: "command not found: aws"
+A: AWS CLI not installed or not in PATH
+
+Q: "InvalidInstanceID.Malformed"
+A: Check your instance ID is correct (starts with i-)
+
+Q: "The document "AWS-RunShellScript" cannot be found"
+A: Wrong document name - should be exactly "AWS-RunShellScript"
+
+Q: "Access Denied"
+A: IAM permissions missing - need ssm:SendCommand
+
+Q: "Instance is offline"
+A: SSM Agent not running on instance - needs to be restarted
+
+================================================================================
+QUICK COMPARISON: METHOD A vs METHOD B
+================================================================================
+
+Feature              | Method A (FIS)           | Method B (SSM)
+---------------------|--------------------------|---------------------------
+Setup Complexity     | Moderate (1 template)    | Low (just a command)
+Execution Speed      | Medium (need template)   | Fast (direct execution)
+Audit Trail         | Excellent (CloudTrail)   | Good (CloudTrail)
+Reversibility       | Automatic cleanup        | Automatic after 120s
+IAM Control         | Strict (role-based)      | Flexible
+Best For            | Production environments  | Learning/quick tests
+Monitoring          | Built-in FIS dashboard   | CloudWatch metrics
+Multi-instance      | Native support           | Manual per-instance
+Enterprise Ready    | Yes                      | Yes, but simpler
+
+RECOMMENDATION FOR BEGINNERS:
+- First test: Use Method B with 1 instance (easiest to debug)
+- After success: Scale to 3 instances with Method B
+- For production: Migrate to Method A (more professional)
+
+================================================================================
+TROUBLESHOOTING GUIDE
+================================================================================
+
+PROBLEM: CloudWatch shows no CPU spike
+SOLUTION:
+1. Verify instance ID is correct (check EC2 console)
+2. Verify SSM Agent is online (Fleet Manager shows "Online")
+3. Try Method A (different approach)
+4. Check instance security group allows SSM communication
+5. Restart SSM Agent: aws ssm send-command --instance-ids <ID> --document-name "AWS-RunShellScript" --parameters commands=["sudo systemctl restart amazon-ssm-agent"]
+
+PROBLEM: Command status shows "Failed"
+SOLUTION:
+1. Check output: aws ssm get-command-invocation --command-id <ID> --instance-id <ID> --query 'StandardErrorContent'
+2. If "sudo: not found" - instance is not Amazon Linux/Ubuntu
+3. If "apt-get: not found" - might be RedHat/CentOS, use "yum" instead
+4. If "Access Denied" - instance IAM role missing SSM permissions
+
+PROBLEM: Instances not recovering after test
+SOLUTION:
+1. This is NORMAL - they were stressed, not crashed
+2. Applications may take 30-60 seconds to recover
+3. If Auto Scaling: check termination settings
+4. Use CloudWatch to verify CPU returned to normal (< 5%)
+5. Try SSH/RDP connection - instance should be responsive
+
+PROBLEM: Auto Scaling not triggering
+SOLUTION:
+1. Verify ASG has scaling policies configured
+2. Check alarm threshold - might be set too high (above 90%)
+3. Check cool-down period - might be preventing scaling
+4. Verify target group health checks are working
+5. View ASG Activity to see if scale requests were rejected
+
+PROBLEM: Can't find my instances
+SOLUTION:
+1. Go to EC2 console: https://console.aws.amazon.com/ec2/
+2. Make sure you're in the correct region (top right corner)
+3. Click "Instances" in left sidebar
+4. If empty: instances might have been terminated
+5. Check "Terminated instances" view to see what happened
+
+================================================================================
+SAFETY CHECKLIST BEFORE RUNNING ANY TEST
+================================================================================
+
+Before pressing "Start" on either method, verify:
+
+□ I have written down all instance IDs (they change every test)
+□ I have approval from the appropriate stakeholder
+□ This is NOT a production environment (or is non-critical)
+□ I have a 2-3 minute window with no active users
+□ CloudWatch/monitoring is open and ready
+□ I know how to stop the experiment (Method A) or cancel (Method B)
+□ Auto Scaling is tested and working (if applicable)
+□ I understand the expected behavior and what to look for
+□ All alarms are configured with appropriate thresholds
+□ I have a backup plan if something goes wrong
+□ My team knows I'm running this test
+
+DURING THE TEST:
+□ Watch CloudWatch metrics in real-time
+□ Do NOT stop the test unless absolutely necessary
+□ Let it run its full 2-minute duration
+□ Take screenshots for documentation
+
+AFTER THE TEST:
+□ Verify CPU returned to normal
+□ Check that system is fully recovered
+□ Review CloudTrail logs (audit trail)
+□ Document results and observations
+□ Share findings with team
+
+================================================================================
+NEXT STEPS AFTER SUCCESSFUL TESTING
+================================================================================
+
+Once you've successfully simulated crashes with 3 servers:
+
+1. ANALYZE RESULTS
+   - How quickly did Auto Scaling detect failures?
+   - How many new instances were created?
+   - How long did recovery take?
+   - Did applications reconnect properly?
+
+2. TUNE AUTO SCALING POLICIES
+   - Adjust scale-up thresholds if too sensitive
+   - Adjust scale-down thresholds if too slow to recover
+   - Consider instance warm-up times
+
+3. DOCUMENT FOR COMPLIANCE
+   - Export CloudTrail logs showing what happened
+   - Take screenshots of before/after metrics
+   - Write summary of test execution
+
+4. ITERATE AND IMPROVE
+   - Test with longer duration (300 seconds)
+   - Test with higher CPU load (95%)
+   - Test with multiple types of failures
+
+5. AUTOMATE FOR REGULAR TESTING
+   - Create Lambda functions to schedule tests
+   - Set up regular chaos engineering simulations
+   - Implement automated validation
+
+================================================================================
+GLOSSARY FOR BEGINNERS
+================================================================================
+
+Term                 | Meaning
+---------------------|----------------------------------------------------
+Instance ID          | Unique identifier for a virtual server (i-xxxxxxx)
+SSM                  | Systems Manager - AWS service for instance management
+FIS                  | Fault Injection Simulator - AWS chaos testing service
+CloudWatch           | AWS monitoring service that tracks metrics
+Auto Scaling Group   | Group of instances that automatically grows/shrinks
+IAM Role             | Permission set that allows services to act
+CPU Utilization      | Percentage of CPU processing power being used
+Stress-ng            | Linux tool that intentionally stresses the CPU
+EC2                  | Elastic Compute Cloud - AWS virtual servers
+CloudTrail           | AWS audit log showing all actions taken
+
+================================================================================
+APPENDIX: COMPLETE SCRIPT FOR METHOD B (COPY-PASTE READY)
+================================================================================
+
+For users who want to run everything at once:
+
+SETUP PHASE:
+# 1. Install AWS CLI if not already installed
+# Download from: https://aws.amazon.com/cli/
+# Then configure: aws configure
+
+# 2. Get your instance IDs
+aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[InstanceId,Tags[?Key==`Name`].Value|[0]]' --output table
+
+# Copy the Instance IDs from output above into these variables:
+INSTANCE_1="i-xxxxxxxxxxxxxxx"
+INSTANCE_2="i-xxxxxxxxxxxxxxx"
+INSTANCE_3="i-xxxxxxxxxxxxxxx"
+
+EXECUTION PHASE:
+# Send stress command to all three instances
+
+for INSTANCE_ID in $INSTANCE_1 $INSTANCE_2 $INSTANCE_3
+do
+  echo "Starting stress test on $INSTANCE_ID..."
+  
+  aws ssm send-command \
+    --instance-ids "$INSTANCE_ID" \
+    --document-name "AWS-RunShellScript" \
+    --parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-ng || true","stress-ng -c 0 -l 90 -t 120s"]
+  
+  sleep 2
+done
+
+echo "Stress tests started on all instances. Watch CloudWatch metrics for the next 2 minutes."
+
+VERIFICATION PHASE (run after 2-3 minutes):
+# Check that all commands completed successfully
+
+for INSTANCE_ID in $INSTANCE_1 $INSTANCE_2 $INSTANCE_3
+do
+  echo "Status check for $INSTANCE_ID:"
+  aws ssm describe-command-invocations \
+    --instance-id "$INSTANCE_ID" \
+    --query 'CommandInvocations[0].[CommandId,Status]' \
+    --output text
+done
+
+================================================================================
+FINAL NOTES FOR BEGINNERS
+================================================================================
+
+1. COMMON MISTAKES TO AVOID:
+   - Forgetting to save instance IDs (they change every time)
+   - Using wrong instance ID format (must start with "i-")
+   - Running without verifying SSM Agent status first
+   - Not monitoring CloudWatch during the test
+   - Expecting instances to actually "crash" (they won't - they'll slow down)
+   - Running without Auto Scaling configured (can't see recovery)
+   - Not setting time limits (use 120s maximum)
+
+2. IF SOMETHING GOES WRONG:
+   - Method A: Click "Stop experiment" in FIS console
+   - Method B: The 120-second timer stops it automatically
+   - If instance becomes unresponsive: wait 2 minutes, it recovers
+   - If Auto Scaling deletes the instance: new ones will be created
+   - DO NOT try to manually kill instances or restart
+
+3. REALISTIC EXPECTATIONS:
+   - Instances will become SLOW, not completely unavailable
+   - Network connectivity remains intact
+   - SSH/RDP connections may timeout or be very slow
+   - Auto Scaling may or may not trigger (depends on configuration)
+   - Full recovery takes 2-10 minutes after stress stops
+
+4. SUCCESS LOOKS LIKE:
+   - CloudWatch shows CPU spike to ~90%
+   - CPU remains high for ~120 seconds
+   - CPU returns to normal after 120 seconds
+   - No errors in command output
+   - System responds normally after recovery
+   - (If ASG configured) New instances appear then old ones terminate
+
+5. PRODUCTION READINESS:
+   - These methods are SAFE and APPROVED for production
+   - They're used by major cloud companies
+   - Always start with non-production first
+   - Test during low-traffic windows
+   - Get proper approvals before production tests
+   - Document everything for compliance
+
+================================================================================
+CONTACT & SUPPORT
+================================================================================
+
+If you encounter issues:
+
+1. Check CloudTrail logs for what actually happened:
+   - Go to https://console.aws.amazon.com/cloudtrail/
+   - Search for your command ID or experiment ID
+   - See exact error messages
+
+2. Check EC2 Instance Connect:
+   - Go to EC2 console
+   - Select your instance
+   - Click "Connect" button
+   - Use EC2 Instance Connect to SSH without keys
+   - Run: top, htop, or w to see CPU usage
+
+3. Consult AWS Documentation:
+   - FIS: https://docs.aws.amazon.com/fis/
+   - SSM: https://docs.aws.amazon.com/systems-manager/
+   - EC2: https://docs.aws.amazon.com/ec2/
+
+================================================================================
+END OF GUIDE
+================================================================================
+
+Document Version: 1.0
+Last Updated: 2026-01-08
+Status: Ready for Beginner Use
+Recommendation: Start with Method B on 1 instance, graduate to Method A
+
+Good luck with your failure simulations! Remember: the goal is to learn,
+not to break production. Always test, document, and verify results.

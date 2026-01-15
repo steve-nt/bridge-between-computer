@@ -43,7 +43,7 @@ aws ec2 describe-instances \
 
 ```bash
 # Step 1: Set variables
-INSTANCE_ID="i-0abc1234def567890"  # REPLACE with actual instance ID
+INSTANCE_ID="i-0f9087a79628fd056"  # REPLACE with actual instance ID
 REGION="eu-north-1"
 
 # Step 2: Verify instance is managed by SSM
@@ -52,6 +52,8 @@ aws ssm describe-instance-information \
   --region $REGION \
   --output table
 
+aws ssm describe-instance-information --instance-information-filter-list "key=InstanceIds, valueSet=i-0f9087a79628fd056" 
+    --region eu-north-1 --output table
 # Expected: Should show instance as "Online"
 
 # Step 3: Send stress command

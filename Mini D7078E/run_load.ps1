@@ -46,9 +46,9 @@ Write-Host ""
 Write-Host "Prerequisites OK" -ForegroundColor Green
 Write-Host ""
 Write-Host "LOAD SCALING:" -ForegroundColor Yellow
-Write-Host "Phase 1: 200 RPS  (original: 50 RPS)   - 4x bigger" -ForegroundColor Cyan
-Write-Host "Phase 2: 800 RPS  (original: 200 RPS)  - 4x bigger" -ForegroundColor Cyan
-Write-Host "Phase 3: 2000 RPS (original: 500 RPS)  - 4x bigger" -ForegroundColor Cyan
+Write-Host "Phase 1: 200 RPS  (original: 50 RPS)" -ForegroundColor Cyan
+Write-Host "Phase 2: 800 RPS  (original: 200 RPS)" -ForegroundColor Cyan
+Write-Host "Phase 3: 2000 RPS (original: 500 RPS)" -ForegroundColor Cyan
 Write-Host ""
 
 # Phase 1 - 200 RPS

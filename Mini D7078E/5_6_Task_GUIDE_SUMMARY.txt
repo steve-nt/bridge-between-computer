@@ -28,6 +28,8 @@ HOW TO TRIGGER FAILURE (Pick One):
   
   Why: Simple, safe, time-limited (120 seconds), fully auditable
 
+aws ssm send-command --instance-ids i-0f9087a79628fd056 --document-name "AWS-RunShellScript" --parameters 'commands=["stress-ng -c 0 -l 90 -t 120s"]'
+
   OPTION B: AWS FIS Experiment
   ─────────────────────────────
   Use: AWS Console > Fault Injection Simulator > Create Experiment
