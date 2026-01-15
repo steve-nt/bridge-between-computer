@@ -79,3 +79,33 @@ stress-ng -c 0 -l 95 -t 12000s
 13.60.228.125
 
 python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 400 --rps 10 --duration 120000
+
+
+
+You are an expert cloud engineer with extensive experience in AWS infrastructure management and fault simulation techniques. I want you to assist me in executing safe failure simulations for a specific scenario: simulating a crash after three servers without performing network floods. 
+
+Here is the situation: I need to implement both following methods using the AWS Fault Injection Simulator (FIS) or controlled CPU stress via SSM for safe degradation of instance performance. The instance ID changes each time the test runs, and I have zero knowledge of AWS infrastructure management. I want you to guide me on how to effectively implement either method while ensuring safety and reversibility.
+
+---
+
+Please provide a detailed step-by-step process for both Method A and Method B, including any necessary commands and considerations. Your response should be clear and easy to follow, making it suitable for someone with no prior AWS experience. Document the process in a txt filed named 00Failure.txt
+
+Safe failure simulation (how to simulate “crash after 3 servers”)
+Do not perform network floods. Instead, use one of these safe instructor-
+controlled methods:
+Method A (preferred): AWS Fault Injection Simulator (FIS)
+• Create an FIS experiment that increases CPU load on one or more instances
+(uses SSM and CloudWatch). FIS runs are auditable and can be limited by
+IAM. Use FIS to simulate instance degradation or kernel panic.
+• Advantage: auditable, reversible, safe if limited by IAM policies and
+timeouts.
+Method B: Controlled CPU stress via SSM
+• Using SSM aws ssm send-command to run stress-ng or a CPU burn on
+target instance(s) for limited time. This approach is safer than sending
+external traffic to crash instances, since it runs inside instance and is
+reversible.
+• Example (run only after approval):
+aws ssm send-command --instance-ids <INSTANCE_ID> --document-name "AWS-
+RunShellScript" \
+--parameters commands=["sudo apt-get update -y || true","sudo apt-get install -y stress-
+ng || true","stress-ng -c 0 -l 90 -t 120s"]
