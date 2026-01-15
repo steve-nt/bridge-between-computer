@@ -1,0 +1,34 @@
+I require a step-by-step revision of my assignment titled "D7077E Assignment-2 stente-5" based on the feedback provided by my professor. Read all the files in the folder. The .txt files are the sources/ references. The files @D7077E Assignment-2 stente-5.pdf @D7077E Assignment-2 stente-5.docx and @D7077E Assignment-2 stente-5.txt are the assignment in different file type. Please structure the revision process as follows: 
+
+Please ensure the revisions are interactive; we will discuss each section, reach an agreement, and then implement the changes. Be mindful to maintain clarity and coherence throughout the assignment. For each change we will create a new md file. 
+
+Context details: My assignment is due today. I have a background in information and technology , but I am still learning and  I am looking for assistance to improve the quality of this work to meet my professor's expectations.
+
+
+The initial feedback was the following: 
+
+Hi, you have made a start and need to improve the work to pass the assignment. The main problem is structural – you need to adequately introduce things before you use these! Please address the following items:
+In general – you need to clean up the assignment and remove all instructions etc.!
+Introduction – you need to introduce all building blocks/security controls here that you intend to use later in the conceptualization. Currently you have brought up: segmentation/layering and zero-trust only. Consider adding: physical security, SIEM/logging/analysis/IPS/IDS, backup/restore, VPN/remote access, availability measures (equipment, OT-systems, networks, utilities, etc.), gateways for data exchange, IRP/DRP, etc.
+Conceptualization – firstly, you need to introduce which building blocks you will use with references and a short motivation for why you use these (so that these do not appear for the first time in or around Figures 1 and 2). Add any additional building blocks (see above) that are required to achieve an adequate defense-in-depth. Subsequently, update Figure 2 and add what is needed here!
+Analysis – this section is a bit weak and needs improvement. Update this based on any changes in conceptualization. Avoid using a lot of references here as it is your reflections/analysis of what your result mean that should be here.
+Summary and conclusions – update this section after you have updated the analysis. Ensure to use your reflective/analytic abilities and make it interesting to read!
+References – you need to complete all references as they all miss necessary information. See the template for instructions!
+
+The secondary feedback is the following: 
+
+Hi, you have made improvements regarding assignment 2 but it is not good enough to pass the assignment. If you can, make a new version ASAP and email it to me at john.lindstrom@ltu.se , or else you will need to re-submit it a the re-exam period in March.
+
+
+Please address the following:
+
+
+Conceptualization – you need to write together the text into a coherent/fluent text (now it looks like an SMS conversation). Make it readable and understandable.
+
+
+Analysis – this section is still too weak and you need to improve it. See the template and ensure to use your analytic/reflective abilities and find the meaning instead of enumerating the outcomes/content.
+
+
+Summary and conclusions – same as for the analysis.
+
+WE should address the secondary feedback since the inital feedback has already been addressed.
