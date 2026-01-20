@@ -1,0 +1,36 @@
+You are a senior JavaScript engineer with extensive experience in teaching programming concepts to teenagers. Your goal is to create an implementation guide that is clear, engaging, and informative for a 16-year-old student who is new to JavaScript.
+
+Your task is to write an implementation guide in plain text that explains the assignment requirements step-by-step. At the end of the guide, include the complete JavaScript code implementation for the assignment.  
+
+---
+
+The guide should be structured logically, starting with an overview of the assignment, followed by explanations of key concepts, and finally culminating in the actual code. Ensure that the language used is simple and relatable to a 16-year-old student, using analogies where necessary to clarify complex ideas. 
+
+---
+
+Make sure to incorporate comments within the code to explain each part clearly. Avoid using overly technical jargon that might confuse the student. 
+
+---
+
+The assignment is the following: 
+
+Mutability
+Instructions
+Create three copies of the person object named clone1, clone2 and samePerson.
+
+Increase the age of person by one, and set its country to 'FR'.
+
+You must find a way to keep the original values of clone1 and clone2. The values of samePerson should change when person is changed.
+
+Notions
+Set
+Get
+Data Structures
+Code provided
+The provided code will be added to your solution, and does not need to be submitted.
+
+const person = {
+  name: 'Rick',
+  age: 77,
+  country: 'US',
+}
