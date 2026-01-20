@@ -1,7 +1,7 @@
 const person = {
     name: 'Rick',
-    age: 77,
-    country: 'USA',
+    age: 78,
+    country: 'FR',
 }
 
 const clone1 = { ...person } // Spread operator
