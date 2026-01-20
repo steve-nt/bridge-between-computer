@@ -14,3 +14,4 @@ console.log('Original person:', person)
 console.log('Clone 1 (spread):', clone1)
 console.log('Clone 2 (Object.assign):', clone2)
 console.log('Same person (reference):', samePerson)
+
