@@ -18,15 +18,10 @@ Make sure to add either sources or keywords to incentivize furhter search and st
 
 The assignment is the following: 
 
-More Or Less
+Returns
 Instructions
-Create 4 functions:
+Create the following functions:
 
-more that takes 1 argument and adds 1 to it.
-less that takes 1 argument and subtracts 1 from it.
-add that takes 2 arguments and adds them together.
-sub that takes 2 arguments and subtracts the second argument from the first.
-All the functions must return the result of the operations specified above.
-
-Each function should be defined with the exact number of parameters needed.
+    id that takes one argument and returns it.
+    getLength that takes an array or a string and returns its length.
 
