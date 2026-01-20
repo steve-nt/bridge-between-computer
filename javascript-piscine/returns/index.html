@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>More or Less - Test</title>
+</head>
+<body>
+    <script src="returns.js"></script>
+    <script>
+        // Testing more()
+        console.log(id(5));                    // Should print: 5
+        console.log(id("hello"));              // Should print: hello
+        console.log(id([1, 2, 3]));            // Should print: [ 1, 2, 3 ]
+        console.log(id(true));                 // Should print: true
+
+        // Testing less()
+        console.log(getLength("hello"));       // Should print: 5
+        console.log(getLength("xyz"));         // Should print: 3
+        console.log(getLength([1, 2, 3]));     // Should print: 3
+        console.log(getLength([]));            // Should print: 0
+        console.log(getLength(""));            // Should print: 0
+    </script>
+</body>
+</html>
