@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>More or Less - Test</title>
+</head>
+<body>
+    <script src="more-or-less.js"></script>
+    <script>
+        // Testing more()
+        console.log("Testing more():");
+        console.log("more(5) =", more(5));        // Expected: 6
+        console.log("more(0) =", more(0));        // Expected: 1
+        console.log("more(-10) =", more(-10));    // Expected: -9
+
+        // Testing less()
+        console.log("\nTesting less():");
+        console.log("less(5) =", less(5));        // Expected: 4
+        console.log("less(0) =", less(0));        // Expected: -1
+        console.log("less(-10) =", less(-10));    // Expected: -11
+
+        // Testing add()
+        console.log("\nTesting add():");
+        console.log("add(5, 3) =", add(5, 3));    // Expected: 8
+        console.log("add(-5, 5) =", add(-5, 5));  // Expected: 0
+        console.log("add(100, 200) =", add(100, 200)); // Expected: 300
+
+        // Testing sub()
+        console.log("\nTesting sub():");
+        console.log("sub(10, 3) =", sub(10, 3));  // Expected: 7
+        console.log("sub(5, 8) =", sub(5, 8));    // Expected: -3
+        console.log("sub(0, 5) =", sub(0, 5));    // Expected: -5
+    </script>
+</body>
+</html>
