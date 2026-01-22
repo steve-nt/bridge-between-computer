@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Last First Kiss - Test</title>
+</head>
+<body>
+    <script src="last-first-kiss.js"></script>
+    <script>
+        // TEST 1: Testing with an array
+        const numbers = [1, 2, 3, 4, 5];
+        console.log(first(numbers));    // Should print: 1
+        console.log(last(numbers));     // Should print: 5
+        console.log(kiss(numbers));     // Should print: [5, 1]
+
+        // TEST 2: Testing with a string
+        const text = 'JavaScript';
+        console.log(first(text));       // Should print: 'J'
+        console.log(last(text));        // Should print: 't'
+        console.log(kiss(text));        // Should print: ['t', 'J']
+
+        // TEST 3: Testing with a single element
+        const single = [42];
+        console.log(first(single));     // Should print: 42
+        console.log(last(single));      // Should print: 42
+        console.log(kiss(single));      // Should print: [42, 42]
+        
+        // TEST 4: Testing with empty collection (bonus edge case!)
+        const empty = [];
+        console.log(first(empty));      // Should print: undefined
+        console.log(last(empty));       // Should print: undefined
+        console.log(kiss(empty));       // Should print: [undefined, undefined]
+
+    </script>
+</body>
+</html>

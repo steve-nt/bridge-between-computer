@@ -18,12 +18,6 @@ Make sure to add either sources or keywords to incentivize furhter search and st
 
 The assignment is the following: 
 
-Last First Kiss
+Concat Str
 Instructions
-Create 3 functions:
-
-first: that takes an array or a string and returns its first element or character.
-
-last: that takes an array or a string and return its last element or character.
-
-kiss: that takes an array or string, and returns an array of 2 elements. The returned array should contain the last and first elements or characters, in that order.
+Create a function named concatStr which takes 2 arguments and concatenates them.
