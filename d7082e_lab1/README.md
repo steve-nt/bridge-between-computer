@@ -31,7 +31,7 @@ The program should/will compile and run but will generate a warning, You will fi
 Use the Rust docs [std](https://doc.rust-lang.org/stable/std/index.html) to find the documentation for the types used. Update this file (`README.md`), with direct links to the corresponding documentation. Make sure the links get you where intended when clicked.
 
 - [String](https://doc.rust-lang.org/std/string/struct.String.html)
-- [read_line](https://doc.rust-lang.org/std/io/trait.BufRead.html#method.read_until)
+- [read_line](https://doc.rust-lang.org/std/io/trait.BufRead.html#method.read_line)
 - [Result](https://doc.rust-lang.org/std/result/enum.Result.html)
 - [println!](https://doc.rust-lang.org/std/macro.println.html)
 - [match](https://doc.rust-lang.org/std/keyword.match.html)
