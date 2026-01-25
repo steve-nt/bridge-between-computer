@@ -191,101 +191,228 @@ match guess.cmp(&secret_number) {
 
 ---
 
-## 🚀 Complete Code Implementation
+## 🚀 Final Implementation (After All Refactoring)
 
-Here's the full, working solution with detailed comments:
+Here's the final, refactored solution with documentation and improved error handling:
 
 ```rust
-//! A simple guessing game where the player tries to guess a random number
-//! between 1 and 100. The computer tells you if your guess is too high,
-//! too low, or correct.
+//! A simple number guessing game in Rust.
 //!
-//! This is a beginner-friendly program that teaches:
-//! - Reading user input
-//! - Pattern matching
-//! - Loops
-//! - The Result type
-//! - Using external crates (libraries)
+//! The program generates a random number between 1 and 100,
+//! and prompts the player to guess it. After each guess, the program
+//! provides feedback on whether the guess was too low, too high, or correct.
 
 use std::cmp::Ordering;
 use std::io;
+
 use rand::Rng;
 
-fn main() {
-    // Display a welcome message
-    println!("Welcome to the Guessing Game! 🎮");
-    println!("I'm thinking of a number between 1 and 100.");
-    println!("Can you guess it?\n");
-
-    // Generate a random secret number between 1 and 100 (inclusive)
-    // rand::thread_rng() = get a random number generator for this thread
-    // gen_range(1..=100) = generate a number from 1 to 100 (the = means including 100)
-    let secret_number = rand::thread_rng().gen_range(1..=100);
-
-    // Keep track of how many guesses the player has made
-    // We use 'mut' because we'll be incrementing this value
-    let mut guess_count = 0;
-
-    // Start an infinite loop - we'll break out when the player guesses correctly
+/// Prompts the user for a guess and returns it as a u32.
+///
+/// This function continuously reads input from standard input until
+/// a valid positive integer is provided. If invalid input is received,
+/// an error message is displayed and the user is re-prompted.
+///
+/// # Returns
+///
+/// A `u32` representing the user's valid guess.
+///
+/// # Panics
+///
+/// Panics if reading from standard input fails.
+fn get_user_guess() -> u32 {
     loop {
-        // Increment the guess counter
-        guess_count += 1;
+        println!("Please input your guess.");
 
-        // Ask the user for their guess
-        println!("Please input your guess (Guess #{}): ", guess_count);
+        let mut guess = String::new();
 
-        // Create a new empty String to store the user's input
-        // String::new() = create an empty, modifiable text container
-        let mut input = String::new();
-
-        // Read a line from standard input (the keyboard)
-        // stdin() = get access to the keyboard input
-        // read_line(&mut input) = read what the user types and store it in 'input'
-        //                         &mut means "let me modify this variable"
-        // expect("...") = if something goes wrong, show this error message and crash
-        //                 (This is fine for learning - in real code we'd handle it better)
         io::stdin()
-            .read_line(&mut input)
+            .read_line(&mut guess)
             .expect("Failed to read line");
 
-        // Convert the text input into a number
-        // .trim() removes whitespace (spaces, newlines) from the edges
-        //         This is important because read_line() includes the newline character!
-        // .parse() tries to convert the text into the type we specify (u32 = unsigned 32-bit integer)
-        //          This returns a Result: either Ok(number) or Err(error)
-        // expect("...") = if parse fails, show this message
-        //
-        // We store it in a variable called 'guess' of type u32
-        let guess: u32 = input
-            .trim()
-            .parse()
-            .expect("Please type a valid number!");
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Please enter a valid number!");
+                continue;
+            }
+        };
 
-        // Display the guess they made
-        println!("You guessed: {}\n", guess);
+        return guess;
+    }
+}
 
-        // Compare the guess with the secret number
-        // .cmp() = "compare" - returns an Ordering (Less, Greater, or Equal)
-        // match = look at the result and handle each possible case
+fn main() {
+    println!("Guess the number!");
+
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    loop {
+        let guess = get_user_guess();
+
+        println!("You guessed: {guess}");
+
         match guess.cmp(&secret_number) {
-            // Case 1: The guess is less than the secret number
-            Ordering::Less => println!("📉 Too small! Try a bigger number.\n"),
-
-            // Case 2: The guess is greater than the secret number
-            Ordering::Greater => println!("📈 Too big! Try a smaller number.\n"),
-
-            // Case 3: The guess equals the secret number - they won!
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
             Ordering::Equal => {
-                println!("🎉 You got it! The number was {}!", secret_number);
-                println!("It took you {} guesses to win!", guess_count);
-                break;  // Exit the loop - the game is over!
+                println!("You win!");
+                break;
             }
         }
     }
-
-    println!("\nThanks for playing! 👋");
 }
 ```
+
+### Key Improvements in Final Version:
+1. **Extracted Function**: `get_user_guess()` handles all input validation and looping
+2. **Crate-Level Docs**: `//!` explains what the entire program does
+3. **Function Docs**: `///` documents the `get_user_guess()` function with Returns and Panics sections
+4. **Better Error Handling**: Invalid input now displays `"Please enter a valid number!"` message
+5. **Cleaner Main**: `main()` focuses on game logic, not input details
+6. **No Compiler Warnings**: Code compiles cleanly with `cargo build`
+
+---
+
+## 🔄 Refactoring Improvements (Task 4)
+
+### Before Refactoring:
+```rust
+// All input handling was in main()
+loop {
+    println!("Please input your guess.");
+    let mut guess = String::new();
+    io::stdin().read_line(&mut guess).expect("Failed to read line");
+    let guess: u32 = match guess.trim().parse() {
+        Ok(num) => num,
+        Err(_) => continue,  // Silent failure
+    };
+    // ... rest of game logic
+}
+```
+
+**Problems:**
+- `main()` function is cluttered
+- Input logic is repeated (or would be if refactored elsewhere)
+- Invalid input silently fails with no user feedback
+- Hard to test input logic separately
+
+### After Refactoring:
+```rust
+/// Prompts the user for a guess and returns it as a u32.
+/// ... (with full documentation)
+fn get_user_guess() -> u32 {
+    loop {
+        println!("Please input your guess.");
+        let mut guess = String::new();
+        io::stdin().read_line(&mut guess).expect("Failed to read line");
+        
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Please enter a valid number!");  // Clear feedback!
+                continue;
+            }
+        };
+        return guess;
+    }
+}
+
+fn main() {
+    println!("Guess the number!");
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+    
+    loop {
+        let guess = get_user_guess();  // Clean and simple!
+        println!("You guessed: {guess}");
+        match guess.cmp(&secret_number) {
+            // ... comparison logic
+        }
+    }
+}
+```
+
+**Benefits:**
+- ✅ Separation of concerns: input handling is separate from game logic
+- ✅ Better error feedback: users know what went wrong
+- ✅ More testable: input function can be tested independently
+- ✅ More readable: `main()` is clear and focused
+- ✅ Documentation: function purpose is clearly documented
+
+---
+
+## 📝 Documentation Added
+
+### Crate-Level Documentation (`//!`)
+Located at the top of `src/main.rs`, explains the purpose of the entire program:
+```rust
+//! A simple number guessing game in Rust.
+//!
+//! The program generates a random number between 1 and 100,
+//! and prompts the player to guess it. After each guess, the program
+//! provides feedback on whether the guess was too low, too high, or correct.
+```
+
+### Function Documentation (`///`)
+Documents the `get_user_guess()` function with standard Rust doc format:
+```rust
+/// Prompts the user for a guess and returns it as a u32.
+///
+/// This function continuously reads input from standard input until
+/// a valid positive integer is provided. If invalid input is received,
+/// an error message is displayed and the user is re-prompted.
+///
+/// # Returns
+///
+/// A `u32` representing the user's valid guess.
+///
+/// # Panics
+///
+/// Panics if reading from standard input fails.
+```
+
+**View the Generated Documentation:**
+```bash
+cargo doc --open
+```
+This generates HTML documentation and opens it in your browser!
+
+---
+
+## ✨ Error Handling Improvements (Bonus Feature)
+
+### Original Approach (Tutorial):
+```rust
+let guess: u32 = match guess.trim().parse() {
+    Ok(num) => num,
+    Err(_) => continue,  // Silent - user doesn't know why it failed
+};
+```
+
+### Improved Approach (Our Implementation):
+```rust
+let guess: u32 = match guess.trim().parse() {
+    Ok(num) => num,
+    Err(_) => {
+        println!("Please enter a valid number!");  // User-friendly feedback
+        continue;
+    }
+};
+```
+
+**Example Session:**
+```
+Guess the number!
+Please input your guess.
+abc
+Please enter a valid number!        ← Clear feedback!
+Please input your guess.
+50
+You guessed: 50
+Too big!
+```
+
+
 
 ---
 
@@ -325,16 +452,25 @@ let mut input = String::new();
 io::stdin().read_line(&mut input);  // OK!
 ```
 
-### Mistake 2: Forgetting to `.expect()` on a Result
+### Mistake 2: Not Handling the Result from parse()
 ```rust
-// ❌ Wrong
-let guess: u32 = input.trim().parse();  // Error! parse() returns a Result
+// ❌ Wrong - will not compile
+let guess: u32 = input.trim().parse();
 
-// ✅ Right
+// ✅ Right - using expect() (simple, crashes on error)
 let guess: u32 = input.trim().parse().expect("Please type a number!");
+
+// ✅ Better - using match (graceful error handling)
+let guess: u32 = match input.trim().parse() {
+    Ok(num) => num,
+    Err(_) => {
+        println!("Please enter a valid number!");
+        continue;  // Ask for input again
+    }
+};
 ```
 
-### Mistake 3: Using `u32` for a value that should be negative
+### Mistake 3: Using `u32` for values that could be negative
 ```rust
 // If you want to support negative numbers, use i32 instead
 let guess: i32 = input.trim().parse().expect("Please type a number!");
@@ -345,19 +481,73 @@ let guess: i32 = input.trim().parse().expect("Please type a number!");
 // ❌ Problem: "42\n" won't parse as a number (the \n newline causes issues)
 let guess: u32 = input.parse().expect("Please type a number!");
 
-// ✅ Solution: Remove the newline first
+// ✅ Solution: Remove the newline and spaces first
 let guess: u32 = input.trim().parse().expect("Please type a number!");
 ```
 
+### Mistake 5: Not Providing User Feedback for Invalid Input
+```rust
+// ❌ Not user-friendly - silent failure
+let guess: u32 = match input.trim().parse() {
+    Ok(num) => num,
+    Err(_) => continue,
+};
+
+// ✅ User-friendly - explains what went wrong
+let guess: u32 = match input.trim().parse() {
+    Ok(num) => num,
+    Err(_) => {
+        println!("Please enter a valid number!");
+        continue;
+    }
+};
+```
+
+
+
 ---
 
-## 🎓 Next Steps (After Completing This)
+## 🎓 Lab Tasks Completion Status
 
-1. **Task 2**: Add documentation links to your README
-2. **Task 3**: Update the `rand` crate API (it's changing from `gen_range()` to `gen_range()` with new syntax)
-3. **Task 4**: Refactor by extracting the input-reading code into its own function
-4. **Add better error handling**: Instead of `.expect()`, use `match` to handle errors gracefully
-5. **Add validation**: Make sure guesses are between 1 and 100
+### ✅ Task 1: Setting up Rust
+- [x] Installed Rust and setup git environment
+- [x] Setup VSCode with Rust Analyzer support
+- [x] Created user on Vesuvio
+- [x] Forked lab on Vesuvio
+- [x] Cloned repo locally
+- [x] Completed guessing game tutorial
+
+### ✅ Task 2: Read the Docs
+- [x] Added documentation links to README.md for:
+  - [String](https://doc.rust-lang.org/std/string/struct.String.html)
+  - [read_line](https://doc.rust-lang.org/std/io/trait.BufRead.html#method.read_line)
+  - [Result](https://doc.rust-lang.org/std/result/enum.Result.html)
+  - [println!](https://doc.rust-lang.org/std/macro.println.html)
+  - [match](https://doc.rust-lang.org/std/keyword.match.html)
+  - [break](https://doc.rust-lang.org/std/keyword.break.html)
+
+### ✅ Task 3: External Dependencies
+- [x] Verified `rand` crate documentation
+- [x] Documented both APIs:
+  - [gen_range](https://docs.rs/rand/latest/rand/trait.Rng.html#method.gen_range) (current stable API in 0.8.5)
+  - [random_range](https://docs.rs/rand/latest/rand/trait.Rng.html#method.random_range) (future API)
+- [x] Code compiles without warnings
+- [x] Using correct API for rand 0.8.5
+
+### ✅ Task 4: Refactoring and Local Documentation
+- [x] Extracted user input into `get_user_guess()` function
+- [x] Added crate-level documentation (`//!`)
+- [x] Added function documentation (`///`)
+- [x] Generated HTML documentation with `cargo doc`
+- [x] **BONUS**: Added error feedback for invalid input
+
+### ⏳ Task 5: Submit, Review, and Finalize
+- [ ] Commit/push code to Vesuvio
+- [ ] Submit repository link in Canvas
+- [ ] Review 2 peer repositories
+- [ ] Create GitHub issues for peer reviews
+- [ ] Fix issues based on feedback
+- [ ] Write learning reflection
 
 ---
 
