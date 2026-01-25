@@ -12,8 +12,8 @@ use rand::Rng;
 /// Prompts the user for a guess and returns it as a u32.
 ///
 /// This function continuously reads input from standard input until
-/// a valid positive integer is provided. Invalid input is silently ignored,
-/// and the user is re-prompted.
+/// a valid positive integer is provided. If invalid input is received,
+/// an error message is displayed and the user is re-prompted.
 ///
 /// # Returns
 ///
@@ -34,7 +34,10 @@ fn get_user_guess() -> u32 {
 
         let guess: u32 = match guess.trim().parse() {
             Ok(num) => num,
-            Err(_) => continue,
+            Err(_) => {
+                println!("Please enter a valid number!");
+                continue;
+            }
         };
 
         return guess;
