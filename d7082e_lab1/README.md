@@ -2,6 +2,14 @@
 
 Covers lectures 1 and 2 (chapters 1-6 of the [Rust Book](https://doc.rust-lang.org/book/)).
 
+You may collaborate with other students for solving the Tasks, but you will subimit review etc, individually.
+
+If you have collaborated with others. Change the below to match the way you collaborated. In this way, suspection of plagiarism can be avoided even if your repos turn out to be very similar.
+
+- [](), Mr X, came up with the idea of Y which I used in my code
+- [](), Mrs Z, suggest using R, which turned ut great, so I used that as well.
+- Etc.
+
 ## Task 1 - Setting up Rust
 
 - Install Rust and setup a working git environment. WSL recommended for Windows users.
@@ -22,12 +30,12 @@ The program should/will compile and run but will generate a warning, You will fi
 
 Use the Rust docs [std](https://doc.rust-lang.org/stable/std/index.html) to find the documentation for the types used. Update this file (`README.md`), with direct links to the corresponding documentation. Make sure the links get you where intended when clicked.
 
-- [String](...)
-- [read_line](...)
-- [Result](...)
-- [println!](...)
-- [match](...)
-- [break](...)
+- [String](https://doc.rust-lang.org/std/string/struct.String.html)
+- [read_line](https://doc.rust-lang.org/std/io/trait.BufRead.html#method.read_until)
+- [Result](https://doc.rust-lang.org/std/result/enum.Result.html)
+- [println!](https://doc.rust-lang.org/std/macro.println.html)
+- [match](https://doc.rust-lang.org/std/keyword.match.html)
+- [break](https://doc.rust-lang.org/std/keyword.break.html)
 
 Navigating and understanding the docs is _instrumental_ to programming in Rust. Using Rust analyzer or similar tools, help you when programming. You may optionally use an AI assistant (LLM) for helping you write, document and test your code.
 
@@ -35,13 +43,13 @@ Navigating and understanding the docs is _instrumental_ to programming in Rust. 
 
 Follow the link from the official crates.io release for the [rand](https://crates.io/crates/rand) to find its documentation. Update the link below, and verify that it gets you where intended when clicked.
 
-- [gen_range](...)
+- [gen_range](https://docs.rs/rand/latest/rand/trait.Rng.html#method.gen_range)
 
 As you see the API is about to change, and the function is marked as `Deprecated`. The docs suggest the new (and improved) API. Change the code accordingly such that it compiles and runs without warnings.
 
 Update the link to the new API used below.
 
-- [...](...)
+- [random_range](https://docs.rs/rand/latest/rand/trait.Rng.html#method.random_range)
 
 ## Task 4 - Re-factoring and Local documentation
 
