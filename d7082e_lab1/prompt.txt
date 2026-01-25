@@ -4,7 +4,6 @@ The code should be structured clearly with comments explaining each section, and
 
 Ensure that the code is efficient and follows Rust's safety and concurrency principles. Avoid using complex libraries; keep it simple and focused on the core functionality of the guessing game.
 
-
 Your task is to help implement a simple guessing game in Rust. Here are the details I want to include in this game
 
 Complete the Programming a Guessing Game tutorial below. Notice, You should replace the provided src/main.rs with Your guessing game code, do not create a new Rust crate.

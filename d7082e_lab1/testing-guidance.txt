@@ -1,0 +1,82 @@
+ ● Here are several ways to test the guessing game:
+
+   1. Manual Interactive Testing (Easiest)
+
+     cd /home/steven/Desktop/bridge-between-computer/d7082e_lab1
+     cargo run
+
+   Then manually enter guesses and test various scenarios:
+
+     - Enter a number that's too low
+     - Enter a number that's too high
+     - Enter the correct number
+     - Enter invalid input (letters, special characters)
+
+   --------------------------------------------------------------------------------------------------------------------------------------
+
+   2. Automated Testing with Piped Input
+
+   Test a complete game session automatically:
+
+     cd /home/steven/Desktop/bridge-between-computer/d7082e_lab1
+     echo -e "50\n75\n90\n95\n" | cargo run --quiet
+
+   --------------------------------------------------------------------------------------------------------------------------------------
+
+   3. Test Invalid Input Handling
+
+     # Test that invalid input is skipped
+     echo -e "abc\n50\n25\n37\n" | timeout 5 cargo run --quiet
+
+   This tests that the game ignores "abc" and continues.
+
+   --------------------------------------------------------------------------------------------------------------------------------------
+
+   4. Test Winning Scenario
+
+   Let me create a test script that systematically tests different scenarios:
+ ✓ Run comprehensive tests on the guessing game
+   $ cat > /tmp/test_guessing_game.sh << 'EOF'
+   #!/bin/bash
+
+   cd /home/steven/Desktop/bridge-between-computer/d7082e_lab1...
+    └ 49 lines...
+
+ ● Perfect! Here's a summary of testing approaches:
+
+   Quick Reference: Testing Commands
+
+   ┌────────────────────┬─────────────────────────────────────────┐
+   │ Test Case          │ Command                                 │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Run the game       │ cargo run                               │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Test invalid input │ echo -e "abc\n50\n" | cargo run --quiet │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Test too low       │ echo -e "1\n" | cargo run --quiet       │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Test too high      │ echo -e "100\n" | cargo run --quiet     │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Check compilation  │ cargo check                             │
+   ├────────────────────┼─────────────────────────────────────────┤
+   │ Check for warnings │ cargo build 2>&1 | grep warning         │
+   └────────────────────┴─────────────────────────────────────────┘
+
+   What Each Test Validates
+
+   ✅ Invalid input handling - Program skips non-numeric input and continues
+   ✅ Too low feedback - Correctly identifies guesses below secret number
+   ✅ Too high feedback - Correctly identifies guesses above secret number
+   ✅ Multiple guesses - Loop works and accepts multiple attempts
+   ✅ No compilation errors - Code compiles cleanly
+   ✅ No warnings - Clean code with no unused variables
+
+   For the Winning Scenario
+
+   To find the actual secret number and test winning:
+
+     for i in {1..100}; do
+       echo "$i"
+     done | cargo run --quiet 2>/dev/null | grep "You win!" -B 1
+
+   This brute-forces all numbers 1-100 and shows when the game wins.
