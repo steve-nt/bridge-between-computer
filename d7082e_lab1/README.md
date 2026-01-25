@@ -79,7 +79,15 @@ Run:
 
 - Reflect in your own words what you have learned by doing this lab. Hint, compare your knowledge regarding Rust, tooling etc., before and after doing this lab.
 
-< Your Text Here>
+D7082ELAB1 Reflection 1 
+
+D7082ELAB1 Reflection 2
+
+D7082ELAB1 Reflection 3
+
+D7082ELAB1 Reflection 4
+
+D7082ELAB1 Reflection 5
 
 - In canvas assignment submit link to your final lab1 repository.
 
