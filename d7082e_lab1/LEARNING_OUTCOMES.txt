@@ -1,0 +1,255 @@
+================================================================================
+D7082E LAB 1: RUST GUESSING GAME - LEARNING OUTCOMES
+================================================================================
+
+By the end of this lab, participants will be able to:
+
+1. FOUNDATIONAL RUST PROGRAMMING
+   Install Rust and verify the installation is working correctly using the Rust
+   compiler and Cargo package manager.
+
+2. SETTING UP DEVELOPMENT ENVIRONMENT
+   Configure and use a modern code editor with Rust language support (such as
+   VSCode with Rust Analyzer) to write and debug Rust code.
+
+3. UNDERSTANDING IMMUTABILITY
+   Explain the difference between immutable and mutable variables in Rust and
+   apply the 'mut' keyword correctly when modifying variable values.
+
+4. WORKING WITH STRINGS
+   Distinguish between String and &str types, and use String::new() to create
+   empty strings for collecting user input.
+
+5. INPUT/OUTPUT OPERATIONS
+   Read user input from the keyboard using io::stdin().read_line() and handle
+   the Result type it returns with appropriate error management.
+
+6. ERROR HANDLING WITH RESULT TYPE
+   Understand and implement basic error handling using Rust's Result enum,
+   distinguishing between Ok and Err variants.
+
+7. PATTERN MATCHING
+   Write and use match expressions to handle multiple possible outcomes and
+   make decisions based on different values or patterns.
+
+8. TYPE CONVERSION
+   Convert between different data types (String to u32) using the parse()
+   method and handle conversion errors appropriately.
+
+9. LOOPS AND CONTROL FLOW
+   Implement loop constructs with break statements to create interactive
+   programs that repeat until specific conditions are met.
+
+10. COMPARING VALUES
+    Use the cmp() method and Ordering enum to compare numeric values and
+    provide appropriate feedback based on comparison results.
+
+11. USING EXTERNAL CRATES
+    Add and use external Rust libraries (crates) by modifying Cargo.toml,
+    specifically integrating the rand crate for random number generation.
+
+12. DEPENDENCY MANAGEMENT WITH CARGO
+    Manage project dependencies, understand semantic versioning, and use
+    Cargo to build and run Rust projects.
+
+13. CODE REFACTORING
+    Identify code sections that should be extracted into separate functions
+    and perform refactoring while maintaining functionality.
+
+14. FUNCTION DESIGN
+    Design and implement functions with clear purposes, appropriate parameters,
+    and return types that solve specific problems.
+
+15. DOCUMENTATION STANDARDS
+    Write crate-level documentation using //! comments and function-level
+    documentation using /// comments following Rust conventions.
+
+16. GENERATING AND READING DOCUMENTATION
+    Generate HTML documentation using cargo doc and navigate Rust's official
+    documentation to understand library functions and types.
+
+17. SEPARATION OF CONCERNS
+    Organize code into functions with distinct responsibilities, improving
+    readability and maintainability of the program.
+
+18. ERROR FEEDBACK AND USER EXPERIENCE
+    Implement user-friendly error messages that inform users when their input
+    is invalid, improving the program's usability.
+
+19. VERSION CONTROL WORKFLOW
+    Use git commands to commit, push, and manage code changes, and understand
+    how to track changes across multiple development iterations.
+
+20. TESTING AND VALIDATION
+    Test programs with various inputs (valid numbers, invalid text, edge cases)
+    to verify correct behavior and identify issues before deployment.
+
+21. DEBUGGING TECHNIQUES
+    Use compiler error messages and warnings to identify and fix bugs in code,
+    understanding what each error means and how to resolve it.
+
+22. RANGE EXPRESSIONS
+    Use Rust's range syntax (1..100, 1..=100) correctly to specify inclusive
+    and exclusive ranges for loops and numeric operations.
+
+23. BORROWING AND REFERENCES
+    Understand the difference between owned values and references (&), and
+    apply the correct reference syntax (&mut) when passing arguments.
+
+24. TRAIT UNDERSTANDING
+    Recognize and use Rust traits (like Rng trait from rand crate) to access
+    functionality from external libraries.
+
+25. SEMANTIC VERSIONING
+    Understand semantic versioning (major.minor.patch) and choose appropriate
+    version constraints when specifying crate dependencies.
+
+26. ITERATIVE DEVELOPMENT
+    Practice incrementally building and testing features, adding functionality
+    gradually while maintaining a working program.
+
+27. CODE COMMENTS
+    Write clear, concise comments that explain "why" not "what," and know when
+    comments are necessary versus when code should be self-explanatory.
+
+28. PROBLEM DECOMPOSITION
+    Break down complex programming tasks into smaller, manageable functions
+    that each solve a specific part of the problem.
+
+29. BOUNDARY TESTING
+    Test programs with edge cases (minimum values, maximum values, zero,
+    negative numbers) to verify robust error handling.
+
+30. READING COMPILER FEEDBACK
+    Interpret Rust compiler messages to understand type mismatches, borrowing
+    issues, and other compile-time errors.
+
+31. PROGRAM OUTPUT CLARITY
+    Design user-friendly output messages that clearly communicate program
+    status, results, and error conditions.
+
+32. VARIABLE SCOPE
+    Understand how variable scope works in Rust, including shadowing where
+    a new variable with the same name replaces the previous binding.
+
+33. COMMAND-LINE USAGE
+    Use terminal/command-line interface to navigate directories, execute
+    Cargo commands, and run compiled programs.
+
+34. PROJECT STRUCTURE
+    Understand standard Rust project layout (src/, Cargo.toml, target/) and
+    why each component is organized this way.
+
+35. LIBRARY VS BINARY
+    Distinguish between binary crates (executable programs) and library crates
+    (reusable code), and understand their different purposes.
+
+36. ONLINE DOCUMENTATION NAVIGATION
+    Find and use official Rust documentation on docs.rs, crates.io, and the
+    Rust Book to solve programming problems independently.
+
+37. ERROR MESSAGE INTERPRETATION
+    Translate error messages from the Rust compiler into actionable steps to
+    fix code issues and improve programming practices.
+
+38. CODE STYLE CONSISTENCY
+    Apply consistent formatting, naming conventions, and code organization
+    throughout a project to improve readability.
+
+39. MODULARITY PRINCIPLES
+    Write code that is modular and reusable, extracting common patterns into
+    functions that can be called multiple times.
+
+40. PROGRAM REQUIREMENTS ANALYSIS
+    Analyze what a program needs to do, identify necessary inputs and outputs,
+    and design code structure to meet those requirements.
+
+================================================================================
+ASSESSMENT CRITERIA
+================================================================================
+
+These 40 outcomes are assessable through:
+
+✓ Code Review: Examining implementation quality, structure, and style
+✓ Compilation Check: Verifying code compiles without warnings
+✓ Functional Testing: Testing with normal, edge case, and invalid inputs
+✓ Documentation Review: Checking code comments and generated documentation
+✓ Repository Inspection: Verifying git usage and commit practices
+✓ Practical Demonstration: Running and explaining program behavior
+✓ Error Handling Testing: Verifying graceful failure with invalid inputs
+✓ Performance Analysis: Checking code efficiency and optimization
+✓ Peer Code Review: Getting feedback from collaborators
+✓ Self-Reflection: Documenting learning process and challenges
+
+================================================================================
+LEARNING OUTCOMES SUMMARY BY CATEGORY
+================================================================================
+
+FOUNDATIONAL SETUP & CONFIGURATION (Outcomes 1-4, 33-34)
+  • Rust installation and Cargo setup
+  • Development environment configuration
+  • Immutability and variable management
+  • String types and operations
+  • Terminal/CLI usage
+  • Standard project structure
+
+CORE RUST LANGUAGE CONCEPTS (Outcomes 5-10, 22-24, 30, 32)
+  • Input/Output and user interaction
+  • Error handling with Result type
+  • Pattern matching and control flow
+  • Type conversion and casting
+  • Loops and conditional logic
+  • Value comparison operations
+  • Range expressions
+  • Borrowing and references
+  • Trait system basics
+  • Variable scope and shadowing
+
+ECOSYSTEM & DEPENDENCIES (Outcomes 11-12, 25, 35)
+  • External crate integration
+  • Cargo and dependency management
+  • Semantic versioning
+  • Binary vs library crate types
+
+BEST PRACTICES & CODE QUALITY (Outcomes 13-18, 27-28, 38-39)
+  • Code refactoring techniques
+  • Function design and modularity
+  • Documentation standards (crate and function level)
+  • Separation of concerns
+  • User-friendly error handling
+  • Code comments and explanation
+  • Problem decomposition
+  • Code style and consistency
+  • Modularity principles
+
+PROFESSIONAL DEVELOPMENT PRACTICES (Outcomes 19, 26, 31, 36-37, 40)
+  • Version control with git
+  • Iterative development workflow
+  • Clear user-facing output
+  • Documentation research skills
+  • Error message interpretation
+  • Requirements analysis
+
+TESTING & DEBUGGING (Outcomes 20-21, 29-30, 37)
+  • Input validation testing
+  • Edge case testing
+  • Boundary condition testing
+  • Debugging with compiler feedback
+  • Interpreting error messages
+  • Fixing code issues
+
+================================================================================
+REAL-WORLD APPLICATION
+================================================================================
+
+Skills developed in this lab directly apply to:
+
+• Professional software development workflows
+• Collaborative programming in teams
+• Building reliable command-line applications
+• Understanding and using open-source libraries
+• Writing maintainable and documented code
+• Debugging and error handling in production systems
+• Learning new programming languages independently
+
+================================================================================
