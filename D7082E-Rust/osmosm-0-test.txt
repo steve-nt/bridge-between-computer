@@ -1,0 +1,7 @@
+https://vesuvio-git.neteq.ltu.se/osmosm-0/d-7082-e-lab-1/-/issues/3
+
+- [String](https://doc.rust-lang.org/stable/std/index.html#:~:text=%3E%20%2D%20owned%20slice-,str%2C%20a%20U,-TF%2D8%20string)
+The link i think is wrong
+
+
+
