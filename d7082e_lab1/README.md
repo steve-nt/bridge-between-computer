@@ -23,6 +23,8 @@ If you have collaborated with others. Change the below to match the way you coll
 - Clone the repo to your local machine.
 
 Complete the [Programming a Guessing Game](https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html) tutorial. Notice, You should replace the provided `src/main.rs` with Your guessing game code, do not create a new Rust crate.
+You should run the following command to add the rand crate
+cargo add rand 
 
 The program should/will compile and run but will generate a warning, You will fix that later.
 

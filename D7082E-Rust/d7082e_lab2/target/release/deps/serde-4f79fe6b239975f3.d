@@ -1,0 +1,14 @@
+/home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/deps/serde-4f79fe6b239975f3.d: /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/build/serde-9d08b465ff0b51b1/out/private.rs
+
+/home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/deps/libserde-4f79fe6b239975f3.rlib: /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/build/serde-9d08b465ff0b51b1/out/private.rs
+
+/home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/deps/libserde-4f79fe6b239975f3.rmeta: /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/build/serde-9d08b465ff0b51b1/out/private.rs
+
+/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/build/serde-9d08b465ff0b51b1/out/private.rs:
+
+# env-dep:OUT_DIR=/home/steven/Desktop/bridge-between-computer/D7082E-Rust/d7082e_lab2/target/release/build/serde-9d08b465ff0b51b1/out
