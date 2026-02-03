@@ -1,0 +1,682 @@
+================================================================================
+TASK 6: TEARDOWN, CLEANUP & FINAL DOCUMENTATION
+================================================================================
+
+OBJECTIVE:
+Stop all load generators, collect final evidence, delete AWS resources,
+and produce final lab report with analysis and lessons learned.
+
+REGION: eu-north-1
+STATUS: Ready for cleanup
+
+================================================================================
+IMPORTANT: DO NOT SKIP THIS STEP!
+================================================================================
+
+Leaving resources running will cost money! ($0.01-0.10+ per hour)
+
+After completing Tasks 1-5, you MUST:
+  ✓ Delete Auto Scaling Group (terminates instances)
+  ✓ Delete Application Load Balancer
+  ✓ Delete Target Group
+  ✓ Delete Launch Template
+  ✓ (Optional) Deregister AMI
+  ✓ (Optional) Delete Security Groups
+
+Estimated cost to save: $0.10-1.00 per day!
+
+================================================================================
+STEP 1: STOP ALL LOAD GENERATORS (IMMEDIATE!)
+================================================================================
+
+If you're still running load tests, STOP THEM NOW:
+
+For PowerShell scripts:
+  ├─ Window 1: Press Ctrl+C
+  ├─ Window 2: Press Ctrl+C
+  └─ Window 3: Press Ctrl+C
+
+For Docker Compose:
+  └─ Terminal: Press Ctrl+C
+  └─ Run: docker-compose down
+
+For Python scripts:
+  └─ Terminal: Press Ctrl+C
+
+Wait 30 seconds for graceful shutdown.
+
+Result:
+  ✓ No more load being sent to ALB
+  ✓ Instances no longer under stress
+  ✓ CPU will drop to normal levels
+  ✓ RequestCount will drop to 0
+
+================================================================================
+STEP 2: COLLECT FINAL CLOUDWATCH METRICS & SCREENSHOTS
+================================================================================
+
+Take these screenshots FOR YOUR LAB REPORT:
+
+Screenshot Set 1: FINAL METRICS
+Go to: CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+
+Capture:
+  □ Full dashboard showing final state
+  □ CPU Utilization (should be low, ~5%)
+  □ RequestCount (should be low or 0)
+  □ HealthyHostCount (current state: 1, 2, or 3)
+  
+Save as: 01_final_metrics_dashboard.png
+
+Screenshot Set 2: ASG ACTIVITY LOG
+Go to: EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG
+Click: Activity tab
+
+Capture:
+  □ All scaling events (launches, terminations)
+  □ Timestamps of each event
+  □ Status of each action
+  
+Save as: 02_asg_activity_log.png
+
+Screenshot Set 3: EC2 INSTANCES CURRENT STATE
+Go to: EC2 > Instances
+Filter: Show instances from your ASG
+
+Capture:
+  □ Current instances running (1, 2, or 3)
+  □ Instance IDs
+  □ Instance states (Running, Terminated, Terminating)
+  □ Launch times
+  □ Public IPs
+  
+Save as: 03_ec2_instances_final.png
+
+Screenshot Set 4: CLOUDWATCH ALARMS STATE
+Go to: CloudWatch > Alarms > All Alarms
+
+Capture:
+  □ cpu-high-alarm-80percent (current state)
+  □ cpu-low-alarm-30percent (current state)
+  □ Alarm history showing triggers
+  
+Save as: 04_cloudwatch_alarms_final.png
+
+Screenshot Set 5: TARGET GROUP HEALTH
+Go to: EC2 > Target Groups > D7078E-MINI-PROJECT-GROUP35-TG
+Click: Targets tab
+
+Capture:
+  □ All instances in target group
+  □ Health status (Healthy, Unhealthy, Draining)
+  □ Last health check status
+  
+Save as: 05_target_group_health.png
+
+Screenshot Set 6: FULL TIMELINE VIEW (Optional but recommended)
+Go to: CloudWatch > Dashboards
+Create custom time range showing entire load test
+
+Capture:
+  □ Complete timeline from start to finish
+  □ All phases visible (Phase 1, 2, 3)
+  □ Scaling events visible in graph
+  
+Save as: 06_full_timeline_view.png
+
+================================================================================
+STEP 3: DELETE AUTO SCALING GROUP (INSTANCES WILL TERMINATE)
+================================================================================
+
+CAUTION: This will terminate all running instances!
+But make sure you've taken screenshots first!
+
+Using AWS Console:
+
+1. Go to: EC2 > Auto Scaling Groups
+
+2. Select: D7078E-MINI-PROJECT-GROUP35-ASG
+
+3. Click: Delete Auto Scaling group
+
+4. Confirmation dialog appears:
+   - Review selected ASG name
+   - Check "Yes, terminate instances when deleting"
+   - Click "Delete"
+
+5. Wait for deletion to complete (1-2 minutes)
+
+Expected result:
+  ├─ ASG deleted
+  ├─ All instances receive termination signal
+  ├─ Instances transition to "Shutting down"
+  ├─ Instances transition to "Terminated"
+  ├─ HealthyHostCount in CloudWatch drops 3 → 2 → 1 → 0
+  └─ No running instances remain
+
+Verify:
+  ├─ EC2 > Auto Scaling Groups: ASG should be gone
+  ├─ EC2 > Instances: All instances should be "Terminated"
+  └─ CloudWatch: HealthyHostCount should be 0
+
+Take screenshot: 07_asg_deleted_instances_terminated.png
+
+================================================================================
+STEP 4: DELETE APPLICATION LOAD BALANCER
+================================================================================
+
+Using AWS Console:
+
+1. Go to: EC2 > Load Balancers
+
+2. Select: D7078E-MINI-PROJECT-GROUP35-LB
+
+3. Click: Actions > Delete load balancer
+
+4. Confirmation dialog:
+   - Verify load balancer name
+   - Click "Yes, delete"
+
+5. Wait for deletion (1-2 minutes)
+
+Expected result:
+  ├─ ALB deleted
+  ├─ DNS name no longer resolves
+  └─ No load balancing occurring
+
+Verify:
+  ├─ EC2 > Load Balancers: ALB should be gone
+  └─ curl to ALB DNS: Should fail (connection refused)
+
+Take screenshot: 08_alb_deleted.png
+
+================================================================================
+STEP 5: DELETE TARGET GROUP
+================================================================================
+
+Using AWS Console:
+
+1. Go to: EC2 > Target Groups
+
+2. Select: D7078E-MINI-PROJECT-GROUP35-TG
+
+3. Click: Actions > Delete
+
+4. Confirmation:
+   - Verify target group name
+   - Click "Yes, delete"
+
+5. Wait for deletion (should be instant)
+
+Expected result:
+  ├─ Target Group deleted
+  ├─ No targets registered
+  └─ No health checks occurring
+
+Verify:
+  └─ EC2 > Target Groups: TG should be gone
+
+Take screenshot: 09_target_group_deleted.png
+
+================================================================================
+STEP 6: DELETE LAUNCH TEMPLATE
+================================================================================
+
+Using AWS Console:
+
+1. Go to: EC2 > Launch Templates
+
+2. Search for: D7078E (your launch template)
+
+3. Select it
+
+4. Click: Delete
+
+5. Confirmation:
+   - Verify template name
+   - Click "Delete"
+
+6. Wait for deletion (instant)
+
+Expected result:
+  └─ Launch Template deleted
+
+Verify:
+  └─ EC2 > Launch Templates: Should not see your template
+
+Take screenshot: 10_launch_template_deleted.png
+
+================================================================================
+STEP 7: (OPTIONAL) DELETE SECURITY GROUPS
+================================================================================
+
+If you created security groups just for this lab, you can delete them:
+
+Using AWS Console:
+
+1. Go to: EC2 > Security Groups
+
+2. Search for: "web-app" or your lab prefix
+
+3. Select security groups (don't delete default SG)
+
+4. Click: Delete security group
+
+5. Confirm deletion
+
+WARNING:
+  ├─ Don't delete "default" security group (AWS prevents this)
+  ├─ Only delete ones you specifically created
+  └─ If in doubt, leave them (won't cost anything)
+
+This step is optional.
+
+================================================================================
+STEP 8: (OPTIONAL) DEREGISTER AMI
+================================================================================
+
+If you want to free up storage space:
+
+Using AWS Console:
+
+1. Go to: EC2 > AMIs
+
+2. Search for: "web-app-ami-d7078e" (your AMI)
+
+3. Right-click > Deregister
+
+4. Confirmation:
+   - Verify AMI name and ID
+   - Click "Deregister"
+
+5. Wait for deregistration
+
+Alternatively, keep the AMI if you want to reuse it later!
+
+This step is optional.
+
+================================================================================
+STEP 9: VERIFY ALL RESOURCES DELETED
+================================================================================
+
+Check that everything is cleaned up:
+
+☐ EC2 > Auto Scaling Groups
+   └─ Your ASG should NOT appear
+
+☐ EC2 > Load Balancers
+   └─ Your ALB should NOT appear
+
+☐ EC2 > Target Groups
+   └─ Your TG should NOT appear
+
+☐ EC2 > Launch Templates
+   └─ Your template should NOT appear
+
+☐ EC2 > Instances
+   └─ Should show TERMINATED instances from your ASG
+   └─ (These will disappear after a few hours)
+
+☐ CloudWatch > Dashboards
+   └─ Optional: Delete D7078E-Lab-Dashboard if you don't need it
+
+Take screenshot: 11_all_resources_verified_deleted.png
+
+Note down:
+  - Deletion start time: _________
+  - Deletion complete time: _________
+  - Total resources deleted: ___ items
+
+================================================================================
+STEP 10: COLLECT CLOUDTRAIL LOGS (Optional but recommended)
+================================================================================
+
+For audit trail and documentation:
+
+Go to: CloudTrail > Event history
+
+Filter by:
+  ├─ User or role: Your AWS username
+  ├─ Resource type: Auto Scaling, Elastic Load Balancing, EC2
+  ├─ Event name: Contains "Create", "Delete", "Scale"
+
+Download as JSON:
+
+  1. Select desired events
+  2. Click "Download events as JSON"
+  3. Save file: cloudtrail_events.json
+
+This provides:
+  ✓ Complete audit trail
+  ✓ Exact timestamps
+  ✓ Who did what
+  ✓ Which resources were affected
+  ✓ Perfect for lab report!
+
+================================================================================
+STEP 11: CHECK AWS COSTS (OPTIONAL)
+================================================================================
+
+Verify your costs are as expected:
+
+Go to: AWS Billing > Cost Explorer
+
+View:
+  ├─ EC2 charges (should have ended when ASG deleted)
+  ├─ ALB charges (should have ended when ALB deleted)
+  ├─ Data transfer (usually minimal)
+  └─ Total lab cost
+
+Expected costs:
+  ├─ 30-minute lab with 3 instances + ALB: $0.30 - $2.00
+  ├─ 1-hour lab: $0.60 - $4.00
+  ├─ Full day lab: $10 - $20
+
+If costs are higher than expected:
+  ├─ Check if resources still running (they shouldn't be!)
+  ├─ Check for extra resources (unused ALBs, unused instances)
+  ├─ Note: Charges may take 24 hours to appear on billing
+
+Document: Actual costs incurred: $______
+
+================================================================================
+STEP 12: COMPILE ALL EVIDENCE FOR LAB REPORT
+================================================================================
+
+Organize screenshots in a folder:
+
+D7078E-Lab-Report-Evidence/
+├── 01_final_metrics_dashboard.png
+├── 02_asg_activity_log.png
+├── 03_ec2_instances_final.png
+├── 04_cloudwatch_alarms_final.png
+├── 05_target_group_health.png
+├── 06_full_timeline_view.png
+├── 07_asg_deleted_instances_terminated.png
+├── 08_alb_deleted.png
+├── 09_target_group_deleted.png
+├── 10_launch_template_deleted.png
+├── 11_all_resources_verified_deleted.png
+├── cloudtrail_events.json (optional)
+└── README.txt (summary of all events)
+
+Plus any screenshots from Tasks 1-5:
+├── Task_1_Screenshots/
+│   ├── instance_running.png
+│   ├── web_app_responding.png
+│   └── ami_created.png
+├── Task_2_Screenshots/
+│   ├── launch_template.png
+│   ├── alb_active.png
+│   ├── target_group_healthy.png
+│   └── asg_instance_running.png
+├── Task_3_Screenshots/
+│   ├── scaling_policies_created.png
+│   └── alarms_configured.png
+├── Task_4_Screenshots/
+│   ├── phase_1_low_load.png
+│   ├── phase_2_medium_load.png
+│   ├── phase_3_high_load.png
+│   ├── scaling_1_to_2.png
+│   ├── scaling_2_to_3.png
+│   └── all_3_instances_healthy.png
+└── Task_5_Screenshots/ (if completed)
+    ├── failure_detection.png
+    ├── instance_replacement.png
+    └── full_recovery.png
+
+================================================================================
+STEP 13: CREATE FINAL LAB REPORT
+================================================================================
+
+Write a comprehensive lab report document (PDF or Word):
+
+REPORT OUTLINE:
+
+1. TITLE PAGE
+   ├─ Title: D7078E Cloud Security Mini Project
+   ├─ Name: _______________
+   ├─ Date: _______________
+   ├─ Student ID: _______________
+   └─ Institution: _______________
+
+2. EXECUTIVE SUMMARY (1 page)
+   ├─ What was tested
+   ├─ Key findings
+   ├─ Objectives achieved
+   └─ Overall success/lessons
+
+3. OBJECTIVES (1 page)
+   ├─ Task 1: ✓ Prepare web app AMI
+   ├─ Task 2: ✓ Create ALB, TG, ASG, Launch Template
+   ├─ Task 3: ✓ Configure CloudWatch alarms & scaling
+   ├─ Task 4: ✓ Run load generators and observe scaling
+   ├─ Task 5: ✓ Simulate failure and observe recovery (if done)
+   └─ Task 6: ✓ Cleanup and document
+
+4. ARCHITECTURE DIAGRAM (1 page)
+   ├─ Show: Load generators → ALB → ASG → 3 Instances
+   ├─ Show: CloudWatch monitoring
+   └─ Show: Scaling policies and alarms
+
+5. METHODOLOGY (2-3 pages)
+   ├─ Tools used (AWS, Python, CloudWatch, etc.)
+   ├─ Infrastructure setup
+   ├─ Load generation approach
+   ├─ Monitoring strategy
+   └─ Failure simulation method
+
+6. RESULTS (5-10 pages with screenshots)
+   
+   Task 1 Results:
+   ├─ Screenshot: Instance running
+   ├─ Screenshot: Web app responding to endpoints
+   ├─ Screenshot: /burn endpoint CPU spike
+   └─ Findings: AMI successfully created
+   
+   Task 2 Results:
+   ├─ Screenshot: Launch Template
+   ├─ Screenshot: ALB active
+   ├─ Screenshot: Target Group healthy
+   ├─ Screenshot: ASG with 1 instance
+   └─ Findings: Infrastructure operational
+   
+   Task 3 Results:
+   ├─ Screenshot: Scaling policies
+   ├─ Screenshot: CloudWatch alarms configured
+   └─ Findings: Scaling automation ready
+   
+   Task 4 Results (DETAILED):
+   ├─ Screenshot: Phase 1 metrics (low load)
+   ├─ Screenshot: Phase 2 metrics (medium load)
+   ├─ Screenshot: Phase 3 metrics (high load, scaling triggered)
+   ├─ Screenshot: 1st instance launch (1 → 2)
+   ├─ Screenshot: 2nd instance launch (2 → 3)
+   ├─ Screenshot: All 3 instances healthy
+   ├─ Timeline: Exact timestamps of scaling events
+   ├─ Metrics: Peak CPU, peak RPS, etc.
+   └─ Findings: Auto-scaling works perfectly!
+   
+   Task 5 Results (If completed):
+   ├─ Screenshot: Before failure (3 healthy)
+   ├─ Screenshot: During failure (health check failing)
+   ├─ Screenshot: Replacement launching
+   ├─ Screenshot: After recovery (3 healthy again)
+   ├─ Timeline: Failure → Detection → Replacement → Recovery
+   ├─ Duration: Time to recover ___ minutes
+   └─ Findings: Automatic failover successful!
+   
+   Task 6 Results:
+   ├─ Screenshots: Resource cleanup
+   └─ Verification: All resources deleted
+
+7. ANALYSIS & OBSERVATIONS (3-5 pages)
+   
+   Auto-Scaling Performance:
+   ├─ Time from alarm trigger to scaling action: ___ seconds
+   ├─ Time for new instance to become healthy: ___ minutes
+   ├─ Peak CPU percentage: ____%
+   ├─ Peak request rate: ___ RPS
+   ├─ Total requests served: ___,___
+   └─ Success rate: ___%
+   
+   Failure & Recovery (if Task 5 done):
+   ├─ Failure detection time: ___ seconds
+   ├─ Replacement launch time: ___ seconds
+   ├─ Total recovery time: ___ minutes
+   ├─ System availability during failure: __%
+   ├─ Zero manual intervention: ✓ YES
+   └─ Automatic failover: ✓ SUCCESSFUL
+   
+   Cost Analysis:
+   ├─ Estimated lab cost: $_____
+   ├─ Cost breakdown by service
+   └─ Cost optimization recommendations
+   
+   Infrastructure Performance:
+   ├─ Average latency: ___ ms
+   ├─ P95 latency: ___ ms
+   ├─ Error rate: ____%
+   ├─ Throughput scalability: Linear (excellent)
+   └─ Load balancing: Even distribution across instances
+
+8. LESSONS LEARNED (2-3 pages)
+   
+   What Worked Well:
+   ├─ Auto-scaling triggered at correct threshold
+   ├─ New instances launched promptly
+   ├─ Health checks detected failures quickly
+   ├─ ALB distributed load evenly
+   ├─ System remained available during scaling
+   └─ Automatic failover was seamless
+   
+   Challenges & Observations:
+   ├─ Scale-in takes longer than scale-out (this is intentional)
+   ├─ Load ramping strategy important
+   ├─ Monitoring critical for debugging
+   └─ Instance boot time affects scaling latency
+   
+   Production Implications:
+   ├─ Architecture is suitable for production
+   ├─ SLA achievable: 99.0%+ availability
+   ├─ Can handle 5-10x current load with more scaling
+   ├─ Cost scales linearly with capacity
+   └─ Multi-AZ deployment improves resilience further
+   
+   Recommendations:
+   ├─ Implement instance warm-up pooling (pre-booted instances)
+   ├─ Use larger instance types for faster response
+   ├─ Add CloudFront CDN for static content
+   ├─ Implement session persistence for stateful apps
+   ├─ Add data layer replication
+   ├─ Implement rate limiting
+   ├─ Add DDoS protection (AWS Shield/WAF)
+   └─ Continuous deployment of new instances
+
+9. CONCLUSION (1 page)
+   ├─ All objectives achieved
+   ├─ System demonstrates high availability
+   ├─ Auto-scaling works as designed
+   ├─ Suitable for production workloads
+   └─ Lab successfully demonstrates cloud architecture principles
+
+10. APPENDIX (5+ pages)
+    ├─ Full screenshots (organized by task)
+    ├─ CloudTrail logs (sample events)
+    ├─ Configuration details (exact settings used)
+    ├─ Commands executed (for reproduction)
+    ├─ Performance metrics (detailed graphs)
+    ├─ Cost breakdown
+    └─ References and links
+
+REPORT LENGTH: 20-30 pages (including screenshots)
+
+================================================================================
+STEP 14: FINAL CHECKLIST - TASK 6 COMPLETE
+================================================================================
+
+Before submitting, verify:
+
+□ All load generators stopped
+□ All AWS resources deleted (ASG, ALB, TG, Launch Template)
+□ All instances terminated
+□ No resources still running (check EC2, ALB, ASG consoles)
+□ CloudTrail logs collected
+□ All screenshots organized in folder
+□ Lab report written (20-30 pages)
+□ All evidence included in appendix
+□ Timeline documented with exact timestamps
+□ Metrics calculated and analyzed
+□ Lessons learned section completed
+□ References and sources cited
+□ Report spell-checked and formatted
+□ PDF generated and verified readable
+
+================================================================================
+STEP 15: SUBMIT YOUR LAB
+================================================================================
+
+Deliverables to submit:
+
+1. Lab Report (PDF)
+   └─ File: D7078E-Lab-Report-YOURNAME.pdf
+   └─ Size: 20-30 pages
+   └─ Format: Professional
+
+2. Evidence Folder
+   └─ Folder: D7078E-Lab-Evidence/
+   └─ Contains: 15+ screenshots
+   └─ Contains: CloudTrail logs
+   └─ Contains: Configuration files
+   └─ Contains: Timeline document
+
+3. Code & Scripts (Optional)
+   └─ agent.py (load generator)
+   └─ docker-compose.yml
+   └─ Dockerfile
+   └─ run_high_load.ps1
+   └─ run_max_load.ps1
+
+4. Checklist
+   └─ Verification that all tasks completed
+
+Submit via:
+├─ Canvas (if instructor specified)
+├─ Email to instructor
+└─ USB drive (if offline submission)
+
+================================================================================
+TASK 6 COMPLETE - LAB FINISHED! ✅
+================================================================================
+
+Congratulations on completing the D7078E Cloud Security Mini Project!
+
+You have successfully:
+
+✓ Created web server infrastructure on AWS
+✓ Configured auto-scaling based on demand
+✓ Demonstrated horizontal scaling (1 → 2 → 3 instances)
+✓ Set up CloudWatch monitoring and alarms
+✓ Ran load tests and observed system behavior
+✓ Simulated failure and observed automatic recovery (if Task 5 done)
+✓ Documented all findings in comprehensive report
+✓ Cleaned up all resources to save costs
+
+SKILLS DEMONSTRATED:
+✓ Cloud Infrastructure Design
+✓ AWS EC2, ALB, ASG, CloudWatch
+✓ Infrastructure as Code
+✓ Load Testing & Performance Analysis
+✓ Monitoring & Alerting
+✓ High Availability Architecture
+✓ Failure Recovery & Resilience
+✓ Cost Management
+✓ Technical Documentation
+
+This lab demonstrates professional cloud engineering practices!
+
+You've earned: ⭐⭐⭐⭐⭐ (5 stars!)
+
+Good luck with your submission! 🚀
+
+================================================================================

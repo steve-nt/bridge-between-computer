@@ -1,0 +1,367 @@
+power-recap
+available
+Repo to create for this project
+https://platform.zone01.gr/git/sntentop/power-recap
+js
+500 B
+1
+AI-Surge mode
+
+Context
+Welcome back! Previously, you successfully brought your robot friend to Earth. Now, a new challenge awaits, one that will unlock the Gate of Knowledge.
+
+To begin your mission, you must first demonstrate your mastery of the foundational knowledge acquired during the first week of the AI.starter Piscine.
+
+Your mission today is creating a compelling portfolio that showcases both your personality and the foundational skills you've mastered. This isn't just an assignment, it's your chance to introduce yourself to fellow peers and demonstrate what you've learned. Check out this example to see the caliber of work you will do.
+
+Important Note: Ensure that you have Visual Studio Code (VSCode) and its necessary extensions installed on your device. Start by following this guide.
+
+Your project will be evaluated by your peers. They will assess your understanding of your code and its functionality, so don't rely blindly on AI and have fun with your peers!
+
+Remember to aim to complete each project within one day to ensure you can progress to the final project!
+
+Using AI Tools for Learning
+Objective: Leverage the installed AI tools to enhance your learning by recalling the concepts you learned in the last week of the AI.Starter Piscine!
+
+Watch this video to learn how to use the installed tools, then apply what you learned in the following prompts:
+
+Prompt examples:
+
+"As a beginner, give me a recap of how to use HTML and all the must-know tags."
+
+"As a beginner, give me a recap of CSS and how to use classes and IDs to style my HTML."
+
+"As a beginner, give me a recap of JS and how I can declare variables, objects, and create functions that take arguments."
+
+Review the results to refresh your understanding of the concepts covered in the first week of the AI.starter Piscine, and don't forget to share what you learn with your peers and move soon to the instructions!
+
+Instructions
+Section 1 - HTML
+Exercise 1: Creating a Simple Portfolio Skeleton
+Objective: Recall how to structure a basic HTML page.
+
+Create inside your workspace folder another folder called power-recap, then add the following files inside:
+
+power-recap.html
+
+power-recap.css
+
+power-recap.js
+
+If you struggle, follow this video on how to create a folder with files inside in VSCode. Don't forget to help your peers, and get help too!
+
+Tasks:
+
+Set up the HTML structure:
+
+Paste the following full HTML document structure into your power-recap.html file:
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Title</title>
+    <!-- Paste your CSS link here -->
+  </head>
+  <body>
+    <!-- Your page content goes here -->
+  </body>
+</html>
+Configure the head section:
+
+Replace the text between the <title> </title> tags with the text About Me. This will change the title of your webpage in the browser.
+
+Connect your CSS file with the HTML file using the <link> tag:
+
+<link rel="stylesheet" type="text/css" href="power-recap.css" />
+Add a personal introduction:
+
+Inside your <body> </body> tags, add an <h1> element with your name.
+
+On a new line, add a paragraph (<p>) introducing yourself:
+
+Mention your age (optional).
+
+Your country.
+
+Your current role (e.g., student, teacher, developer).
+
+Three fun facts about you.
+
+Hint: Use a <br/> tag to insert a line break and start a new line in your HTML content.
+
+Add a favorite animal section:
+
+Add an <h3> with the sentence: My favorite animal is Your favorite animal. Here is a cute picture of it:
+
+Hint: Replace Your favorite animal with your actual favorite animal (e.g., cat, penguin, panda).
+
+Add an animal image:
+
+Use an <img> tag.
+
+Copy an image address from Google Images or Pixabay.
+
+Paste the image URL in the src attribute.
+
+Add:
+
+A class="animal".
+
+A meaningful alt description.
+
+width and height attributes (e.g., width="300" height="200").
+
+Code example:
+<!-- Here is your <h3> heading -->
+<img
+  src="https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_1280.jpg"
+  alt="Cute cat laying on a couch"
+  class="animal"
+  width="300"
+  height="200"
+/>
+Hint: Use the Live Preview extension to see the progress of your work. You can watch the following video.
+
+Exercise 2: Adding a Skill Search Feature
+Objective: Make your portfolio interactive by letting users "search" for a skill.
+
+Tasks:
+
+Create the search section:
+
+Create a <section> inside your <body> below your intro content.
+
+Add an instructions paragraph:
+
+Inside that section, add a <p> with: Type any skill you want to search, and let me show you what I can do with JavaScript!
+
+Ask your AI peer how to use the <strong> tag to make text bold.
+
+Add a search input field:
+
+Add an <input> element to allow the user to type in a skill:
+
+Set its id to "searchInput".
+
+Set its type to "text".
+
+Add a placeholder such as: "Try 'HTML', 'CSS', or 'JavaScript'".
+
+Code example
+<input
+  id="searchInput"
+  type="text"
+  placeholder="Try 'HTML', 'CSS', or 'JavaScript'"
+/>
+Add a search button:
+
+Add a <button> that users can click:
+
+Set its id to "searchButton".
+
+The text inside should be: Search.
+
+Add a result display area:
+
+Add an empty paragraph below the button. This will be updated by JavaScript when a search is made.
+
+Set its id to "searchResult".
+
+Section 2 - CSS
+Exercise 1: Styling Your Webpage
+Objective: Make the portfolio visually appealing.
+
+Tasks:
+
+Add CSS reset and basic styling:
+
+Go to your power-recap.css file.
+
+Paste the following CSS rulesets to style your portfolio:
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f0f8ff; /* Soft blue */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  color: #333;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+Understand and customize the code:
+
+Select your code using your mouse, and follow these steps to use your AI peer to understand each line of the code.
+
+Then change the background-color of your portfolio to your favorite color, as well as other properties to make it unique.
+
+Add element-specific styling:
+
+Paste the following CSS rulesets into your power-recap.css file to style all the elements of your portfolio. Don't forget to modify the colors and other properties to make it unique to your portfolio:
+
+/* Style h1 */
+h1 {
+  font-size: 2.5rem;
+  color: #1e88e5;
+  margin-bottom: 20px;
+}
+
+/* Style h3 */
+h3 {
+  margin-top: 30px;
+  color: #444;
+}
+
+/* Style p */
+p {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
+
+/* Animal image */
+.animal {
+  margin-top: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Style search input */
+#searchInput {
+  padding: 10px;
+  width: 80%;
+  border: 2px solid #90caf9;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+/* Button styling */
+#searchButton {
+  padding: 10px 20px;
+  background-color: #42a5f5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Add hover to button */
+#searchButton:hover {
+  background-color: #1e88e5;
+}
+
+/* Result paragraph */
+#searchResult {
+  margin-top: 15px;
+  font-style: italic;
+  color: #666;
+}
+Exercise 2: Remove Default List Styling
+Objective: Clean up any list elements for better presentation.
+
+Tasks:
+
+Select all <ul> elements and set list-style-type to none to remove bullet points.
+
+Set padding-left to 0 to remove the default indentation.
+
+ul {
+  /* Your properties here */
+}
+Section 3 - JavaScript & DOM
+Exercise 1: Capturing User Input and Displaying It
+Objective: Learn how to capture user input from a text field and display it on the page.
+
+Tasks:
+
+Link the JavaScript file:
+
+Open your power-recap.html file and paste the following line before your </body> closing tag to link your JS file to your HTML file:
+
+<script src="power-recap.js"></script>
+Prompt example:
+
+"Why do we paste the JS script link before the closing body tag?"
+
+Set up DOM element selection:
+
+Locate the text input field (<input>) and button (<button>).
+
+Open the power-recap.js file.
+
+Create three variables that select the searchInput, searchButton, and searchResult using document.getElementById().
+
+Code Example
+// Step 1: Select the elements by their IDs
+const searchInput = document.getElementById("searchInput");
+// In the same way, select searchButton using its id.
+// In the same way, select searchResult using its id.
+Add event listener functionality:
+
+Add an event listener to the searchButton so that when clicked:
+
+It retrieves the value from the searchInput.
+
+It updates the paragraph to display "You searched for: [user input]".
+
+Handle empty input validation:
+
+Handle cases where the user leaves the input empty:
+
+If the input is empty, display Please enter a topic to search.
+
+Otherwise, display the paragraph as described above.
+
+Hint: You can check for empty input using: userInput.trim() === "" and don't forget to take a look at the code example, start from there!
+
+Complete Code Example
+// Step 1: Select the inputField, searchButton, and searchResult by their IDs using getElementById()
+
+//Add an event listener to the searchButton
+searchButton.addEventListener("click", function () {
+  //Step 2: Retrieve the value from the input field
+
+  // Check if input is empty
+  if (userInput.trim() === "") {
+    // Step 3:This is the case when the input is empty
+    // Step 4: Display "Please enter a topic to search."
+    // Step 5:Your code here
+  } else {
+    // Display: You searched for "content"
+    searchResult.textContent = `You searched for: ${userInput}`;
+  }
+});
+Ask your peers if you want to learn more!
+
+Bonus:
+Update the font-family in your CSS from Google Fonts.
+
+Add a background animation by following this guide.
+
+How to Submit Your Work
+Make a new folder on Gitea with the name of the current project, and add all the expected files.
+
+Please follow the steps shown in this tutorial.
+
+Required files to submit:
+
+power-recap.html
+
+power-recap.css
+
+power-recap.js
+
+Expected Output
+Your project should look something like this (You can make it better!).
+
+Good luck, and may you soon unlock the Gate of Knowledge!

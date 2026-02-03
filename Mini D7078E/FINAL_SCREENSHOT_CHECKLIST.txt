@@ -1,0 +1,679 @@
+================================================================================
+D7078E LAB - FINAL SCREENSHOT CHECKLIST
+================================================================================
+
+This is your quick checklist for taking screenshots throughout the lab.
+Check each box as you complete the step and take the screenshot.
+
+================================================================================
+TASK 1: PREPARE A WEB APP AMI (6 screenshots)
+================================================================================
+
+BEFORE YOU START TASK 1:
+  ☐ You have AWS console access
+  ☐ You know your region (eu-north-1)
+  ☐ You have an EC2 key pair ready
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 1.1: EC2 Instance Running
+   Location: EC2 → Instances
+   What: Instance "web-server-base" in "Running" state
+   File name: 01_ec2_instance_running.png
+   Timing: After instance launches and status checks pass
+
+☐ Screenshot 1.2: Root Endpoint Response
+   Location: Terminal/PowerShell
+   What: curl http://13.49.73.251/ response
+   File name: 02_web_app_root_endpoint.png
+   Timing: After web app tested
+
+☐ Screenshot 1.3: Metrics Endpoint Response
+   Location: Terminal/PowerShell
+   What: curl http://13.49.73.251/metrics response
+   File name: 03_web_app_metrics_endpoint.png
+   Timing: After web app tested
+
+☐ Screenshot 1.4: Burn Endpoint Response
+   Location: Terminal/PowerShell
+   What: curl http://13.49.73.251/burn response
+   File name: 04_web_app_burn_endpoint.png
+   Timing: After web app tested
+
+☐ Screenshot 1.5: CloudWatch CPU Spike
+   Location: CloudWatch → Metrics
+   What: CPU spike when /burn called
+   File name: 05_cloudwatch_cpu_spike.png
+   Timing: During or just after /burn endpoint call
+
+☐ Screenshot 1.6: AMI Created and Available
+   Location: EC2 → AMIs
+   What: "web-app-ami-d7078e" with "Available" status
+   File name: 06_ami_created_available.png
+   Timing: After AMI creation completes
+
+TASK 1 STATUS:
+  ☐ All 6 screenshots taken
+  ☐ Folder created: Screenshots/Task_1_AMI_Creation/
+  ☐ All files saved with correct names
+
+================================================================================
+TASK 2: CREATE ALB + TG + ASG + LAUNCH TEMPLATE (10 screenshots)
+================================================================================
+
+BEFORE YOU START TASK 2:
+  ☐ Task 1 complete
+  ☐ AMI ID noted: ami-01bb672d521e213d4
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 2.1: Launch Template Created
+   Location: EC2 → Launch Templates
+   What: "D7078E-MINI-PROJECT-GROUP35-WEBSRV-APP-TEMPLATE" visible
+   File name: 07_launch_template_created.png
+   Timing: After template creation
+
+☐ Screenshot 2.2: Target Group Created
+   Location: EC2 → Target Groups
+   What: "D7078E-MINI-PROJECT-GROUP35-TG" visible
+   File name: 08_target_group_created.png
+   Timing: After TG creation
+
+☐ Screenshot 2.3: ALB Active
+   Location: EC2 → Load Balancers
+   What: "D7078E-MINI-PROJECT-GROUP35-LB" with "Active" state
+   File name: 09_alb_active.png
+   Timing: After ALB creation and becomes active (1-2 min)
+
+☐ Screenshot 2.4: ALB Listeners Configured
+   Location: EC2 → Load Balancers → [Your ALB] → Listeners tab
+   What: HTTP:80 forwarding to target group
+   File name: 10_alb_listeners_configured.png
+   Timing: After configuring listener
+
+☐ Screenshot 2.5: ASG Created with 1 Instance
+   Location: EC2 → Auto Scaling Groups
+   What: "D7078E-MINI-PROJECT-GROUP35-ASG" with 1 instance
+   File name: 11_asg_created_1_instance.png
+   Timing: After ASG creation
+
+☐ Screenshot 2.6: ASG Instance Management
+   Location: EC2 → Auto Scaling Groups → [Your ASG] → Instance management tab
+   What: 1 instance showing "InService"
+   File name: 12_asg_instance_management.png
+   Timing: After instance becomes healthy (1-2 min)
+
+☐ Screenshot 2.7: Target Group - 1 Healthy Target
+   Location: EC2 → Target Groups → [Your TG] → Targets tab
+   What: 1 target showing "Healthy" status
+   File name: 13_target_group_1_healthy_target.png
+   Timing: After instance registers and becomes healthy (30-60 sec)
+
+☐ Screenshot 2.8: ALB Test - Root Endpoint
+   Location: Terminal/PowerShell
+   What: curl to ALB DNS showing root response
+   File name: 14_alb_test_root.png
+   Timing: After ALB setup complete
+
+☐ Screenshot 2.9: ALB Test - Metrics Endpoint
+   Location: Terminal/PowerShell
+   What: curl to ALB DNS showing /metrics response
+   File name: 15_alb_test_metrics.png
+   Timing: After ALB setup complete
+
+☐ Screenshot 2.10: ALB Test - Burn Endpoint
+   Location: Terminal/PowerShell
+   What: curl to ALB DNS showing /burn response
+   File name: 16_alb_test_burn.png
+   Timing: After ALB setup complete
+
+TASK 2 STATUS:
+  ☐ All 10 screenshots taken
+  ☐ Folder created: Screenshots/Task_2_Infrastructure_Setup/
+  ☐ All files saved with correct names
+  ☐ Resource IDs documented:
+    ├─ ALB DNS: _________________________________
+    ├─ Target Group ARN: _______________________
+    └─ ASG Name: _______________________________
+
+================================================================================
+TASK 3: CLOUDWATCH ALARMS & SCALING POLICIES (8 screenshots)
+================================================================================
+
+BEFORE YOU START TASK 3:
+  ☐ Task 2 complete
+  ☐ ALB responding normally
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 3.1: CloudWatch Dashboard Created
+   Location: CloudWatch → Dashboards
+   What: "D7078E-Lab-Dashboard" visible
+   File name: 17_cloudwatch_dashboard_created.png
+   Timing: After dashboard creation
+
+☐ Screenshot 3.2: CPU Utilization Widget
+   Location: CloudWatch → Dashboards → [Your Dashboard]
+   What: CPU widget showing baseline ~5%
+   File name: 18_cloudwatch_cpu_widget.png
+   Timing: After adding widgets
+
+☐ Screenshot 3.3: RequestCount Widget
+   Location: CloudWatch → Dashboards → [Your Dashboard]
+   What: RequestCount widget showing minimal traffic
+   File name: 19_cloudwatch_requestcount_widget.png
+   Timing: After adding widgets
+
+☐ Screenshot 3.4: HealthyHostCount Widget
+   Location: CloudWatch → Dashboards → [Your Dashboard]
+   What: HealthyHostCount showing 1
+   File name: 20_cloudwatch_healthyhost_widget.png
+   Timing: After adding widgets
+
+☐ Screenshot 3.5: Scale-Out Policy
+   Location: EC2 → Auto Scaling Groups → [Your ASG] → Automatic scaling tab
+   What: "scale-out-policy" with status "Active"
+   File name: 21_scaling_policy_scaleout.png
+   Timing: After policy creation
+
+☐ Screenshot 3.6: Scale-In Policy
+   Location: EC2 → Auto Scaling Groups → [Your ASG] → Automatic scaling tab
+   What: "scale-in-policy" with status "Active"
+   File name: 22_scaling_policy_scalein.png
+   Timing: After policy creation
+
+☐ Screenshot 3.7: CloudWatch Alarm - 80% CPU
+   Location: CloudWatch → Alarms
+   What: "cpu-high-alarm-80percent" in "OK" state
+   File name: 23_cloudwatch_alarm_80percent.png
+   Timing: After alarm creation
+
+☐ Screenshot 3.8: CloudWatch Alarm - 30% CPU
+   Location: CloudWatch → Alarms
+   What: "cpu-low-alarm-30percent" in "OK" state
+   File name: 24_cloudwatch_alarm_30percent.png
+   Timing: After alarm creation
+
+TASK 3 STATUS:
+  ☐ All 8 screenshots taken
+  ☐ Folder created: Screenshots/Task_3_Alarms_And_Scaling/
+  ☐ All files saved with correct names
+  ☐ Scale-Out Policy ARN: ________________________
+  ☐ Scale-In Policy ARN: _________________________
+
+================================================================================
+TASK 4: RUN INTERNAL LOAD GENERATORS (13 CRITICAL screenshots)
+================================================================================
+
+⚠️  MOST IMPORTANT TASK - TAKE MANY SCREENSHOTS!
+
+BEFORE YOU START TASK 4:
+  ☐ Task 3 complete
+  ☐ Dashboard open in browser (keep it open!)
+  ☐ Python agent.py ready
+  ☐ ALB DNS noted: _______________________________
+  ☐ CloudWatch dashboard refresh set to 10 seconds
+
+CRITICAL: KEEP CLOUDWATCH DASHBOARD OPEN THE ENTIRE TIME!
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 4.1: Baseline Before Load (CRITICAL!)
+   Location: CloudWatch Dashboard
+   What: All metrics at baseline (CPU ~5%, HealthyHostCount=1, RequestCount~0)
+   File name: 25_baseline_before_load.png
+   Timing: BEFORE starting any load generator
+   Why critical: Shows starting state
+
+☐ Screenshot 4.2: Phase 1 Complete (5 minutes)
+   Location: CloudWatch Dashboard
+   What: After 5 min low load (CPU 20-30%, still 1 host)
+   File name: 26_phase1_low_load.png
+   Timing: After Phase 1 (2 RPS for 5 minutes)
+   Why: Shows baseline load doesn't trigger scaling
+
+☐ Screenshot 4.3: Phase 2 Complete (10 minutes)
+   Location: CloudWatch Dashboard
+   What: After 10 min medium load (CPU 40-60%, still 1 host)
+   File name: 27_phase2_medium_load.png
+   Timing: After Phase 2 (50 RPS for 10 minutes)
+   Why: Shows medium load not enough to trigger scaling
+
+☐ Screenshot 4.4: ALARM TRIGGERED at 80% (CRITICAL!)
+   Location: CloudWatch → Alarms OR Dashboard
+   What: "cpu-high-alarm-80percent" → "IN_ALARM" (RED!)
+   File name: 28_alarm_triggered_80percent.png
+   Timing: When CPU first reaches 80%+ for 2 consecutive minutes
+   Why critical: This is the TRIGGER MOMENT - MUST CAPTURE!
+
+☐ Screenshot 4.5: First Scaling Event (CRITICAL!)
+   Location: EC2 → Auto Scaling Groups → Activity tab
+   What: "Launching 1 instance" activity visible
+   File name: 29_asg_activity_scaling_1to2.png
+   Timing: 1-2 minutes after alarm triggers
+   Why critical: Proves ASG responded to alarm
+
+☐ Screenshot 4.6: Instance 2 Becoming Healthy
+   Location: EC2 → Target Groups → Targets tab
+   What: 2 targets visible, status transitioning to healthy
+   File name: 30_target_group_2_healthy.png
+   Timing: 1-2 minutes after instance launched
+   Why: Shows instance registered with load balancer
+
+☐ Screenshot 4.7: High Load with 2 Instances
+   Location: CloudWatch Dashboard
+   What: HealthyHostCount=2, CPU still high, high RequestCount
+   File name: 31_phase3_high_load_2_instances.png
+   Timing: During Phase 3, after 1st scaling complete
+   Why: Shows 1st scaling succeeded, load still high
+
+☐ Screenshot 4.8: Second Scaling Event (CRITICAL!)
+   Location: EC2 → Auto Scaling Groups → Activity tab
+   What: Another "Launching 1 instance" visible
+   File name: 32_asg_activity_scaling_2to3.png
+   Timing: 2-3 minutes after first scaling
+   Why critical: Proves 2nd scaling triggered automatically
+
+☐ Screenshot 4.9: Instance 3 Becoming Healthy (CRITICAL!)
+   Location: EC2 → Target Groups → Targets tab
+   What: All 3 targets showing "Healthy"
+   File name: 33_target_group_3_healthy_complete.png
+   Timing: 1-2 minutes after instance 3 launched
+   Why critical: Shows MAXIMUM CAPACITY REACHED (3/3)
+
+☐ Screenshot 4.10: All 3 Instances Running
+   Location: EC2 → Instances
+   What: All 3 instances from ASG showing "Running"
+   File name: 34_ec2_3_instances_running.png
+   Timing: After all 3 become healthy
+   Why: Visual confirmation of all instances
+
+☐ Screenshot 4.11: ASG at Max Capacity
+   Location: EC2 → Auto Scaling Groups → [Your ASG]
+   What: Desired=3, Current=3, all InService
+   File name: 35_asg_3_instances_inservice.png
+   Timing: After all scaling complete
+   Why: Confirms ASG configuration and status
+
+☐ Screenshot 4.12: Peak Load Metrics (CRITICAL!)
+   Location: CloudWatch Dashboard
+   What: All 3 instances running, CPU stable, high RequestCount
+   File name: 36_final_high_load_3_instances.png
+   Timing: During peak load with all 3 instances
+   Why critical: Shows system handling peak load gracefully
+
+☐ Screenshot 4.13: Load Test Complete
+   Location: CloudWatch Dashboard
+   What: CPU and RequestCount returning to normal
+   File name: 37_load_test_complete.png
+   Timing: After load generator stops
+   Why: Shows complete lifecycle
+
+TASK 4 STATUS - CRITICAL CHECKLIST:
+  ☐ Screenshot 25: Baseline (MUST HAVE)
+  ☐ Screenshot 28: Alarm triggered (MUST HAVE)
+  ☐ Screenshot 29: First scaling (MUST HAVE)
+  ☐ Screenshot 32: Second scaling (MUST HAVE)
+  ☐ Screenshot 33: All 3 healthy (MUST HAVE)
+  ☐ Screenshot 36: Peak load (MUST HAVE)
+  ☐ All other screenshots: 7 nice-to-have
+  ☐ Folder created: Screenshots/Task_4_Load_Testing/
+  ☐ Timeline recorded:
+    ├─ Phase 1 started: _____________________
+    ├─ Alarm triggered: _____________________
+    ├─ 1st scaling: _________________________
+    ├─ 2nd scaling: _________________________
+    └─ Load complete: _______________________
+
+================================================================================
+TASK 5: FAILURE SIMULATION (8 optional but impressive screenshots)
+================================================================================
+
+⚠️  OPTIONAL BUT HIGHLY RECOMMENDED FOR LAB REPORT
+
+BEFORE YOU START TASK 5:
+  ☐ Task 4 complete
+  ☐ All 3 instances healthy
+  ☐ CloudWatch dashboard ready
+  ☐ Target Group showing 3 healthy targets
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 5.1: Before Failure (CRITICAL!)
+   Location: EC2 → Target Groups → Targets tab
+   What: All 3 targets showing "Healthy"
+   File name: 38_before_failure_3_healthy.png
+   Timing: Before running stress command
+   Why critical: Baseline before failure
+
+☐ Screenshot 5.2: Stress Command Executing
+   Location: Terminal/PowerShell
+   What: SSM send-command output with CommandId
+   File name: 39_stress_command_executing.png
+   Timing: When stress command starts
+   Why: Proves failure simulation initiated
+
+☐ Screenshot 5.3: Failure Detected (CRITICAL!)
+   Location: EC2 → Target Groups → Targets tab
+   What: One target showing "Unhealthy"
+   File name: 40_failure_detected_unhealthy.png
+   Timing: ~30-60 seconds after stress starts
+   Why critical: Shows automatic failure detection
+
+☐ Screenshot 5.4: Replacement Launching (CRITICAL!)
+   Location: EC2 → Auto Scaling Groups → Activity tab
+   What: "Launching 1 instance" visible
+   File name: 41_asg_launching_replacement.png
+   Timing: 1 minute after failure detected
+   Why critical: Shows automatic replacement
+
+☐ Screenshot 5.5: CPU Spike During Failure
+   Location: CloudWatch Dashboard
+   What: One instance CPU at 90%, HealthyHostCount=2
+   File name: 42_failure_cpu_spike.png
+   Timing: During stress test
+   Why: Shows system handling reduced capacity
+
+☐ Screenshot 5.6: Recovery Complete (CRITICAL!)
+   Location: EC2 → Target Groups → Targets tab
+   What: All 3 targets "Healthy" again
+   File name: 43_replacement_healthy_recovered.png
+   Timing: 2-3 minutes after replacement launched
+   Why critical: Shows automatic recovery
+
+☐ Screenshot 5.7: System Recovered
+   Location: CloudWatch Dashboard
+   What: All metrics normal, 3 healthy hosts
+   File name: 44_failure_recovery_complete.png
+   Timing: After stress test ends
+   Why: Confirms full recovery
+
+☐ Screenshot 5.8: Activity Log Showing Failure & Recovery
+   Location: EC2 → Auto Scaling Groups → Activity tab
+   What: Complete timeline of failure and recovery
+   File name: 45_asg_activity_failure_recovery.png
+   Timing: After recovery complete
+   Why: Shows complete history
+
+TASK 5 STATUS (OPTIONAL):
+  ☐ Screenshot 38: Before failure (MUST HAVE if doing Task 5)
+  ☐ Screenshot 40: Failure detected (MUST HAVE if doing Task 5)
+  ☐ Screenshot 41: Replacement launching (MUST HAVE if doing Task 5)
+  ☐ Screenshot 43: Recovery complete (MUST HAVE if doing Task 5)
+  ☐ All other screenshots: nice-to-have
+  ☐ Folder created: Screenshots/Task_5_Failure_Simulation/
+  ☐ Task 5 completion: ☐ Completed OR ☐ Skipped (acceptable)
+  ☐ Recovery time recorded: _____ minutes
+
+================================================================================
+TASK 6: CLEANUP (12 screenshots)
+================================================================================
+
+BEFORE YOU START TASK 6:
+  ☐ Task 4 (and 5 if done) complete
+  ☐ All evidence collected
+  ☐ Lab report ready to write
+
+SCREENSHOTS TO TAKE:
+
+☐ Screenshot 6.1: Final Metrics
+   Location: CloudWatch Dashboard
+   What: Complete test history in graphs
+   File name: 46_final_metrics_before_cleanup.png
+   Timing: Before deleting anything
+
+☐ Screenshot 6.2: Complete ASG Activity Log (CRITICAL!)
+   Location: EC2 → Auto Scaling Groups → Activity tab
+   What: Full timeline from launch to completion
+   File name: 47_asg_activity_complete_log.png
+   Timing: Before cleanup
+   Why critical: Complete history documentation
+
+☐ Screenshot 6.3: ASG Deletion Dialog
+   Location: EC2 → Auto Scaling Groups
+   What: Delete confirmation showing "Terminate instances"
+   File name: 48_asg_deletion_dialog.png
+   Timing: When deleting ASG
+
+☐ Screenshot 6.4: ASG Deleted
+   Location: EC2 → Auto Scaling Groups
+   What: ASG no longer in list
+   File name: 49_asg_deleted.png
+   Timing: After ASG deletion completes
+
+☐ Screenshot 6.5: Instances Terminating
+   Location: EC2 → Instances
+   What: Instances status "Shutting down" or "Terminated"
+   File name: 50_instances_terminating.png
+   Timing: After ASG deletion
+
+☐ Screenshot 6.6: ALB Deletion Dialog
+   Location: EC2 → Load Balancers
+   What: Delete confirmation
+   File name: 51_alb_deletion_dialog.png
+   Timing: When deleting ALB
+
+☐ Screenshot 6.7: ALB Deleted
+   Location: EC2 → Load Balancers
+   What: ALB no longer in list
+   File name: 52_alb_deleted.png
+   Timing: After ALB deletion
+
+☐ Screenshot 6.8: Target Group Deletion Dialog
+   Location: EC2 → Target Groups
+   What: Delete confirmation
+   File name: 53_target_group_deletion_dialog.png
+   Timing: When deleting Target Group
+
+☐ Screenshot 6.9: Target Group Deleted
+   Location: EC2 → Target Groups
+   What: Target group no longer in list
+   File name: 54_target_group_deleted.png
+   Timing: After Target Group deletion
+
+☐ Screenshot 6.10: Launch Template Deletion Dialog
+   Location: EC2 → Launch Templates
+   What: Delete confirmation
+   File name: 55_launch_template_deletion_dialog.png
+   Timing: When deleting Launch Template
+
+☐ Screenshot 6.11: Launch Template Deleted
+   Location: EC2 → Launch Templates
+   What: Template no longer in list
+   File name: 56_launch_template_deleted.png
+   Timing: After Launch Template deletion
+
+☐ Screenshot 6.12: All Resources Cleaned (CRITICAL!)
+   Location: EC2 Dashboard overview
+   What: No resources from this lab remaining
+   File name: 57_all_resources_cleaned.png
+   Timing: After all deletions complete
+   Why critical: Proves cleanup complete
+
+TASK 6 STATUS:
+  ☐ Screenshot 47: Activity log (MUST HAVE)
+  ☐ Screenshot 57: All cleaned (MUST HAVE)
+  ☐ All other cleanup screenshots: nice-to-have
+  ☐ Folder created: Screenshots/Task_6_Cleanup/
+  ☐ Lab report written and saved
+  ☐ All evidence organized
+
+================================================================================
+TOTAL SCREENSHOT COUNT
+================================================================================
+
+Task 1: 6 screenshots
+Task 2: 10 screenshots
+Task 3: 8 screenshots
+Task 4: 13 screenshots (MOST CRITICAL!)
+Task 5: 8 screenshots (optional)
+Task 6: 12 screenshots
+
+MINIMUM REQUIRED: 47 screenshots
+WITH TASK 5: 55 screenshots
+
+CRITICAL/MUST-HAVE SCREENSHOTS (11 total):
+  1. Screenshot 06: AMI created
+  2. Screenshot 13: Target group 1 healthy
+  3. Screenshot 25: Baseline before load
+  4. Screenshot 28: Alarm triggered 80% ⭐
+  5. Screenshot 29: First scaling ⭐
+  6. Screenshot 32: Second scaling ⭐
+  7. Screenshot 33: All 3 healthy ⭐
+  8. Screenshot 36: Peak load metrics ⭐
+  9. Screenshot 43: Recovery complete (if Task 5)
+  10. Screenshot 47: Activity log ⭐
+  11. Screenshot 57: All cleaned ⭐
+
+These 11 screenshots tell the COMPLETE story!
+
+================================================================================
+HOW TO ORGANIZE YOUR SCREENSHOTS
+================================================================================
+
+Create folder structure:
+
+Screenshots/
+├── Task_1_AMI_Creation/
+│   ├── 01_ec2_instance_running.png
+│   ├── 02_web_app_root_endpoint.png
+│   ├── 03_web_app_metrics_endpoint.png
+│   ├── 04_web_app_burn_endpoint.png
+│   ├── 05_cloudwatch_cpu_spike.png
+│   └── 06_ami_created_available.png
+│
+├── Task_2_Infrastructure_Setup/
+│   ├── 07_launch_template_created.png
+│   ├── 08_target_group_created.png
+│   ├── 09_alb_active.png
+│   ├── 10_alb_listeners_configured.png
+│   ├── 11_asg_created_1_instance.png
+│   ├── 12_asg_instance_management.png
+│   ├── 13_target_group_1_healthy_target.png
+│   ├── 14_alb_test_root.png
+│   ├── 15_alb_test_metrics.png
+│   └── 16_alb_test_burn.png
+│
+├── Task_3_Alarms_And_Scaling/
+│   ├── 17_cloudwatch_dashboard_created.png
+│   ├── 18_cloudwatch_cpu_widget.png
+│   ├── 19_cloudwatch_requestcount_widget.png
+│   ├── 20_cloudwatch_healthyhost_widget.png
+│   ├── 21_scaling_policy_scaleout.png
+│   ├── 22_scaling_policy_scalein.png
+│   ├── 23_cloudwatch_alarm_80percent.png
+│   └── 24_cloudwatch_alarm_30percent.png
+│
+├── Task_4_Load_Testing/ (MOST IMPORTANT!)
+│   ├── 25_baseline_before_load.png (CRITICAL)
+│   ├── 26_phase1_low_load.png
+│   ├── 27_phase2_medium_load.png
+│   ├── 28_alarm_triggered_80percent.png (CRITICAL)
+│   ├── 29_asg_activity_scaling_1to2.png (CRITICAL)
+│   ├── 30_target_group_2_healthy.png
+│   ├── 31_phase3_high_load_2_instances.png
+│   ├── 32_asg_activity_scaling_2to3.png (CRITICAL)
+│   ├── 33_target_group_3_healthy_complete.png (CRITICAL)
+│   ├── 34_ec2_3_instances_running.png
+│   ├── 35_asg_3_instances_inservice.png
+│   ├── 36_final_high_load_3_instances.png (CRITICAL)
+│   └── 37_load_test_complete.png
+│
+├── Task_5_Failure_Simulation/ (OPTIONAL)
+│   ├── 38_before_failure_3_healthy.png
+│   ├── 39_stress_command_executing.png
+│   ├── 40_failure_detected_unhealthy.png
+│   ├── 41_asg_launching_replacement.png
+│   ├── 42_failure_cpu_spike.png
+│   ├── 43_replacement_healthy_recovered.png
+│   ├── 44_failure_recovery_complete.png
+│   └── 45_asg_activity_failure_recovery.png
+│
+└── Task_6_Cleanup/
+    ├── 46_final_metrics_before_cleanup.png
+    ├── 47_asg_activity_complete_log.png
+    ├── 48_asg_deletion_dialog.png
+    ├── 49_asg_deleted.png
+    ├── 50_instances_terminating.png
+    ├── 51_alb_deletion_dialog.png
+    ├── 52_alb_deleted.png
+    ├── 53_target_group_deletion_dialog.png
+    ├── 54_target_group_deleted.png
+    ├── 55_launch_template_deletion_dialog.png
+    ├── 56_launch_template_deleted.png
+    └── 57_all_resources_cleaned.png
+
+================================================================================
+SUBMISSION CHECKLIST
+================================================================================
+
+Before submitting your lab:
+
+SCREENSHOTS:
+  ☐ All 47+ screenshots taken (55 if Task 5 done)
+  ☐ All screenshots properly named (01_..., 02_..., etc.)
+  ☐ All screenshots organized by task
+  ☐ Screenshots are clear and readable
+  ☐ Critical screenshots are of high quality
+
+DOCUMENTATION:
+  ☐ Lab report written (20-30 pages)
+  ☐ Lab report includes:
+    ├─ Title page with your name and date
+    ├─ Executive summary
+    ├─ All tasks listed
+    ├─ Results section with all screenshots
+    ├─ Analysis section with metrics
+    ├─ Lessons learned section
+    ├─ Appendices with screenshots and configurations
+  ☐ Timeline documented with exact timestamps
+  ☐ All key metrics recorded:
+    ├─ Peak CPU: ___%
+    ├─ Peak RPS: ____ req/sec
+    ├─ Time to scale 1→3: ____ minutes
+    └─ Recovery time (if Task 5): ____ minutes
+
+EVIDENCE:
+  ☐ All resource IDs documented:
+    ├─ AMI ID: ami-01bb672d521e213d4
+    ├─ ALB DNS: ________________________________
+    ├─ ASG Name: _______________________________
+    └─ Account ID: 793891462342
+  ☐ CloudTrail logs collected (optional)
+  ☐ Configuration files saved (if applicable)
+
+CLEANUP:
+  ☐ All AWS resources deleted
+  ☐ Cost monitoring shows $0 accruing
+  ☐ Screenshot of cleaned AWS console
+
+FINAL REVIEW:
+  ☐ Lab report spell-checked
+  ☐ All screenshots referenced in report
+  ☐ All conclusions are accurate
+  ☐ Report is professional and complete
+
+================================================================================
+YOU'RE READY TO START!
+================================================================================
+
+Follow this checklist systematically:
+
+1. Print or display this checklist
+2. Go through each task in order
+3. Take screenshots at the specified times
+4. Check off each screenshot as you take it
+5. After Task 6, organize all screenshots
+6. Write your lab report
+7. Submit all deliverables
+
+GOOD LUCK! 🎉
+
+Questions? Refer to:
+  - SCREENSHOT_GUIDE.txt - Detailed screenshot locations
+  - TASK_WALKTHROUGH.txt - Complete step-by-step walkthrough
+  - task_1.txt through task_6.txt - Full task instructions
+
+You've got this! 💪
+
+================================================================================

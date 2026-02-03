@@ -1,0 +1,49 @@
+TASK 3: Create 3 Security Groups with Strict Isolation Rules
+==============================================================
+
+Objective:
+Configure three security groups to enforce strict network isolation between EC2 instances.
+
+Security Groups Created:
+
+1. SG-WEB (Web Application Server)
+   Inbound Rules:
+   - HTTPS (443) from 0.0.0.0/0 (external access)
+   - SSH (22) from 203.0.113.55/32 (admin only)
+   
+   Outbound Rules:
+   - Allow all (default)
+   
+   Assigned to: WEB-SERVER (i-09b2da9995b961dc9)
+
+2. SG-DB (Database Server)
+   Inbound Rules:
+   - SSH (22) from 203.0.113.55/32 (admin only)
+   - NO MySQL (3306)
+   - NO traffic from other EC2 instances
+   
+   Outbound Rules:
+   - Allow all (default)
+   
+   Assigned to: DB-SERVER (i-081af8cc4ec64625e)
+
+3. SG-STORAGE (Storage/API Server)
+   Inbound Rules:
+   - NO inbound traffic from EC2 instances
+   - API Gateway access handled externally
+   
+   Outbound Rules:
+   - Allow all (for S3, CloudWatch, CloudTrail APIs)
+   
+   Assigned to: STORAGE-SERVER (i-0f8da4bee4b8ff2ba)
+
+Isolation Enforced:
+- ❌ Web Server ↔ DB Server (blocked)
+- ❌ Web Server ↔ Storage Server (blocked)
+- ❌ DB Server ↔ Storage Server (blocked)
+- ✅ External users → Web Server (HTTPS only)
+- ✅ Admin → DB Server (SSH only)
+
+Status: COMPLETED ✓
+
+Next Task: Task 4 - Create S3 Bucket & Upload Files

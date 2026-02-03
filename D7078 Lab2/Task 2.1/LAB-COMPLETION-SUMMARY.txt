@@ -1,0 +1,242 @@
+===========================================================================
+LAB 2.1 COMPLETION SUMMARY & LEARNING OUTCOMES
+===========================================================================
+
+Date Completed: 2025-11-30
+Group: Group35
+Students: [Add group members and their contributions]
+
+===========================================================================
+SECTION 1: RESOURCES CREATED
+===========================================================================
+
+1. Security Group
+   - Name: Group35-D7078-lab2-security-group
+   - ID: sg-0cf4b63253b8a5ad6
+   - Region: eu-north-1
+   - Inbound Rules:
+     * SSH (port 22): 79.167.66.242/32 (your IP only)
+     * HTTP (port 80): 0.0.0.0/0 (anywhere)
+
+2. S3 Bucket
+   - Name: group35-d7078-lab2-bucket-sg-170191
+   - Region: eu-north-1
+   - Objects uploaded: test-local.txt (29 bytes)
+
+3. IAM Policy
+   - File: Labs3Policy.json
+   - Actions: s3:ListBucket, s3:GetBucketLocation, s3:GetObject, 
+              s3:PutObject, s3:DeleteObject
+   - Resources: group35-d7078-lab2-bucket-sg-170191
+
+4. IAM Role
+   - Name: Group35-D7078-Lab2-Role
+   - ARN: arn:aws:iam::793891462342:role/Group35-D7078-Lab2-Role
+   - Trust Policy: Allows EC2 service to assume role
+
+5. Instance Profile
+   - Name: Group35-D7078-Lab2-Profile
+   - Linked Role: Group35-D7078-Lab2-Role
+
+6. EC2 Key Pair
+   - Name: Group35-D7078-Lab2-KeyPair
+   - Format: PEM
+   - File: Group35-D7078-Lab2-KeyPair.pem (1679 bytes)
+
+7. EC2 Instance
+   - Instance ID: i-0c32227bfffc472e0
+   - Type: t3.micro
+   - AMI: ami-03e876513b1441cbf (Ubuntu 22.04 LTS)
+   - Public IP: 16.170.224.197
+   - Private IP: 172.31.35.231
+   - Security Group: sg-0cf4b63253b8a5ad6
+   - IAM Instance Profile: Group35-D7078-Lab2-Profile
+   - Key Pair: Group35-D7078-Lab2-KeyPair
+
+===========================================================================
+SECTION 2: EXPERIMENTS & RESULTS
+===========================================================================
+
+Experiment 1: Security Group Inbound Rules
+- Objective: Verify SSH can only be accessed from specific IP
+- Result: ✓ SSH rule restricted to 79.167.66.242/32
+- Result: ✓ HTTP rule open to 0.0.0.0/0
+
+Experiment 2: S3 Bucket Access
+- Objective: Upload file to S3 bucket
+- Command: aws s3api put-object --bucket group35-d7078-lab2-bucket-sg-170191 ...
+- Result: ✓ File uploaded successfully (test-local.txt)
+- ETag: "220973ac612c945bfce3503f6e81ab11"
+
+Experiment 3: S3 Bucket Listing
+- Objective: Verify file appears in bucket
+- Command: aws s3api list-objects-v2 --bucket group35-d7078-lab2-bucket-sg-170191
+- Result: ✓ File appears in bucket with correct metadata
+
+Experiment 4: IAM Role Permissions
+- Objective: Verify EC2 instance has S3 access via IAM role
+- Method: Created policy with specific S3 actions
+- Result: ✓ Instance profile successfully attached to EC2
+- Note: Role enables access without explicit credentials
+
+===========================================================================
+SECTION 3: KEY LEARNING POINTS
+===========================================================================
+
+1. Security Groups
+   - Define network-level access controls
+   - Stateful firewall rules (inbound/outbound)
+   - Applied at instance level
+   - Can restrict by IP, CIDR block, or security group
+
+2. IAM Roles vs Access Keys
+   - Roles provide temporary credentials (session tokens)
+   - Access keys are permanent (higher security risk)
+   - Roles can be updated without code changes
+   - No credentials stored on instance with roles
+
+3. Least Privilege Principle
+   - Grant only minimum permissions needed
+   - Scoped to specific resources (bucket ARN)
+   - Specific actions (s3:GetObject, s3:PutObject, etc.)
+   - Deny by default, explicitly allow what's needed
+
+4. Instance Profiles
+   - Container for IAM roles
+   - Allows EC2 instances to assume roles
+   - Retrieves temporary credentials from metadata service
+   - Credentials automatically rotated
+
+5. S3 Bucket Security
+   - Bucket-level policies (ListBucket)
+   - Object-level policies (GetObject, PutObject, DeleteObject)
+   - Different resource ARNs for bucket vs objects
+
+===========================================================================
+SECTION 4: CHALLENGES & SOLUTIONS
+===========================================================================
+
+Challenge 1: AWS CLI Command Syntax
+- Issue: Using `aws s3` instead of `aws s3api`
+- Solution: Used `s3api` for put-object and list-objects-v2
+- Learning: Different CLI commands for different operations
+
+Challenge 2: File Path with Spaces
+- Issue: Directory name "D7078 Lab2" contains spaces
+- Solution: Used escape character: "D7078\ Lab2"
+- Learning: Always quote or escape paths with spaces
+
+Challenge 3: S3 Bucket Names Must Be Globally Unique
+- Issue: Generic bucket names already taken
+- Solution: Added unique suffix to bucket name
+- Learning: S3 namespace is global, not regional
+
+Challenge 4: EC2 Instance Status Transition
+- Issue: Instance took time to transition to "running"
+- Solution: Checked status multiple times until running
+- Learning: AWS operations are asynchronous
+
+===========================================================================
+SECTION 5: SECURITY OBSERVATIONS
+===========================================================================
+
+Good Security Practices Implemented:
+✓ SSH restricted to single IP address (79.167.66.242/32)
+✓ HTTP open to internet (port 80) - appropriate for web servers
+✓ Used IAM roles instead of embedding access keys
+✓ Applied least privilege principle to S3 policy
+✓ Instance profile used for credential delivery
+✓ Created separate security group for this lab
+
+Improvements That Could Be Made:
+- HTTPS (port 443) not configured (only HTTP)
+- No SSL/TLS for data in transit
+- S3 bucket not encrypted at rest (could add)
+- No logging enabled on S3 bucket
+- No backup/disaster recovery setup
+- Internet-facing HTTP access (could restrict further)
+
+===========================================================================
+SECTION 6: REFLECTION ANSWERS
+===========================================================================
+
+[To be filled after answering reflection questions]
+
+Q1: Why is it more secure to use IAM roles instead of embedding AWS access keys?
+A: [Your answer here]
+
+Q2: What principle of cloud security is applied when restricting SSH access to a single IP?
+A: [Your answer here]
+
+Q3: What happens if you remove the S3 actions from the IAM policy and try the upload again?
+A: [Your answer here]
+
+Q4: How would you modify the Security Group to restrict HTTP access to an internal network only?
+A: [Your answer here]
+
+Q5: What challenges did you face when designing least-privilege policies?
+A: [Your answer here]
+
+===========================================================================
+SECTION 7: TIME & EFFORT TRACKING
+===========================================================================
+
+Estimated time breakdown:
+- AWS CLI setup & verification: 10 minutes
+- Security Group creation: 10 minutes
+- S3 bucket creation: 5 minutes
+- IAM role & policy creation: 15 minutes
+- EC2 instance launch: 15 minutes
+- Testing & validation: 15 minutes
+- Documentation: 20 minutes
+
+Total Time: ~90 minutes
+
+===========================================================================
+SECTION 8: FILES CREATED
+===========================================================================
+
+Configuration Files:
+✓ Labs3Policy.json - IAM policy for S3 access
+✓ Labs3TrustPolicy.json - Trust policy for EC2 role
+
+Documentation Files:
+✓ Step1-Verify-AWS-CLI.txt
+✓ Step2-Create-Security-Group.txt
+✓ Step3-Add-Inbound-Rules.txt
+✓ Step4-Create-S3-Bucket.txt
+✓ Step5-Create-IAM-Policy.txt
+✓ Step6-Create-IAM-Role.txt
+✓ Step7-Attach-Policy-to-Role.txt
+✓ Step8-Create-Instance-Profile.txt
+✓ Step9-Create-EC2-KeyPair.txt
+✓ Step10-Launch-EC2-Instance.txt
+✓ Step11-Check-Instance-Status.txt
+✓ Step12-Validate-IAM-Role-Access.txt
+✓ Step13-Verify-S3-Contents.txt
+✓ Reflection-Questions.txt
+✓ Cleanup-Instructions.txt
+✓ DOCUMENTATION-GUIDE.txt
+✓ LAB-COMPLETION-SUMMARY.txt (this file)
+
+Key Files:
+✓ Group35-D7078-Lab2-KeyPair.pem - EC2 key pair
+
+===========================================================================
+NEXT STEPS
+===========================================================================
+
+Before final submission:
+
+1. [ ] Take all 13 screenshots (see DOCUMENTATION-GUIDE.txt)
+2. [ ] Organize screenshots in /Screenshots folder
+3. [ ] Answer all reflection questions
+4. [ ] Complete this summary document
+5. [ ] Run cleanup steps (see Cleanup-Instructions.txt)
+6. [ ] Create lab report (following LaTeX template from Overleaf)
+7. [ ] Mention group member contributions
+8. [ ] Include screenshots in report
+9. [ ] Zip all code and documentation files
+10. [ ] Submit to Canvas
+
+===========================================================================

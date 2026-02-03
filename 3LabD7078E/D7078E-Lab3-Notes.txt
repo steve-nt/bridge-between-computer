@@ -1,0 +1,143 @@
+
+DB-SERVER-D7078E-Lab3
+Instance ID             i-081af8cc4ec64625e
+Public IPv4 address     13.53.126.50
+Private IPv4 addresses  172.31.25.135
+
+On your DB-SERVER (16.171.112.166), run these commands instead:
+sudo apt update
+sudo apt install -y mysql-server
+sudo systemctl start mysql
+sudo systemctl enable mysql
+
+WEB-SERVER-D7078E-Lab3
+Instance ID             i-09b2da9995b961dc9
+Public IPv4 address     16.171.112.166
+Private IPv4 addresses  172.31.30.14
+
+On your WEB-SERVER (16.171.112.166), run these commands instead:
+sudo apt update
+sudo apt install -y nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+STORAGE-SERVER-D7078E-Lab3
+Instance ID             i-0f8da4bee4b8ff2ba
+Public IPv4 address     13.49.18.107
+Private IPv4 addresses  172.31.20.229
+
+On your STORAGE-SERVER (13.49.18.107), run these commands instead:
+sudo apt update
+sudo apt install -y python3 python3-pip curl unzip
+# Install AWS CLI v2 (latest version)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+rm -rf aws awscliv2.zip
+   
+# Verify installation
+aws --version
+
+
+WAYS TO FIND ADMIN IP:
+You can find your public IP by:
+- Running: curl -s https://checkip.amazonaws.com on your local computer
+- Or searching "what is my IP" online
+
+
+TASK 3: Create 3 Security Groups with Strict Isolation Rules
+
+   Admin IP: 203.0.113.55/32
+
+   Step-by-Step Instructions:
+
+   1. Create SG-WEB (Web Application Server Security Group)
+
+   In AWS Console:
+
+     - Go to EC2 → Security Groups
+     - Click "Create security group"
+     - Name: SG-WEB
+     - Description: Security group for Web Application Server
+     - VPC: Select your default VPC
+
+   Inbound Rules for SG-WEB:
+
+     - Rule 1: Type HTTPS, Protocol TCP, Port 443, Source 0.0.0.0/0 (allow external HTTPS)
+     - Rule 2: Type SSH, Protocol TCP, Port 22, Source 203.0.113.55/32 (admin access only)
+
+   Outbound Rules for SG-WEB:
+
+     - Keep default (allow all outbound) for now, we'll restrict later
+
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   2. Create SG-DB (Database Server Security Group)
+
+     - Name: SG-DB
+     - Description: Security group for Database Server
+
+   Inbound Rules for SG-DB:
+
+     - Rule 1: Type SSH, Protocol TCP, Port 22, Source 203.0.113.55/32 (admin access only)
+     - Remove all other inbound rules (no MySQL 3306, no HTTP/HTTPS, no EC2-to-EC2 traffic)
+
+   Outbound Rules for SG-DB:
+
+     - Allow all (default)
+
+   ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   
+
+TASK 4: Create S3 Bucket & Upload Files
+========================================    
+
+3. Create SG-STORAGE (Storage/API Server Security Group)
+
+     - Name: SG-STORAGE
+     - Description: Security group for Storage and API Gateway Server
+
+   Inbound Rules for SG-STORAGE:
+
+     - Remove all inbound rules (no traffic allowed from EC2 instances)
+     - API Gateway access happens outside Security Groups
+
+   Outbound Rules for SG-STORAGE:
+
+     - Allow all (so it can reach S3, CloudWatch, CloudTrail APIs)
+
+S3 Bucket Name
+bucket-d7078e-lab3-group35
+
+S3 Bucket ARN
+arn:aws:s3:::bucket-d7078e-lab3-group35
+
+File names uploaded
+data.json
+document.txt
+
+TASK 5: Create IAM Role for Storage Server (EC2 #3)
+============================================
+   EC2 (the first one listed)
+
+   This is the correct choice because:
+
+     - It allows EC2 instances to call AWS services on your behalf
+     - Your Storage Server (an EC2 instance) needs to access S3
+     - This is the standard role for EC2 instances to interact with other AWS services like S3, CloudWatch, and CloudTrail
+
+   Do NOT choose:
+
+     - ❌ "EC2 Role for AWS Systems Manager" - that's for Systems Manager specifically
+     - ❌ Any of the Spot Fleet/Scheduled Instances options - those are for specific EC2 fleet scenarios
+
+
+SUSPICIOUS ACTIVITY DETECTED 
+User
+Access key
+AKIA*3RV4*6LTD*DUKV*2GVZ
+
+Secret access key
++FNE8h*NTwkVo*N1ev*AU0IO62*edTx0z*80VT0S*aUfjR
+

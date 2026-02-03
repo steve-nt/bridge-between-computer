@@ -1,0 +1,138 @@
+TASK 6: Create API Gateway to Access S3 Files (Public Bucket Approach)
+=====================================================================
+
+Objective:
+Create an AWS API Gateway that acts as a secure intermediary between the Storage Server 
+and S3 bucket, allowing controlled access to S3 files via HTTPS API endpoint.
+
+Lab Exercises Completed:
+
+1. CREATE REST API
+   - API Name: Lab3-S3-API-D7078E-Group35
+   - API ID: z1us5bvs3g
+   - Region: eu-north-1
+   - Endpoint Type: Regional
+   - Security Policy: TLS 1.3
+   - IP Address Type: IPv4
+   - Status: ✅ Successfully created
+
+2. CREATE RESOURCE STRUCTURE
+   - Root resource: /
+   - Proxy resource: /{proxy}
+   - Purpose: Allows dynamic file path access (e.g., /data.json, /document.txt)
+
+3. CONFIGURE GET METHOD
+   - Resource: /{proxy}
+   - Method: GET
+   - Integration Type: HTTP proxy integration
+   - Endpoint URL: https://bucket-d7078e-lab3-group35.s3.eu-north-1.amazonaws.com/{proxy}
+   - Response Transfer Mode: Buffered
+   - Path Parameter: proxy (mapped from method.request.path.proxy)
+
+4. CREATE EXECUTION ROLE FOR API GATEWAY
+   - Role Name: Lab3-APIGateway-S3-Role-D7078-Group35
+   - Trust Principal: apigateway.amazonaws.com
+   - Attached Policies:
+     * AmazonAPIGatewayPushToCloudWatchLogs
+     * AmazonS3ReadOnlyAccess
+     * CloudWatchLogsFullAccess
+   - Status: ✅ Created and configured
+
+5. ENABLE CLOUDWATCH LOGGING
+   - Set CloudWatch log role ARN in API Gateway Account Settings
+   - Enabled execution logs for prod stage
+   - Log level: ERROR
+   - Purpose: Monitor and troubleshoot API calls
+
+6. MAKE S3 BUCKET PUBLIC (For Initial Testing)
+   - Bucket Name: bucket-d7078e-lab3-group35
+   - Unblocked all public access restrictions:
+     * Block all public access - UNCHECKED
+     * Block public access to ACLs - UNCHECKED
+     * Block public access to bucket policies - UNCHECKED
+     * Block public access to access points - UNCHECKED
+   
+   - Added Bucket Policy for Public Read:
+     {
+       "Version": "2012-10-17",
+       "Statement": [
+         {
+           "Effect": "Allow",
+           "Principal": "*",
+           "Action": "s3:GetObject",
+           "Resource": "arn:aws:s3:::bucket-d7078e-lab3-group35/*"
+         }
+       ]
+     }
+
+7. DEPLOY API
+   - Deployment stage: prod
+   - Invoke URL: https://z1us5bvs3g.execute-api.eu-north-1.amazonaws.com/prod/
+   - Status: ✅ Successfully deployed
+
+8. TESTING API WITH PUBLIC BUCKET
+   Test Command 1:
+   curl https://z1us5bvs3g.execute-api.eu-north-1.amazonaws.com/prod/data.json
+   
+   Test Command 2:
+   curl https://z1us5bvs3g.execute-api.eu-north-1.amazonaws.com/prod/document.txt
+   
+   Result: ✅ Both commands successfully returned file contents
+
+Challenges Encountered:
+
+1. Initial Issue: "Missing Authentication Token"
+   - Cause: Authorization settings were blocking unauthenticated requests
+   - Solution: Set Authorization to "NONE" in Method Request
+
+2. Path Parameter Mapping Error: "Invalid mapping expression specified"
+   - Cause: Tried to use mapping expression before defining parameter in Method Request
+   - Solution: Create resource with {proxy} in path explicitly
+   - Learning: Method Request parameters must be defined before Integration Request can reference them
+
+3. AWS Credentials/Authorization Section Missing
+   - Cause: HTTP proxy integration doesn't expose credential signing options
+   - Attempted Solution: Tried regular HTTP integration with signing
+   - Issue: No credentials field available in AWS console
+   - Workaround: Made bucket public for initial testing
+
+4. Internal Server Error with Private Bucket
+   - Cause: API Gateway couldn't sign requests to private S3 bucket
+   - Initial Attempts:
+     * Direct AWS Service integration with S3
+     * HTTP integration with {proxy+} path override
+     * HTTP proxy integration
+   - All attempts failed because API Gateway lacks built-in request signing for S3
+
+Security Implications:
+
+⚠️ PUBLIC BUCKET APPROACH:
+   - ❌ Anyone with the API URL can read all files
+   - ❌ No authentication required
+   - ❌ Violates least privilege principle
+   - ⚠️ Not suitable for production environments
+   - ✅ Good for rapid testing and prototyping
+
+✅ NEXT STEPS (Task 6 - Private Bucket Approach):
+   Use AWS Lambda function to proxy S3 requests
+   - Lambda has proper IAM role to access private S3 bucket
+   - API Gateway calls Lambda instead of S3 directly
+   - Lambda authenticates to S3 using its IAM role
+   - End result: Secure, private access through API Gateway
+
+Architecture Flow (Public Bucket):
+
+   Client (curl)
+        ↓
+   API Gateway (/{proxy} GET)
+        ↓
+   HTTP Proxy Integration
+        ↓
+   S3 Bucket (Public Read Policy)
+        ↓
+   Response (JSON/Text file contents)
+
+Status: COMPLETED ✅ (Public Bucket Testing)
+
+Next Task: Task 6 - Private Bucket Approach using Lambda Proxy Function
+

@@ -1,0 +1,183 @@
+its-dynamic
+available
+js
+650 B
+1
+AI-Surge mode
+
+Context
+Now that you've created the user interface for your Knowledge Gate chatbot, it's time to bring it to life with JavaScript. Your chatbot will be able to recieve, send and display messages from the user.
+
+Important: You will be building on top of your previous project. Create a folder called its-dynamic, and copy your HTML and CSS files from the previous project (start-building). You will then add new JavaScript functionality to these existing files.
+
+Using AI Tools for Learning
+Objective: Leverage the installed AI tools to enhance your learning by recalling JavaScript concepts.
+
+Prompt examples:
+
+"Can you explain what a JavaScript function is and show me an example of how to create and use one?"
+
+"How do I create a new element in JavaScript and add it to an existing part of the webpage?"
+
+Instructions
+Section 1 - JavaScript & DOM
+Exercise 1: Setting Up JavaScript File
+Objective: Create and connect your JavaScript file to make your chatbot interactive.
+
+Tasks:
+
+Create your JavaScript file:
+
+Create a file called: knowledge-gate.js
+
+Connect it to HTML before the closing </body> tag:
+
+<script src="knowledge-gate.js"></script>
+Exercise 2: Creating the Message Display Function
+Objective: Create a function that displays chat messages on the screen.
+
+Using AI to Generate Your Code:
+
+Watch this video to learn how to use your AI tools effectively.
+
+Tasks:
+
+Create the addMessage(messageText, senderType) function:
+
+Use your AI tools to implement this function based on these requirements:
+
+function addMessage(messageText, senderType) {
+  // 1. Create a new <div> element called messageDiv to hold the message.
+  // 2. Add two CSS classes to messageDiv: 'message' and senderType ('user' or 'bot').
+  // 3. Replace newline characters in messageText with <br> and set as HTML content.
+  // 4. Get the container element with ID 'messages' and save as "messagesContainer".
+  // 5. Add messageDiv to the messages container.
+  // 6. Scroll to bottom:
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+Important: You must complete the implementation of this function before proceeding to Exercise 3. These comments are guides, paste this function template into your knowledge-gate.js file and use your AI tools (as shown in the video) to help you implement each step.
+
+Prompt Examples:
+
+"How do I create a new div element and add CSS classes to it in JavaScript?"
+
+"How do I replace text characters with HTML and append elements to a container?"
+
+Exercise 3: Adding the Welcome Message
+Objective: Display a welcome message when the page loads.
+
+Tasks:
+
+Add the page load event listener:
+
+Prerequisites: Make sure you've fully implemented the addMessage() function from Exercise 2 before testing this code.
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Call addMessage() with two arguments:
+  // First: "Hello, I am your intelligent books recommendation chatbot \"01Books\".\nGive me a keyword!\n\nExample: Mathematics"
+  // Second: 'bot'
+});
+Prompt Examples:
+
+"How do I call a function with multiple arguments in JavaScript?"
+
+"What does DOMContentLoaded event do and why is it important for chatbots?"
+
+Exercise 4: Handling User Messages
+Objective: Create the functionality that lets users send messages.
+
+Tasks:
+
+Add the event listener after the DOMContentLoaded section in your knowledge-gate.js file:
+
+document.getElementById("send-button").addEventListener("click", sendMessage);
+This code adds a click event listener to the "Send" button. When the button is clicked, it calls the sendMessage function to handle sending the user's message.
+
+Add the sendMessage function below the event listener:
+
+function sendMessage() {
+  const userInput = document.getElementById("user-input").value.trim();
+
+  if (userInput) {
+    // Call addMessage function to display the user's message
+    // First argument: the user's input text
+    // Second argument: 'user'
+    // Clear the input field by setting its value to an empty string
+  }
+}
+Prompt Examples:
+
+"How do I call a function and pass variables as arguments in JavaScript?"
+
+"How do I clear an input field and what does .trim() do for user input?"
+
+Section 2 - CSS
+Exercise 1: Styling Message Bubbles
+Objective: Style the message bubbles to look like a real chat interface.
+
+Tasks:
+
+Style the general message bubble:
+
+Create a .message class with these properties:
+
+Set max-width to 80%
+
+Set padding to 10px 14px
+
+Set margin to 6px 0
+
+Set border-radius to 16px
+
+Set font-size to 14px
+
+Set line-height to 1.4
+
+Set word-wrap to break-word
+
+Style the user message bubble:
+
+Create a .user class with these properties:
+
+Set align-self to flex-end
+
+Set background-color to #007bff
+
+Set color to #ffffff
+
+Style the bot message bubble:
+
+Create a .bot class with these properties:
+
+Set align-self to flex-start
+
+Set background-color to #f1f0f0
+
+Set color to #333
+
+Prompt Examples:
+
+"How do CSS classes added in JavaScript connect to CSS styling rules?"
+
+"What does align-self: flex-end vs flex-start do for chat message positioning?"
+
+Expected Output
+Your submission should look like this.
+
+Submission
+Required Files
+knowledge-gate.html
+
+knowledge-gate.css
+
+knowledge-gate.js
+
+How to Submit Your Work
+Follow the same steps as the last project tutorial.
+
+Make a new folder on Gitea with the name of the current project, and add all the expected files.
+
+Something is wrong ?
+Submit an issue
+or even better
+propose a change !

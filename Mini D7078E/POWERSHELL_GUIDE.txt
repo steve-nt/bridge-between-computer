@@ -1,0 +1,306 @@
+================================================================================
+D7078E POWERSHELL LOAD TEST SCRIPT - COMPLETE GUIDE
+================================================================================
+
+YOU NOW HAVE:
+
+📁 run_load_test.ps1
+   - Main interactive script
+   - Multiple test options (1, 2, 3, 4, 5, 6, 7)
+   - Pre-requisite checks
+   - Full monitoring setup
+
+📁 start_load_test.ps1
+   - Quick launcher
+   - Executes run_load_test.ps1
+
+📁 QUICK_START.txt
+   - One-liner commands
+   - Copy-paste ready
+   - Multiple options
+
+📁 RUN_POWERSHELL_SCRIPT.txt
+   - Detailed instructions
+   - Troubleshooting guide
+   - Example output
+
+================================================================================
+THE FASTEST WAY TO START (5 SECONDS)
+================================================================================
+
+1. Open PowerShell (not admin, just normal)
+
+2. Copy this entire line:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; .\run_load_test.ps1
+
+3. Paste and press Enter
+
+4. Select option 1, 2, or 3 when prompted
+
+5. Watch scaling happen in CloudWatch Dashboard!
+
+================================================================================
+WHAT THE SCRIPT DOES
+================================================================================
+
+PHASE 1: Moderate Load
+├─ 20 workers
+├─ 5 RPS per worker = 100 RPS total
+├─ 5 minutes duration
+└─ Expected: CPU 30-50%, no scaling
+
+PHASE 2: High Load (TRIGGERS SCALING)
+├─ 50 workers
+├─ 10 RPS per worker = 500 RPS total
+├─ 10 minutes duration
+└─ Expected: CPU 80%+, instances scale 1 → 2 → 3
+
+PHASE 3: Maximum Load (Optional)
+├─ 100 workers
+├─ 20 RPS per worker = 2000 RPS total
+├─ 15 minutes duration
+└─ Expected: All 3 instances at capacity
+
+PHASE 4: Scale-Down (Optional)
+├─ 1 worker
+├─ 1 RPS per worker = 1 RPS total
+├─ 10 minutes duration
+└─ Expected: CPU drops, instances scale back down 3 → 1
+
+================================================================================
+MENU OPTIONS EXPLAINED
+================================================================================
+
+Option 1: Quick Test (RECOMMENDED FOR FIRST TIME)
+├─ Phase 1 + Phase 2
+├─ Total time: 15 minutes
+├─ Shows scaling 1 → 2 → 3
+└─ Perfect for lab demo
+
+Option 2: Full Test
+├─ Phase 1 + Phase 2 + Phase 3
+├─ Total time: 30 minutes
+├─ Shows maximum load capacity
+└─ Good for stress testing
+
+Option 3: Complete Test
+├─ Phase 1 + Phase 2 + Phase 3 + Phase 4
+├─ Total time: 40 minutes
+├─ Shows scale-out AND scale-in
+└─ Complete scaling lifecycle
+
+Option 4: Custom Configuration
+├─ You enter workers, RPS, duration
+├─ Flexible testing
+└─ For advanced users
+
+Option 5: Phase 1 Only
+├─ Baseline load (100 RPS)
+├─ 5 minutes
+└─ Quick validation
+
+Option 6: Phase 2 Only
+├─ High load (500 RPS)
+├─ 10 minutes
+└─ Jump straight to scaling
+
+Option 7: Exit
+└─ Quit the script
+
+================================================================================
+HOW TO RUN STEP-BY-STEP
+================================================================================
+
+Step 1: Open PowerShell
+- Press Windows key + R
+- Type: powershell
+- Press Enter
+(You don't need admin rights)
+
+Step 2: Navigate to folder
+Type: cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E
+Press: Enter
+
+Step 3: Enable script execution
+Type: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+Press: Enter
+When asked, Type: Y (for Yes)
+Press: Enter
+
+Step 4: Run the script
+Type: .\run_load_test.ps1
+Press: Enter
+
+Step 5: Choose your test
+The menu appears. Type: 1 (for Quick Test)
+Press: Enter
+
+Step 6: Open Dashboard (IMPORTANT!)
+- While script is running, open AWS Console
+- CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+- Watch metrics update in real-time!
+
+================================================================================
+WHAT YOU'LL SEE IN POWERSHELL
+================================================================================
+
+Color coding:
+🔵 Cyan headers = Major section
+✓ Green = Success/completion
+⚠ Yellow = Warnings/pauses
+✗ Red = Errors
+⚪ White = Information
+
+The script will show:
+✓ Prerequisites check (Python, aiohttp, agent.py)
+✓ ALB connectivity test
+✓ ASG status check
+✓ Dashboard instructions
+✓ Interactive menu
+✓ Phase progress with timing
+✓ Summary and next steps
+
+================================================================================
+DASHBOARD METRICS TO WATCH
+================================================================================
+
+While the script runs, watch these in CloudWatch:
+
+📊 CPU Utilization
+   Baseline → 1-2% (idle)
+   Phase 1  → 30-50% (moderate load)
+   Phase 2  → 80%+ (high load, scaling triggered)
+   Phase 3  → 40-60% (load distributed across 3 instances)
+   Phase 4  → 0-10% (low load, scale-in triggered)
+
+📊 RequestCount
+   Baseline → 0
+   Phase 1  → ~100 req/sec
+   Phase 2  → ~500 req/sec (spike!)
+   Phase 3  → ~2000 req/sec (maximum)
+   Phase 4  → ~1 req/sec
+
+📊 HealthyHostCount
+   Baseline → 1 instance
+   Phase 1  → 1 instance (no scaling)
+   Phase 2  → 1 → 2 → 3 instances (scaling!)
+   Phase 3  → 3 instances (max capacity)
+   Phase 4  → 3 → 2 → 1 instance (scale-in)
+
+================================================================================
+TIMELINE EXAMPLE
+================================================================================
+
+Time    Event                           Metrics
+────────────────────────────────────────────────────────────────────────
+00:00   Phase 1 starts                  CPU: 0%, RPS: 0, Hosts: 1
+00:10   Load ramps up                   CPU: 30%, RPS: 100, Hosts: 1
+02:00   Phase 1 complete
+02:30   Phase 2 starts                  CPU: 30%, RPS: 100, Hosts: 1
+03:00   High load begins                CPU: 60%, RPS: 500, Hosts: 1
+04:00   CPU hits 80%                    CPU: 82%, RPS: 500, Hosts: 1
+04:30   Alarm triggers!                 cpu-high-alarm-80percent → IN_ALARM
+05:00   First scaling event             Hosts: 1 → 2 (new instance launching)
+06:00   New instance ready              Hosts: 2, CPU: 45%, RPS: 500
+06:30   CPU rises again                 CPU: 75%, RPS: 500, Hosts: 2
+07:00   Second alarm trigger            Alarm fires, second scale-out
+07:30   Second scaling event            Hosts: 2 → 3 (another instance launching)
+08:30   All instances ready             Hosts: 3, CPU: 40%, RPS: 500 (distributed)
+12:00   Phase 2 complete
+12:30   Phase 4 starts (reduce load)    RPS reduced to 1
+15:00   CPU drops significantly         CPU: 5%, RPS: 1, Hosts: 3
+17:30   Scale-in alarm triggers         cpu-low-alarm-30percent → IN_ALARM
+18:00   Instances terminate             Hosts: 3 → 2
+19:00   More terminations               Hosts: 2 → 1
+20:00   Phase 4 complete                CPU: 1%, RPS: 1, Hosts: 1 (baseline)
+
+================================================================================
+TROUBLESHOOTING QUICK REFERENCE
+================================================================================
+
+Problem: "Command not found"
+Solution: Copy ENTIRE line including "Set-ExecutionPolicy..."
+
+Problem: Script doesn't run
+Solution: Make sure PowerShell is NOT "run as administrator"
+         Just normal PowerShell window
+
+Problem: "Python not found"
+Solution: Install Python from python.org
+         Add to PATH during installation
+
+Problem: CPU doesn't hit 80%
+Solution: The load might be too low for your instance type
+         Try: --workers 100 --rps 20 for more aggressive load
+
+Problem: No scaling happening
+Solution: 1. Check cpu-high-alarm-80percent exists
+         2. Make sure alarm threshold is 80
+         3. Wait 2 minutes (alarm needs time to evaluate)
+         4. Check CloudWatch Alarms state
+
+Problem: Dashboard not updating
+Solution: Refresh the browser
+         Wait 30-60 seconds for metrics to appear
+         Check metrics exist in CloudWatch
+
+================================================================================
+DOCUMENTATION FILES YOU HAVE
+================================================================================
+
+These are all in: C:\Users\snten\Desktop\bridge-between-computer\Mini D7078E\
+
+run_load_test.ps1
+  ↳ Main PowerShell script with interactive menu
+  
+start_load_test.ps1
+  ↳ Simple launcher for run_load_test.ps1
+  
+QUICK_START.txt
+  ↳ One-liner copy-paste commands
+  
+RUN_POWERSHELL_SCRIPT.txt
+  ↳ Detailed step-by-step instructions
+  
+This file (POWERSHELL_GUIDE.txt)
+  ↳ Complete guide and reference
+
+Other helpful files:
+  CREATE_DASHBOARD.txt
+  HIGH_LOAD_GENERATOR.txt
+  LOAD_COMMANDS.txt
+
+================================================================================
+FINAL CHECKLIST BEFORE RUNNING
+================================================================================
+
+☐ Python installed (python --version works)
+☐ agent.py exists in same folder as scripts
+☐ ALB is active (can curl it manually)
+☐ ASG exists with at least 1 instance
+☐ CloudWatch Dashboard created
+☐ Scaling policies active (checked in AWS Console)
+☐ Alarms created (checked in AWS Console)
+☐ Cloud Watch open in browser, ready to monitor
+
+If all checked, you're ready to run!
+
+================================================================================
+READY TO GO!
+================================================================================
+
+Command to run:
+
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E; .\run_load_test.ps1
+
+Then:
+1. Select option 1 (Quick Test)
+2. Open CloudWatch Dashboard
+3. Watch it scale from 1 → 2 → 3 instances!
+
+That's it. The rest is automated.
+
+Good luck with your D7078E lab! 🚀
+
+================================================================================

@@ -1,0 +1,897 @@
+===========================================================================
+TROUBLESHOOTING GUIDE
+D7078 Lab 2: Programming Cloud Services
+===========================================================================
+
+Complete guide for diagnosing and solving common issues.
+
+===========================================================================
+SECTION 1: AWS CREDENTIALS ISSUES
+===========================================================================
+
+ERROR 1: "Unable to load credentials from any provider in the chain"
+
+CAUSES:
+- AWS credentials not configured
+- ~/.aws/credentials file doesn't exist
+- Environment variables not set
+- Credentials expired
+
+SOLUTIONS:
+
+Step 1: Configure AWS credentials
+```bash
+aws configure
+# Enter:
+# AWS Access Key ID: [your-key]
+# AWS Secret Access Key: [your-secret]
+# Default region: eu-north-1
+# Default output format: json
+```
+
+Step 2: Verify credentials are loaded
+```bash
+aws sts get-caller-identity
+# Should return:
+# {
+#   "UserId": "793891462342",
+#   "Account": "793891462342",
+#   "Arn": "arn:aws:iam::793891462342:root"
+# }
+```
+
+Step 3: Check credential file
+```bash
+cat ~/.aws/credentials
+# Should show:
+# [default]
+# aws_access_key_id = ...
+# aws_secret_access_key = ...
+```
+
+Step 4: Check credential location
+```bash
+aws configure list
+# Should show location of credentials
+```
+
+---
+
+ERROR 2: "The security token included in the request is invalid"
+
+CAUSES:
+- Credentials expired
+- Credentials corrupted
+- Wrong region configured
+
+SOLUTIONS:
+
+Step 1: Reconfigure credentials
+```bash
+rm ~/.aws/credentials ~/.aws/config
+aws configure
+# Re-enter your credentials
+```
+
+Step 2: Check credential validity
+```bash
+aws s3 ls
+# If this works, credentials are valid
+```
+
+Step 3: Verify region is correct
+```bash
+aws configure get region
+# Should return: eu-north-1 (for this lab)
+```
+
+---
+
+ERROR 3: "User is not authorized to perform: s3:..."
+
+CAUSES:
+- IAM user lacks S3 permissions
+- IAM policy not attached
+- Resource ARN doesn't match
+
+SOLUTIONS:
+
+Step 1: Check current user
+```bash
+aws sts get-caller-identity
+# Note the ARN (user or role)
+```
+
+Step 2: Check IAM permissions
+```bash
+aws iam get-user-policy --user-name your-user --policy-name your-policy
+# Or for role:
+aws iam get-role-policy --role-name your-role --policy-name your-policy
+```
+
+Step 3: Add S3 permissions to IAM user
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+Step 4: Retest after 1-2 minutes (IAM consistency)
+```bash
+aws s3 ls
+```
+
+---
+
+ERROR 4: "The AWS Access Key ID you provided does not exist"
+
+CAUSES:
+- Access key ID is incorrect
+- Access key was deleted
+- Typo in credentials
+
+SOLUTIONS:
+
+Step 1: Verify access key in console
+Go to: AWS Console → IAM → Users → Security credentials
+- Check access key ID matches ~/.aws/credentials
+
+Step 2: Create new access key if deleted
+```bash
+# In AWS Console:
+# IAM → Users → Select user → Security credentials
+# → Create access key
+
+# Then:
+aws configure
+# Enter new credentials
+```
+
+Step 3: Check for typos
+```bash
+cat ~/.aws/credentials
+# Verify exact spelling and characters
+```
+
+===========================================================================
+SECTION 2: MAVEN BUILD ISSUES
+===========================================================================
+
+ERROR 1: "mvn: command not found"
+
+CAUSES:
+- Maven not installed
+- Maven not in PATH
+- Shell needs to be reloaded
+
+SOLUTIONS:
+
+Step 1: Check if Maven is installed
+```bash
+which mvn
+# If nothing returned, Maven not installed
+```
+
+Step 2: Install Maven
+```bash
+# On Ubuntu/Debian:
+sudo apt-get install maven
+
+# On Mac:
+brew install maven
+
+# Verify installation:
+mvn -version
+```
+
+Step 3: Add Maven to PATH (if needed)
+```bash
+export PATH="/opt/maven/bin:$PATH"
+```
+
+---
+
+ERROR 2: "Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin"
+
+CAUSES:
+- Java version too old (need 11+)
+- Java not in PATH
+- Compilation errors in code
+
+SOLUTIONS:
+
+Step 1: Check Java version
+```bash
+java -version
+# Should be Java 11 or newer
+# We tested with Java 21
+
+javac -version
+# Compiler version should match
+```
+
+Step 2: Update Java if needed
+```bash
+# Check available versions:
+apt list --installed | grep java
+
+# Install Java 21:
+sudo apt-get install openjdk-21-jdk
+
+# Set default Java:
+sudo update-alternatives --config java
+```
+
+Step 3: Check for compilation errors
+```bash
+mvn clean compile
+# Look for specific error messages
+# Fix syntax errors in Java files
+```
+
+Step 4: Verify pom.xml syntax
+```bash
+# Check pom.xml is valid XML:
+xmllint pom.xml
+
+# Or try rebuilding:
+mvn clean install
+```
+
+---
+
+ERROR 3: "Missing artifact software.amazon.awssdk:s3:jar:2.20.0"
+
+CAUSES:
+- Maven can't download dependencies
+- Network connectivity issue
+- Corrupted local repository
+
+SOLUTIONS:
+
+Step 1: Check internet connection
+```bash
+ping repo.maven.apache.org
+# Should get responses
+```
+
+Step 2: Clear local Maven cache
+```bash
+rm -rf ~/.m2/repository
+mvn clean install
+# This downloads all dependencies fresh
+```
+
+Step 3: Force update dependencies
+```bash
+mvn clean install -U
+# -U forces update of SNAPSHOT versions
+```
+
+Step 4: Check pom.xml dependency
+```xml
+<!-- Should be present:-->
+<dependency>
+  <groupId>software.amazon.awssdk</groupId>
+  <artifactId>s3</artifactId>
+  <version>2.20.0</version>
+</dependency>
+```
+
+Step 5: Try alternate Maven repository
+```bash
+mvn clean install -Dmaven.repo.local=/tmp/mvn-repo
+```
+
+---
+
+ERROR 4: "BUILD FAILURE: Cannot find symbol"
+
+CAUSES:
+- Missing import statements
+- Typos in class/method names
+- Incompatible AWS SDK version
+
+SOLUTIONS:
+
+Step 1: Check imports
+```java
+// Required imports:
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+// ... etc
+```
+
+Step 2: Check for typos
+```java
+// Correct:
+S3Client s3Client = S3Client.builder()
+
+// Wrong:
+S3Client s3Client = s3Client.builder()  // case sensitive!
+```
+
+Step 3: Check AWS SDK version
+```xml
+<!-- pom.xml should have:-->
+<dependency>
+  <groupId>software.amazon.awssdk</groupId>
+  <artifactId>s3</artifactId>
+  <version>2.20.0</version>
+</dependency>
+```
+
+Step 4: Recompile after fixing
+```bash
+mvn clean compile
+```
+
+===========================================================================
+SECTION 3: S3 BUCKET ISSUES
+===========================================================================
+
+ERROR 1: "The specified bucket does not exist"
+
+CAUSES:
+- Bucket hasn't been created yet
+- Bucket name is incorrect
+- Bucket is in different region
+- Bucket was deleted
+
+SOLUTIONS:
+
+Step 1: List existing buckets
+```bash
+# Run ListS3Buckets program:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+
+# Or use AWS CLI:
+aws s3 ls
+```
+
+Step 2: Verify bucket name
+```java
+// Check the bucket name in code:
+String bucketName = "group35-d7078-bucket-eu-north-1";
+// Should exactly match what's listed
+```
+
+Step 3: Create bucket if missing
+```bash
+# Run CreateS3Buckets program:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+```
+
+Step 4: Check region
+```java
+// Make sure region matches bucket location:
+Region region = Region.EU_NORTH_1;  // Correct for eu-north-1 bucket
+```
+
+---
+
+ERROR 2: "The requested bucket name is not available"
+
+CAUSES:
+- Bucket name already exists (taken by another account)
+- Bucket name invalid
+- Bucket owned by you (already created)
+
+SOLUTIONS:
+
+Step 1: List your buckets to verify
+```bash
+aws s3 ls
+# Check if bucket is listed
+```
+
+Step 2: If bucket is yours, use existing name
+```java
+// Bucket already exists, no need to create
+// Just use it for upload/download operations
+```
+
+Step 3: If name is taken, use different name
+```java
+String bucketName = "group35-d7078-bucket-unique-" + System.currentTimeMillis();
+```
+
+Step 4: Check bucket naming rules
+- 3-63 characters
+- Lowercase, numbers, hyphens only
+- Can't start/end with hyphen
+- Can't have consecutive hyphens
+- Must be globally unique
+
+---
+
+ERROR 3: "Access Denied" when accessing bucket
+
+CAUSES:
+- IAM policy doesn't allow operation
+- Bucket policy denies access
+- Wrong AWS account
+
+SOLUTIONS:
+
+Step 1: Check IAM permissions
+```bash
+aws iam get-user-policy --user-name your-user --policy-name your-policy
+```
+
+Step 2: Verify policy has required actions
+```json
+{
+  "Action": [
+    "s3:ListBucket",
+    "s3:GetBucketLocation",
+    "s3:GetObject",
+    "s3:PutObject",
+    "s3:DeleteObject"
+  ],
+  "Resource": [
+    "arn:aws:s3:::bucket-name",
+    "arn:aws:s3:::bucket-name/*"
+  ]
+}
+```
+
+Step 3: Add missing permissions
+```bash
+# Update IAM policy with all required S3 actions
+```
+
+Step 4: Check bucket policy
+```bash
+aws s3api get-bucket-policy --bucket your-bucket
+# Should not block your AWS account
+```
+
+---
+
+ERROR 4: "The bucket you tried to create already exists, and you own it"
+
+CAUSES:
+- Bucket already created in previous run
+- Trying to create same bucket twice
+
+SOLUTIONS:
+
+Step 1: This is normal - bucket already exists
+```
+This is not an error, just informational.
+Continue using the existing bucket.
+```
+
+Step 2: To create new bucket, use different name
+```java
+String bucketName = "group35-d7078-bucket-" + System.currentTimeMillis();
+```
+
+Step 3: Or delete old bucket first (careful!)
+```bash
+# Delete all objects first:
+aws s3 rm s3://bucket-name --recursive
+
+# Then delete bucket:
+aws s3api delete-bucket --bucket bucket-name
+```
+
+===========================================================================
+SECTION 4: S3 OBJECT OPERATIONS
+===========================================================================
+
+ERROR 1: "The specified key does not exist" or 404 NoSuchKey
+
+CAUSES:
+- Object hasn't been uploaded yet
+- Object name is incorrect
+- Object was deleted
+- File doesn't exist (for upload)
+
+SOLUTIONS:
+
+Step 1: List objects in bucket
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+# Check if objects are listed
+```
+
+Step 2: Upload object if missing
+```bash
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+```
+
+Step 3: Verify object name
+```java
+// For download:
+String objectKey = "test.txt";  // Must match uploaded name exactly
+
+// For upload:
+String filePath = "/tmp/test.txt";  // File must exist at this path
+```
+
+Step 4: Check file exists (for upload)
+```bash
+ls -la /tmp/test.txt
+# Should show file details
+```
+
+---
+
+ERROR 2: "Access Denied" for object operation
+
+CAUSES:
+- IAM policy lacks object permissions
+- Object is in different bucket
+- Wrong credentials
+
+SOLUTIONS:
+
+Step 1: Check object permissions in IAM policy
+```json
+{
+  "Action": [
+    "s3:GetObject",
+    "s3:PutObject",
+    "s3:DeleteObject"
+  ],
+  "Resource": "arn:aws:s3:::bucket-name/*"
+}
+```
+
+Step 2: Ensure bucket AND object ARNs in policy
+```json
+// Wrong (only bucket):
+"Resource": "arn:aws:s3:::bucket-name"
+
+// Correct (bucket + objects):
+"Resource": [
+  "arn:aws:s3:::bucket-name",
+  "arn:aws:s3:::bucket-name/*"
+]
+```
+
+Step 3: Update IAM policy and retry
+```bash
+# After updating policy, wait 1-2 minutes for AWS consistency
+aws s3api put-object --bucket bucket --key test.txt --body /tmp/test.txt
+```
+
+---
+
+ERROR 3: "The object you tried to upload is too large"
+
+CAUSES:
+- File is over 5 TB (S3 max object size)
+- More likely: Network timeout during upload
+
+SOLUTIONS:
+
+Step 1: Check file size
+```bash
+ls -lh /tmp/test.txt
+# Should be < 5 TB
+```
+
+Step 2: Use multipart upload for large files
+```java
+// AWS SDK handles this automatically
+// But max single part is 5 GB
+```
+
+Step 3: For very large files, compress first
+```bash
+gzip /tmp/large-file.txt
+# Upload compressed version
+```
+
+Step 4: Check network connection
+```bash
+ping -c 5 s3.eu-north-1.amazonaws.com
+# Should get responses
+```
+
+===========================================================================
+SECTION 5: NETWORK & PERFORMANCE ISSUES
+===========================================================================
+
+ERROR 1: "Connection timeout" or "Request timeout"
+
+CAUSES:
+- Network connectivity issue
+- AWS service temporarily unavailable
+- Firewall blocking S3 endpoint
+- Network latency too high
+
+SOLUTIONS:
+
+Step 1: Check internet connection
+```bash
+ping -c 5 8.8.8.8  # Google DNS
+# Should get responses without timeout
+```
+
+Step 2: Check AWS service status
+Go to: https://status.aws.amazon.com/
+- Check S3 status in eu-north-1 region
+- May show service issues
+
+Step 3: Verify firewall allows S3
+```bash
+telnet s3.eu-north-1.amazonaws.com 443
+# Should connect successfully
+```
+
+Step 4: Try different region
+```java
+Region region = Region.EU_WEST_1;  // Try Ireland instead
+```
+
+Step 5: Reduce file size for testing
+```java
+createLargeTestFile(testFile, 100 * 1024);  // 100 KB instead of 1 MB
+```
+
+---
+
+ERROR 2: Slow upload/download
+
+CAUSES:
+- Network congestion
+- Large file size
+- AWS region far away
+- System load too high
+
+SOLUTIONS:
+
+Step 1: Check network speed
+```bash
+# Internet speed test:
+speedtest-cli
+# Or visit: https://speedtest.net
+```
+
+Step 2: Check system resources
+```bash
+# CPU usage:
+top
+
+# Memory usage:
+free -h
+
+# Disk usage:
+df -h
+```
+
+Step 3: Try different time of day
+- Avoid peak hours (US business hours)
+- Latency varies with time of day
+
+Step 4: Use closer region
+```java
+// Current (Stockholm):
+Region region = Region.EU_NORTH_1;
+
+// Try closer (Frankfurt):
+Region region = Region.EU_CENTRAL_1;
+```
+
+Step 5: Reduce file size for testing
+```bash
+# Test with smaller file first:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+# To verify basic connectivity before large transfers
+```
+
+---
+
+ERROR 3: Latency measurements vary significantly
+
+CAUSES:
+- Single measurement not statistically significant
+- Network conditions change over time
+- Connection pooling affects timing
+- System background tasks interfere
+
+SOLUTIONS:
+
+Step 1: Run multiple iterations
+- Run 10+ times instead of once
+- Calculate median (not average)
+- Check standard deviation
+
+Step 2: Warm up connections first
+- Run test twice, use second result
+- First run includes SSL handshake
+- Subsequent runs measure steady-state
+
+Step 3: Control variables
+```bash
+# Before testing:
+# - Close other applications
+# - Stop background downloads
+# - Minimize system activity
+```
+
+Step 4: Check at different times
+```bash
+# Run test:
+# - Morning (low traffic)
+# - Afternoon (medium traffic)
+# - Evening (high traffic)
+# Compare results
+```
+
+===========================================================================
+SECTION 6: PROGRAM-SPECIFIC ISSUES
+===========================================================================
+
+PROGRAM 1: CreateS3Buckets
+
+Error: "Bucket already owned by you"
+Solution: Bucket already created, that's fine. Use it for next step.
+
+Error: "Invalid bucket name"
+Solution: Check name follows AWS rules (lowercase, hyphens, no consecutive hyphens)
+
+---
+
+PROGRAM 2: ListS3Buckets
+
+Error: "No buckets listed"
+Solution: Run CreateS3Buckets first to create them
+
+Error: "Owner information shows as null"
+Solution: This is normal, some AWS accounts don't display owner name
+
+---
+
+PROGRAM 3: UploadS3Objects
+
+Error: "File not found"
+Solution: Program creates test files in /tmp/, verify they exist:
+```bash
+ls -la /tmp/test.txt /tmp/sample-document.txt /tmp/data-file.txt
+```
+
+Error: "Bucket not found"
+Solution: Run CreateS3Buckets or ListS3Buckets to verify bucket exists
+
+Error: "Permission denied on local file"
+Solution: Ensure file is readable:
+```bash
+chmod 644 /tmp/test.txt
+```
+
+---
+
+PROGRAM 4: DeleteS3Objects
+
+Error: "Object to delete not found" (but still shows success)
+Solution: This is normal! Delete is idempotent. S3 returns success even if object doesn't exist.
+
+Error: "Before/After counts don't match"
+Solution: Objects may have been added/deleted between runs. Re-upload first.
+
+---
+
+PROGRAM 5: LatencyMeasurementS3
+
+Error: "One region much slower than others"
+Solution: Expected variance. Run multiple times to get median.
+
+Error: "Download faster than upload"
+Solution: Normal. Upload is more latency-sensitive than download.
+
+Error: "Test takes too long"
+Solution: Use smaller file size:
+```java
+createLargeTestFile(testFile, 100 * 1024);  // 100 KB
+```
+
+===========================================================================
+SECTION 7: VERIFICATION STEPS
+===========================================================================
+
+STEP 1: Verify Java Setup
+```bash
+java -version
+# Must be Java 11+
+
+javac -version
+# Compiler version should match
+```
+
+STEP 2: Verify Maven Setup
+```bash
+mvn -version
+# Must be Maven 3.6+
+
+mvn clean compile
+# Should succeed without errors
+```
+
+STEP 3: Verify AWS Credentials
+```bash
+aws sts get-caller-identity
+# Should return your account info
+
+aws s3 ls
+# Should list your buckets
+```
+
+STEP 4: Verify S3 Buckets
+```bash
+# Run ListS3Buckets:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.ListS3Buckets"
+# Should list 3+ buckets
+```
+
+STEP 5: Verify S3 Objects
+```bash
+# Upload objects:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.UploadS3Objects"
+# Should show 3 uploads successful
+
+# List objects:
+aws s3api list-objects-v2 --bucket group35-d7078-bucket-eu-north-1
+# Should show 3 objects
+```
+
+===========================================================================
+SECTION 8: GETTING MORE HELP
+===========================================================================
+
+AWS SDK DOCUMENTATION:
+- https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/
+
+AWS S3 API REFERENCE:
+- https://docs.aws.amazon.com/AmazonS3/latest/API/
+
+Maven Documentation:
+- https://maven.apache.org/guides/
+
+Java Documentation:
+- https://docs.oracle.com/javase/21/docs/
+
+LAB DOCUMENTATION:
+- LAB_REPORT_OUTLINE.md (main report)
+- API_USAGE_GUIDE.txt (program usage)
+- Question2a-S3Client-Architecture.txt (architecture details)
+
+DEBUGGING TECHNIQUES:
+
+Add debug output:
+```java
+System.out.println("DEBUG: bucketName = " + bucketName);
+System.out.println("DEBUG: region = " + region);
+System.out.println("DEBUG: credentials loaded = " + credentialsProvider);
+```
+
+Enable AWS SDK logging:
+```java
+System.setProperty("aws.sdk.log.level", "DEBUG");
+```
+
+Check Maven debug mode:
+```bash
+mvn -X clean compile
+# -X enables debug output (very verbose)
+```
+
+===================================================================
+For additional help, see the accompanying documentation files:
+- LAB_REPORT_OUTLINE.md
+- API_USAGE_GUIDE.txt
+- Question2a-S3Client-Architecture.txt
+===========================================================================

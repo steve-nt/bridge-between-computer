@@ -1,0 +1,33 @@
+===========================================================================
+STEP 2: Create Security Group
+===========================================================================
+
+Create a security group for the lab:
+
+aws ec2 create-security-group \
+  --group-name Group35-D7078-lab2-security-group \
+  --description "Security group for D7078 Lab2 - allows SSH from specific IP and HTTP from anywhere" \
+  --region eu-north-1
+
+===========================================================================
+Expected Output:
+- You will get a GroupId (e.g., sg-0c5358c51b06bd720)
+- Save this GroupId - you will need it for the next steps!
+- Example output:
+{
+    "GroupId": "sg-xxxxxxxxxxxxxxxx",
+    "SecurityGroupArn": "arn:aws:ec2:eu-north-1:793891462342:security-group/sg-xxxxxxxxxxxxxxxx"
+}
+
+===========================================================================
+ACTION: After running this command, please share the GroupId with me.
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws ec2 create-security-group \
+  --group-name Group35-D7078-lab2-security-group \
+  --description "Security group for D7078 Lab2 - allows SSH from specific IP and HTTP from anywhere" \
+  --region eu-north-1
+{
+    "GroupId": "sg-0cf4b63253b8a5ad6",
+    "SecurityGroupArn": "arn:aws:ec2:eu-north-1:793891462342:security-group/sg-0cf4b63253b8a5ad6"
+}

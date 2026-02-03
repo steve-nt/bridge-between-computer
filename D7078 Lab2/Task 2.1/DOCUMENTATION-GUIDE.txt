@@ -1,0 +1,258 @@
+===========================================================================
+DOCUMENTATION & SCREENSHOT GUIDE
+===========================================================================
+
+This guide helps you document all the work completed in Task 2.1 for 
+your lab report submission.
+
+===========================================================================
+SECTION 1: AWS CLI Commands & Output Documentation
+===========================================================================
+
+All command outputs have been run successfully. Here's what to document:
+
+SCREENSHOT 1: AWS CLI Configuration Verification
+Location: Terminal
+Commands to show:
+  aws --version
+  aws configure list
+  aws sts get-caller-identity
+
+What it shows: Your AWS CLI is installed and configured correctly
+
+---
+
+SCREENSHOT 2: Security Group Creation
+Location: Terminal or AWS Console
+Show:
+  - The security group ID: sg-0cf4b63253b8a5ad6
+  - GroupName: Group35-D7078-lab2-security-group
+Command: aws ec2 describe-security-groups --group-ids sg-0cf4b63253b8a5ad6 --region eu-north-1
+
+What it shows: Security group successfully created with proper configuration
+
+---
+
+SCREENSHOT 3: Security Group Inbound Rules
+Location: AWS Console -> EC2 -> Security Groups
+Or Terminal:
+  aws ec2 describe-security-groups \
+    --group-ids sg-0cf4b63253b8a5ad6 \
+    --region eu-north-1 \
+    --query 'SecurityGroups[0].IpPermissions' \
+    --output table
+
+What it shows:
+  - SSH (port 22) from 79.167.66.242/32
+  - HTTP (port 80) from 0.0.0.0/0
+
+---
+
+SCREENSHOT 4: S3 Bucket Creation
+Location: Terminal
+Show bucket listing:
+  aws s3 ls
+
+What it shows: Bucket successfully created
+  bucket3-d7078-lab2-bucket-sg-170191
+
+---
+
+SCREENSHOT 5: IAM Policy Content
+Location: Terminal
+Show the policy document:
+  cat /home/steven/Desktop/bridge-between-computer/D7078\ Lab2/Labs3Policy.json
+
+What it shows: S3 permissions policy with:
+  - s3:ListBucket
+  - s3:GetBucketLocation
+  - s3:GetObject
+  - s3:PutObject
+  - s3:DeleteObject
+
+---
+
+SCREENSHOT 6: IAM Role Creation & Policy Attachment
+Location: Terminal
+Show:
+  aws iam get-role --role-name Group35-D7078-Lab2-Role \
+    --query 'Role.[RoleName,Arn,CreateDate]' \
+    --output table
+
+What it shows:
+  - Role Name: Group35-D7078-Lab2-Role
+  - Role ARN: arn:aws:iam::793891462342:role/Group35-D7078-Lab2-Role
+
+---
+
+SCREENSHOT 7: IAM Instance Profile
+Location: Terminal
+Show:
+  aws iam get-instance-profile \
+    --instance-profile-name Group35-D7078-Lab2-Profile \
+    --query 'InstanceProfile.[InstanceProfileName,Arn,Roles[0].RoleName]' \
+    --output table
+
+What it shows: Instance profile linked to the role
+
+---
+
+SCREENSHOT 8: EC2 Instance Launch
+Location: AWS Console -> EC2 -> Instances
+Or Terminal:
+  aws ec2 describe-instances \
+    --instance-ids i-0c32227bfffc472e0 \
+    --region eu-north-1 \
+    --query 'Reservations[0].Instances[0].[InstanceId,InstanceType,State.Name,PublicIpAddress,IamInstanceProfile.Arn]' \
+    --output table
+
+What it shows:
+  - Instance ID: i-0c32227bfffc472e0
+  - Type: t3.micro
+  - State: running
+  - Public IP: 16.170.224.197
+  - IAM Instance Profile attached: ✓
+
+---
+
+SCREENSHOT 9: EC2 Instance Details (AWS Console)
+Location: AWS Console -> EC2 -> Instances
+Click on instance i-0c32227bfffc472e0
+Show tabs:
+  - Details tab (showing IAM role, security groups)
+  - Security tab (showing security group rules)
+  - Networking tab (showing public/private IPs)
+
+What it shows: Instance is running with correct configuration
+
+---
+
+SCREENSHOT 10: Security Group Attached to Instance
+Location: AWS Console -> EC2 -> Instance Details -> Security Tab
+Show: Security group sg-0cf4b63253b8a5ad6 is attached
+
+What it shows: Instance uses correct security group
+
+---
+
+SCREENSHOT 11: S3 File Upload Success
+Location: Terminal
+Show the output from:
+  aws s3api put-object \
+    --bucket group35-d7078-lab2-bucket-sg-170191 \
+    --key test-local.txt \
+    --body /tmp/test.txt
+
+What it shows:
+  - ETag: "220973ac612c945bfce3503f6e81ab11"
+  - File successfully uploaded
+
+---
+
+SCREENSHOT 12: S3 Bucket Contents
+Location: Terminal or AWS Console
+Terminal command:
+  aws s3api list-objects-v2 \
+    --bucket group35-d7078-lab2-bucket-sg-170191
+
+What it shows:
+  - Bucket contains test-local.txt
+  - Size: 29 bytes
+  - Upload timestamp
+
+---
+
+SCREENSHOT 13: AWS Console - Overview
+Location: AWS Console -> Services Dashboard
+Show all created resources:
+  - EC2 instance running
+  - Security group
+  - IAM role
+  - S3 bucket
+
+What it shows: Complete lab environment setup
+
+===========================================================================
+SECTION 2: How to Take Screenshots
+===========================================================================
+
+Option 1: Linux Screenshot Tool
+  gnome-screenshot        (adds to Pictures folder)
+  scrot /tmp/screenshot.png
+  import -window root /tmp/screenshot.png
+
+Option 2: Firefox/Browser (for AWS Console)
+  Press: Ctrl + Shift + S (built-in screenshot tool)
+  Or: Right-click -> Take Screenshot
+
+Option 3: Terminal Output to File
+  Save terminal output to text files:
+  
+  aws ec2 describe-security-groups --group-ids sg-0cf4b63253b8a5ad6 \
+    --region eu-north-1 > security-group-output.txt
+
+===========================================================================
+SECTION 3: Organize Your Screenshots
+===========================================================================
+
+Create a Screenshots folder and organize by step:
+
+/home/steven/Desktop/bridge-between-computer/D7078 Lab2/Screenshots/
+  ├── 01-AWS-CLI-Config.png
+  ├── 02-Security-Group-Creation.png
+  ├── 03-Inbound-Rules.png
+  ├── 04-S3-Bucket.png
+  ├── 05-IAM-Policy.png
+  ├── 06-IAM-Role.png
+  ├── 07-Instance-Profile.png
+  ├── 08-EC2-Instance-Launch.png
+  ├── 09-EC2-Instance-Details.png
+  ├── 10-Security-Group-Attached.png
+  ├── 11-S3-Upload-Success.png
+  ├── 12-S3-Bucket-Contents.png
+  └── 13-AWS-Console-Overview.png
+
+===========================================================================
+SECTION 4: Document All Command Outputs
+===========================================================================
+
+Create a "CommandOutputs.txt" file with all successful commands:
+
+Example format:
+
+---
+COMMAND 1: AWS CLI Version Check
+Command: aws --version
+Output:
+aws-cli/2.32.6 Python/3.13.9 Linux/6.12.38+kali-amd64 exe/x86_64.kali.2025
+---
+
+COMMAND 2: Security Group Creation
+Command: aws ec2 create-security-group ...
+Output:
+{
+    "GroupId": "sg-0cf4b63253b8a5ad6",
+    ...
+}
+---
+
+[Continue for all major steps...]
+
+===========================================================================
+ACTION ITEMS:
+===========================================================================
+
+Before cleanup, complete:
+
+[ ] Take screenshots of all 13 items listed above
+[ ] Organize screenshots in /Screenshots folder
+[ ] Create CommandOutputs.txt with key command results
+[ ] Create a summary document of what was learned
+[ ] Take a screenshot of AWS Console showing all resources
+
+Once complete, share:
+- Location of screenshots folder
+- Confirmation that all documentation is ready
+- Then we proceed with cleanup
+
+===========================================================================

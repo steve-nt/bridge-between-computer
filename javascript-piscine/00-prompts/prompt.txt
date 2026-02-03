@@ -1,0 +1,9 @@
+I require a detailed implementation guide for the assignment on   . Please include the following sections in your solution:  
+1. A comprehensive breakdown of the assignment requirements and objectives  
+2. Step-by-step instructions on how to implement the solution, including any coding or methodologies  
+3. A list of recommended readings and resources to enhance understanding of the relevant concepts  
+4. An explanation of all key concepts involved in the assignment with definitions and examples  
+
+Ensure that the solution is clear and thorough, suitable for someone with a basic understanding of the topic but not an expert. Avoid using overly technical jargon without clear explanations. The output should be formatted in a clear and organized manner, suitable for saving as a text file.  
+
+For context, I have zero experience in this field. Please maintain a tone that is educational, casual and assume you are explaining to a 16 years old

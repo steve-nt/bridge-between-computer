@@ -1,0 +1,87 @@
+class-it
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+→Jump to Building Power !
+Level 3
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+class-it.html, class-it.css
+—
+Brainpower Mode
+
+Context
+You're almost done creating your robot! A few elements still need some refinement, and then we'll bring it to life!
+
+Resources
+We've provided some content to help you get started smoothly. Check it out!
+
+Video: CSS - Set & style with CSS class
+
+Instructions
+If you look at your page, you'll notice that some elements come in pairs: the eyes, the arms, and the legs. These are identical organs, one on the left and one on the right, sharing the same shape. To avoid duplicating styles, we won't use their id for styling. Instead, we'll use a class. Unlike an id, a class can be assigned to multiple elements, allowing a common ruleset to apply to all HTML elements with that class.
+
+Task 1
+Create the following three classes in your CSS file, apply the specified rulesets, and assign them to the corresponding HTML elements by adding class attributes:
+
+Class eye:
+width: 60 pixels
+
+height: 60 pixels
+
+background-color: red
+
+border-radius: 50%
+
+Assign to: elements with IDs eye-left and eye-right
+
+Class arm:
+background-color: aquamarine
+
+Assign to: elements with IDs arm-left and arm-right
+
+Class leg:
+background-color: dodgerblue
+
+Assign to: elements with IDs leg-left and leg-right
+
+Task 2
+Create an additional class called body-member with the following properties:
+
+width: 50 pixels
+
+margin: 30 pixels
+
+Add this class to the same elements that already have the arm and leg classes. Remember, you can assign multiple classes to the same element by separating them with spaces in the class attribute.
+
+The following elements should have both their specific class AND the body-member class:
+
+arm-left (classes: arm body-member)
+
+arm-right (classes: arm body-member)
+
+leg-left (classes: leg body-member)
+
+leg-right (classes: leg body-member)
+
+Code examples
+Define a class my-first-class and style it with a color of blue and a background-color of pink:
+
+.my-first-class {
+  color: blue;
+  background-color: pink;
+}
+Apply classes to HTML elements:
+
+<div class="my-first-class"></div>
+<div class="another-class"></div>
+<div class="my-first-class another-class"></div>
+Expected output
+Here's what you should see in the browser: Expected Output
+
+Need help? Ask your peer!
+
+Notions
+CSS classDo r

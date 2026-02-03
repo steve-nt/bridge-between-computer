@@ -1,0 +1,201 @@
+D7078E Lab 4: Infrastructure as Code with Terraform on AWS using VS Code
+In this lab, we will learn how to define and deploy AWS resources via Infrastructure as Code
+using Terraform with Visual Studio Code (VS Code). Instead of using the AWS Management
+Console, the aim is to write Terraform configuration files to automate infrastructure
+provisioning.
+This lab will deploy three AWS resources:
+1. An S3 Bucket
+2. An EC2 Instance
+3. A Security Group (to allow SSH)
+The goal is to introduce Infrastructure as Code (IaC) concepts and hands-on Terraform for
+infrastructure provisioning in AWS environment.
+1. Prerequisites
+A valid AWS account
+AWS CLI installed
+Terraform installed
+Visual Studio Code installed
+VS Code Extensions: Terraform by HashiCorp
+2. Important Note: Complete this lab with group collaborations and clearly
+mentioning each member’s contributions (More than one individual can work on
+similar tasks).
+3. Lab Objectives
+a. Understand how Terraform defines infrastructure as code
+b. Set up Terraform in Visual Studio Code
+c. Use AWS CLI authentication
+d. Deploy an S3 bucket, EC2 instance, and Security Group
+e. Use Terraform workflow: init → plan → apply → destroy
+f. Validate deployed resources in AWS Console
+g. Reflections on lab tasks/environment
+4. Terraform Workflow
+
+   HashiCorp Terraform
+   -------------------
+
+   [ Practitioner ]
+          |
+          v
++------------------------+
+| Infrastructure as Code |
++------------------------+
+          |
+          v
+   +------+     +------+
+   | Plan | --> | Apply|
+   +------+     +------+
+          |
+          v
++--------------------------------------+
+|      Multi‑provider Infrastructure   |
+|  +-----------+  +-----+  +--------+  |
+|  | Kubernetes|  | AWS |  | Azure  |  |
+|  +-----------+  +-----+  +--------+  |
+|  +--------+     +-----+  +--------+  |
+|  | GCP   |     | HCL |  | Others |   |
+|  +--------+     +-----+  +--------+  |
++--------------------------------------+
+          |
+          v
+   +-------------+     +-------------+
+   | Environment | --> | Environment |
+   |    #1       |     |    #2       |
+   +-------------+     +-------------+
+               \
+                v
+          +-------------+
+          | Environment |
+          |     #3      |
+          +-------------+
+
+5. Lab Tasks
+Task 1 — Create a Project in Visual Studio Code
+Step 1: Create a working folder
+Open a terminal and run:
+mkdir terraform-aws-lab
+cd terraform-aws-lab
+Step 2: Open the folder in VS Code
+Task 2 — Configure AWS CLI
+In the VS Code terminal:
+aws configure
+Enter:
+• AWS Access Key ID
+• AWS Secret Access Key
+• Default region (e.g., eu-north-1)
+• Output format: json
+Task 3 — Create Terraform Files in VS Code
+Inside VS Code project, create the following files:
+• provider.tf
+• main.tf
+• variables.tf
+• outputs.tf
+Task 4 — Configure Terraform Provider
+provider.tf
+terraform {
+required_providers {
+aws = {
+source = "hashicorp/aws"
+version = "~> 5.0"
+}
+}
+}
+provider "aws" {
+region = var.region
+}
+Task 5 — Create Resources (3 Resources Only)
+Open main.tf in VS Code:
+1. Create Security Group
+resource "aws_security_group" "lab_sg" {
+name = "lab-sg"
+description = "Allow SSH"
+vpc_id = "default"
+ingress {
+from_port = 22
+to_port = 22
+protocol = "tcp"
+cidr_blocks = ["YOUR_PUBLIC_IP/32"]
+}
+egress {
+from_port = 0
+to_port = 0
+protocol = "-1"
+cidr_blocks = ["0.0.0.0/0"]
+}
+}
+2. Create EC2 Instance
+resource "aws_instance" "lab_ec2" {
+ami = var.ami_id
+instance_type = "t2.micro"
+vpc_security_group_ids = [aws_security_group.lab_sg.id]
+tags = {
+Name = "terraform-lab-ec2"
+}
+}
+3. Create S3 Bucket
+resource "aws_s3_bucket" "lab_bucket" {
+bucket = var.bucket_name
+tags = {
+Name = "terraform-lab-bucket"
+}
+}
+Task 6 — Variables File
+variables.tf
+variable "region" {
+default = "eu-north-1"
+}
+variable "ami_id" {
+description = "AMI for EC2"
+default = "ami-07c8c1b18ca66bb07"
+}
+variable "bucket_name" {
+default = "terraform-lab-bucket-demo12345"
+}
+Task 7 — Outputs File
+outputs.tf
+output "instance_public_ip" {
+value = aws_instance.lab_ec2.public_ip
+}
+output "bucket_name" {
+value = aws_s3_bucket.lab_bucket.bucket
+}
+Task 8 — Run Terraform Commands (VS Code Terminal)
+Initialize project:
+terraform init
+Show execution plan:
+terraform plan
+Apply and deploy:
+terraform apply
+Type yes to confirm.
+Task 9 — Validate in AWS Console
+Verify these resources are available and take screenshots.
+✔ EC2 instance created
+✔ Security group rules
+✔ S3 bucket exists
+Task 10 — Cleanup
+Run:
+terraform destroy
+Confirm with yes.
+6. Reflection Questions
+1. Why do we prefer using Terraform rather than manually clicking through the AWS
+console?
+2. What does the Terraform workflow command terraform plan help us understand?
+3. How could more complex applications benefit from IaC?
+4. What risks arise if we store access keys inside Terraform code?
+7. Lab Report
+1. VS Code Terminal Output Screenshot showing resources are provisioned.
+2. Portal screenshot showing resources.
+3. Different screenshots of the VS code environment and Terminal outputs proof.
+4. Answers to the reflection questions.
+Lab Report Submission
+The report should be written in the lab report format template file. This can be found here
+[2] (Do not edit this template file, make a copy in your own Overleaf account to edit!) using
+LaTeX in Overleaf. Download the PDF file after you finish 8 writing and submit the PDF
+along with your zipped code files and short video to Canvas. You must document your code
+properly so it’s readable.
+I. Submit a lab report to the designated LAB 4 folder in Canvas.
+II. Submit as a zip file (report, codes).
+III. Follow the template instructions.
+IV. The report *must* be well-formatted and easy to read.
+V. Mention each group member’s contribution in a section.
+VI. Screenshots: Consider including screenshots for all steps to aid you in the
+grading.
+VII. Submit the code files as well.
+VIII. Make a short video to explain the lab and display the implementations

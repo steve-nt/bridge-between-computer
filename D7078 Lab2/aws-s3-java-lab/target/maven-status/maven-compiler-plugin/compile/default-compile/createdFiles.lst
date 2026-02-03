@@ -1,0 +1,7 @@
+com/group35/d7078/ListS3Buckets.class
+com/group35/d7078/LatencyMeasurementS3.class
+com/group35/d7078/CreateS3Buckets.class
+com/group35/d7078/UploadS3Objects.class
+com/group35/d7078/DeleteS3Objects.class
+com/group35/d7078/LatencyMeasurementS3$LatencyResult.class
+com/group35/d7078/App.class

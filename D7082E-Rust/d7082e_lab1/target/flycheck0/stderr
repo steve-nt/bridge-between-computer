@@ -1,0 +1,17 @@
+<<<<<<< HEAD
+   0.019928074s  INFO prepare_target{force=false package_id=d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1) target="d7082e_lab1"}: cargo::core::compiler::fingerprint: dependency on `rand_core` is newer than we are 1769803608.395191143s > 1769803608.388241909s "/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_chacha-0.3.1"
+   0.021205605s  INFO prepare_target{force=false package_id=d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1) target="d7082e_lab1"}: cargo::core::compiler::fingerprint: fingerprint dirty for d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1)/Check { test: false }/TargetInner { name: "d7082e_lab1", doc: true, ..: with_path("/home/steven/Desktop/bridge-between-computer/d7082e_lab1/src/main.rs", Edition2024) }
+   0.021481497s  INFO prepare_target{force=false package_id=d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1) target="d7082e_lab1"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "rand" })
+   0.022438916s  INFO prepare_target{force=false package_id=rand v0.8.5 target="rand"}: cargo::core::compiler::fingerprint: fingerprint dirty for rand v0.8.5/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rand", ["lib"], "/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.5/src/lib.rs", Edition2018) }
+   0.022469479s  INFO prepare_target{force=false package_id=rand v0.8.5 target="rand"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "rand_chacha" })
+   0.023220954s  INFO prepare_target{force=false package_id=rand_chacha v0.3.1 target="rand_chacha"}: cargo::core::compiler::fingerprint: fingerprint dirty for rand_chacha v0.3.1/Check { test: false }/TargetInner { name_inferred: true, ..: lib_target("rand_chacha", ["lib"], "/home/steven/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_chacha-0.3.1/src/lib.rs", Edition2018) }
+   0.023249602s  INFO prepare_target{force=false package_id=rand_chacha v0.3.1 target="rand_chacha"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDependency { name: "rand_core", dep_mtime: FileTime { seconds: 1769803608, nanos: 395191143 }, max_mtime: FileTime { seconds: 1769803608, nanos: 388241909 } })
+   0.026080484s  INFO prepare_target{force=false package_id=d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1) target="d7082e_lab1"}: cargo::core::compiler::fingerprint: fingerprint dirty for d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1)/Check { test: true }/TargetInner { name: "d7082e_lab1", doc: true, ..: with_path("/home/steven/Desktop/bridge-between-computer/d7082e_lab1/src/main.rs", Edition2024) }
+   0.026134878s  INFO prepare_target{force=false package_id=d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1) target="d7082e_lab1"}: cargo::core::compiler::fingerprint:     dirty: FsStatusOutdated(StaleDepFingerprint { name: "rand" })
+    Checking rand_chacha v0.3.1
+    Checking rand v0.8.5
+    Checking d7082e_lab1 v0.1.0 (/home/steven/Desktop/bridge-between-computer/d7082e_lab1)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.44s
+=======
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.09s
+>>>>>>> d647e9da11e09cc6b2309f7e2400d11efe15fcde

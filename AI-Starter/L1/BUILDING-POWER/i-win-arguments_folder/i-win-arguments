@@ -1,0 +1,108 @@
+i-win-arguments
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+Level 6
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+i-win-arguments.js
+—
+Mindful AI mode
+
+Context
+You've reached the final mission to unlock your full potential, which will bring your robot to life and make it fully functional!
+
+The last step involves mastering the use of arguments in functions. By learning how to use and manage these arguments effectively, you can unlock the full potential of your robot and truly bring it to life.
+
+Let's dive in!
+
+AI-Powered Learning Techniques
+Code Chunking Technique: This technique asks AI to break down complex code examples into smaller, understandable pieces. Instead of trying to understand everything at once, you analyze each part separately and then see how they work together.
+
+Find examples throughout the subject ;)
+
+Concepts
+Functions with Arguments
+Functions can accept inputs called arguments, making them flexible and reusable:
+
+let greet = (name) => {
+  console.log("Hello, " + name);
+};
+
+greet("Robot"); // Output: "Hello, Robot"
+greet("Human"); // Output: "Hello, Human"
+Multiple Arguments
+Functions can accept multiple arguments separated by commas:
+
+let introduce = (name, type) => {
+  console.log(name + " is a " + type);
+};
+
+introduce("R2D2", "droid"); // Output: "R2D2 is a droid"
+Using Methods with Arguments
+You can use string methods on arguments:
+
+let shout = (message) => {
+  console.log(message.toUpperCase());
+};
+
+shout("hello"); // Output: "HELLO"
+Return Values
+Functions can return values instead of just logging them:
+
+let createMessage = (text) => {
+  return "Message: " + text;
+};
+
+let result = createMessage("Hello");
+console.log(result); // Output: "Message: Hello"
+Prompt example:
+"I have this complex function with multiple arguments and string methods. Can you break it down chunk by chunk and explain what each part does: let formatNames = (first, last) => { return (first + ' ' + last).toUpperCase(); }"
+
+Instructions
+Task 1:
+Create two communication functions for your RoboGuard:
+
+battleCry function:
+
+Takes one argument called message
+
+Logs the message converted to uppercase.
+
+secretOrders function:
+
+Takes one argument called message
+
+Logs the message converted to lowercase.
+
+Task 2:
+Create two functions for robot teamwork:
+
+duos function:
+
+Takes two arguments: robot1 and robot2
+
+Logs them in format: robot1 + ' and ' + robot2 + '!'
+
+Example: if called with "Batman" and "Robin", outputs: "Batman and Robin!"
+
+duosWork function:
+
+Takes three arguments: robot1, robot2, and task
+
+Logs them in format: robot1 + ' and ' + robot2 + ' ' + task + '!'
+
+Example: if called with "Bonnie", "Clyde", "escape the Police", outputs: "Bonnie and Clyde escape the Police!"
+
+Task 3:
+Create a function that returns a value:
+
+Define function passButter with no arguments.
+
+Return the string 'The butter.'.
+
+Use return, not console.log.
+
+"Your hard work is paying off. The only limit to your impact is your imagination and commitment." - Tony Robbins

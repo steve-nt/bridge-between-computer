@@ -1,0 +1,121 @@
+((.venv) ) joeltulehag@Mac part2 % caffeinate /Users/joeltulehag/vscode/lab1-ai/.venv/bin/python /Users/joeltulehag/vscode/lab1-ai/part2/v4-one-pixel-attack.py
+Using device: mps
+==================================================
+ONE-PIXEL ATTACK & APR DEFENSE
+==================================================
+
+Loading CIFAR-10...
+
+--- Training Standard ResNet-18 ---
+Epoch [1/5], Loss: 1.2430, Acc: 54.97%
+Epoch [2/5], Loss: 0.7956, Acc: 72.01%
+Epoch [3/5], Loss: 0.6463, Acc: 77.59%
+Epoch [4/5], Loss: 0.5594, Acc: 80.84%
+Epoch [5/5], Loss: 0.5008, Acc: 82.81%
+Standard Model Accuracy: 76.69%
+
+--- Training APR Defense Model ---
+Epoch [1/5], Loss: 1.0057, Acc: 50.06%
+Epoch [2/5], Loss: 0.7550, Acc: 64.35%
+Epoch [3/5], Loss: 0.6258, Acc: 70.97%
+Epoch [4/5], Loss: 0.5688, Acc: 74.19%
+Epoch [5/5], Loss: 0.5168, Acc: 76.57%
+APR Model Accuracy: 72.11%
+
+==================================================
+ATTACK ANALYSIS: STANDARD
+==================================================
+Progress: 10/200
+Progress: 20/200
+Progress: 30/200
+Progress: 40/200
+Progress: 50/200
+Progress: 60/200
+Progress: 70/200
+Progress: 80/200
+Progress: 90/200
+Progress: 100/200
+Progress: 110/200
+Progress: 120/200
+Progress: 130/200
+Progress: 140/200
+Progress: 150/200
+Progress: 160/200
+Progress: 170/200
+Progress: 180/200
+Progress: 190/200
+Progress: 200/200
+
+1. SUCCESS RATE: 86/200 = 43.00%
+2. EFFICIENCY: Avg generations for success: 6.6
+3. CLASS VULNERABILITY:
+   airplane: 56.2% (9/16)
+   automobile: 30.0% (6/20)
+   bird: 65.2% (15/23)
+   cat: 81.8% (9/11)
+   deer: 45.5% (10/22)
+   dog: 35.0% (7/20)
+   frog: 50.0% (13/26)
+   horse: 22.2% (4/18)
+   ship: 55.6% (10/18)
+   truck: 11.5% (3/26)
+
+==================================================
+ATTACK ANALYSIS: APR DEFENSE
+==================================================
+Progress: 10/200
+Progress: 20/200
+Progress: 30/200
+Progress: 40/200
+Progress: 50/200
+Progress: 60/200
+Progress: 70/200
+Progress: 80/200
+Progress: 90/200
+Progress: 100/200
+Progress: 110/200
+Progress: 120/200
+Progress: 130/200
+Progress: 140/200
+Progress: 150/200
+Progress: 160/200
+Progress: 170/200
+Progress: 180/200
+Progress: 190/200
+Progress: 200/200
+
+1. SUCCESS RATE: 62/200 = 31.00%
+2. EFFICIENCY: Avg generations for success: 6.0
+3. CLASS VULNERABILITY:
+   airplane: 11.5% (3/26)
+   automobile: 28.6% (4/14)
+   bird: 41.7% (10/24)
+   cat: 23.5% (4/17)
+   deer: 52.4% (11/21)
+   dog: 38.5% (5/13)
+   frog: 53.3% (8/15)
+   horse: 15.0% (3/20)
+   ship: 34.5% (10/29)
+   truck: 19.0% (4/21)
+
+==================================================
+FINAL COMPARISON
+==================================================
+Metric                    Standard     APR         
+--------------------------------------------------
+Clean Accuracy            76.69%       72.11%
+Attack Success Rate       43.00%       31.00%
+Robustness                57.00%       69.00%
+
+--- Task 4.2 Analysis ---
+Q1: Paper effectiveness reproduction:
+    Absolute ASR reduction: 12.00 percentage points
+    Relative ASR reduction: 27.91%
+Q2: Security vs Accuracy trade-off:
+    Accuracy drop: 4.58 percentage points
+    Robustness gain (absolute): 12.00 percentage points
+Q3: Attacker adaptations:
+    - Use multi-pixel attacks (3-5 pixels)
+    - Increase DE generations/population
+    - Attack with targeted objective instead of untargeted
+((.venv) ) joeltulehag@Mac part2 % 

@@ -1,0 +1,36 @@
+===========================================================================
+STEP 4: Create an S3 Bucket
+===========================================================================
+
+Create an S3 bucket (bucket names must be globally unique):
+
+IMPORTANT: Replace "YOUR_BUCKET_NAME" with a unique name. 
+Examples: group35-d7078-lab2-bucket-sg-12345
+
+aws s3api create-bucket \
+  --bucket group35-d7078-lab2-bucket-sg-170191 \
+  --region eu-north-1 \
+  --create-bucket-configuration LocationConstraint=eu-north-1
+
+===========================================================================
+Expected Output:
+- You will get the bucket location
+- Example output:
+{
+    "Location": "http://group35-d7078-lab2-bucket-sg-170191.s3.amazonaws.com/"
+}
+
+===========================================================================
+ACTION: Run the corrected command above with s3api
+===========================================================================
+┌──(steven㉿kali)-[~]
+└─$ aws s3api create-bucket \
+  --bucket group35-d7078-lab2-bucket-sg-170191 \
+  --region eu-north-1 \
+  --create-bucket-configuration LocationConstraint=eu-north-1
+{
+    "Location": "http://group35-d7078-lab2-bucket-sg-170191.s3.amazonaws.com/"
+}
+                                                                                                                   
+┌──(steven㉿kali)-[~]
+└─$ 

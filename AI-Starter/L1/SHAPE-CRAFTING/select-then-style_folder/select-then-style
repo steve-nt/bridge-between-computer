@@ -1,0 +1,92 @@
+select-then-style
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+→Jump to Building Power !
+Level 2
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+select-then-style.html, select-then-style.css
+—
+Brainpower mode
+
+Context
+To bring your robot friend to life, building its skeleton with HTML is just the first step. Your robot needs personality and style, and that's where CSS (Cascading Style Sheets) comes in. CSS acts like the clothing and accessories that give your robot its unique look and feel. It helps you decorate and arrange the elements on your page, making everything visually appealing. Ready to start styling? Let's dive in and give your robot buddy the perfect look!
+
+Remember to copy and paste your previous HTML submission into the new HTML file in the code editor.
+
+Resources
+We provide you with some resources to help you get started smoothly. Check them out!
+
+Video: Link a CSS stylesheet to your HTML file
+
+Video: CSS - Style with type selectors
+
+Video: HTML/CSS - Set & style with ID selector
+
+Instructions
+Now that you have created and properly identified the different sections of your robot, it's time to make it look more lifelike! To achieve this, you'll style it with CSS.
+
+Tasks
+In your HTML file, link your CSS file select-then-style.css to the <head> section, and then:
+
+Target all elements with the universal selector and style them with:
+
+margin set to 0
+
+box-sizing set to border-box
+
+opacity set to 0.85
+
+Target the body tag and style it with a height of 100vh so it occupies the full viewport height.
+
+Target all section tags with the type selector, and style them with:
+
+padding set to 20px
+
+width set to 100%
+
+height set to calc(100% / 3) (one-third of the body height, since we have 3 sections)
+
+Target each of the following elements with the id selector, using the id attributes you defined earlier for each section, and style them with these background colors:
+
+face with background-color of cyan
+
+upper-body with background-color of blueviolet
+
+lower-body with background-color of lightsalmon
+
+Code examples
+To style an element, you need to declare rulesets, which are composed of a property and a value.
+
+Set the color of div tags to red:
+
+div {
+  color: red;
+}
+Set the background-color of the HTML element with the id block-1:
+
+#block-1 {
+  background-color: red;
+}
+Expected output
+This is what you should see in the browser: screenshot
+
+You should see three equal-height sections stacked vertically, each taking up one-third of the browser window height, with cyan, blue-violet, and light salmon background colors respectively.
+
+Notions
+link a CSS file
+
+CSS Basics
+
+ruleset
+
+List of different selectors
+
+universal selector
+
+type selector
+
+id selector

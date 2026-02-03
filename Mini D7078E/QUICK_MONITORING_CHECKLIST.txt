@@ -1,0 +1,155 @@
+================================================================================
+QUICK CHECKLIST - IS IT WORKING?
+================================================================================
+
+RIGHT NOW, check these things:
+
+================================================================================
+IMMEDIATE CHECKS (in PowerShell windows)
+================================================================================
+
+☐ Both PowerShell windows are still running (not crashed)?
+☐ See "[worker X] req #N status=200" messages?
+☐ Both windows showing request activity?
+☐ No Python errors in either window?
+
+If YES to all above: ✓ Load is being sent! It's working!
+
+================================================================================
+AWS CONSOLE CHECKS (open browser now!)
+================================================================================
+
+Go to: AWS Console > CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+
+Check these metrics NOW:
+
+☐ CPU Utilization: Is it rising? (should be 30%+ by now if scripts running Phase 1/2)
+  └─ If at 0%: Something wrong
+  └─ If rising: ✓ IT'S WORKING!
+
+☐ RequestCount: Is there activity? (should show numbers)
+  └─ If 0: Not sending requests
+  └─ If showing values: ✓ IT'S WORKING!
+
+☐ HealthyHostCount: Still showing 1 for now (normal, Phase 3 is when scaling happens)
+  └─ If showing values: ✓ Normal!
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. WAIT 10-15 MINUTES
+   └─ Let scripts reach Phase 3 (both at same time)
+   └─ This is when combined 2500 RPS load starts
+
+2. AROUND MINUTE 12-15
+   └─ CPU should spike to 80%+
+   └─ Alarms should trigger
+   └─ Scaling should begin
+
+3. WATCH FOR SCALING
+   └─ HealthyHostCount: 1 → 2 → 3
+   └─ ASG Activity: "Launching 1 new instance" messages
+   └─ EC2 Instances: count increases
+
+4. TAKE SCREENSHOTS
+   └─ Of the scaling events
+   └─ Proof that it worked!
+
+================================================================================
+EXPECTED TIMING
+================================================================================
+
+Phase timing (both scripts synchronized):
+
+0-5 min:   Both Phase 1 (50 + 200 = 250 RPS)
+5-10 min:  Both Phase 2 (200 + 800 = 1000 RPS)
+10-25 min: Both Phase 3 (500 + 2000 = 2500 RPS) ← SCALING HERE!
+25-30 min: Both winding down
+
+CRITICAL MOMENT: Minutes 10-20
+  └─ This is when you'll see scaling happen
+  └─ Watch dashboard during this time
+
+================================================================================
+MOST LIKELY OUTCOME
+================================================================================
+
+SCENARIO 1: It works perfectly ✓
+  ├─ You'll see CPU spike
+  ├─ Alarms trigger
+  ├─ Instances scale 1→2→3
+  ├─ RequestCount shows 2000+ RPS
+  └─ AMAZING RESULTS! 🎉
+
+SCENARIO 2: Slow to scale
+  ├─ CPU high but instances not launching yet
+  ├─ Reason: Alarms take 2-5 minutes to evaluate
+  ├─ Solution: Wait longer
+  └─ Will eventually work ✓
+
+SCENARIO 3: Some requests fail
+  ├─ ALB might drop some requests under extreme load
+  ├─ This is NORMAL for 2500 RPS on t2.micro
+  ├─ Some requests fail = Expected
+  └─ Scaling will still happen ✓
+
+SCENARIO 4: One script crashes
+  ├─ One of the scripts might crash
+  ├─ Other continues running
+  ├─ You'll still see scaling from remaining script
+  └─ Still counts as success ✓
+
+================================================================================
+DON'T PANIC IF...
+================================================================================
+
+Don't worry if:
+  ⚠️ You see connection errors (some requests may fail)
+  ⚠️ CPU doesn't spike immediately (gives Phase 1/2 time)
+  ⚠️ Scaling takes a few minutes (alarm evaluation time)
+  ⚠️ One script has issues (other may work fine)
+  ⚠️ Instances aren't showing instantly (they boot in 1-2 minutes)
+
+All of these are normal under extreme load!
+
+================================================================================
+WHAT TO DO RIGHT NOW
+================================================================================
+
+1. Look at your PowerShell windows
+   └─ Are they showing request activity? YES = Good!
+
+2. Open AWS Console
+   └─ CloudWatch Dashboard
+   └─ Check CPU and RequestCount
+   └─ If showing activity = Good!
+
+3. WAIT 10 MINUTES
+   └─ Let scripts reach Phase 3
+   └─ This is when the magic happens
+
+4. MONITOR CLOSELY
+   └─ Minutes 10-20 are critical
+   └─ Watch for CPU spike and scaling
+
+5. TAKE SCREENSHOTS
+   └─ When you see HealthyHostCount increase
+   └─ Proof of success!
+
+================================================================================
+YOU'RE DOING GREAT!
+================================================================================
+
+You're running a 2500 RPS concurrent load test! That's IMPRESSIVE!
+
+Even if some requests fail, even if scaling takes a minute longer,
+you're stress-testing your infrastructure at EXTREME levels!
+
+Just keep both scripts running and monitor the dashboard.
+
+In 5-10 minutes, you should see the magic happen! 🚀
+
+Trust the process! It will work! ✅
+
+================================================================================

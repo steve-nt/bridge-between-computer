@@ -1,0 +1,25 @@
+AWS Cloud Security Lab 3: Multi-Tier Isolation
+===============================================
+
+This document contains confidential information about the multi-tier architecture
+implemented in the D7078E Cloud Security Lab.
+
+Lab Overview:
+- Three isolated EC2 instances deployed
+- Strict security group rules enforce network isolation
+- Database server restricted to admin SSH access only
+- Web application server accessible via HTTPS only
+- Storage server uses API Gateway for controlled access
+
+Security Principles Applied:
+1. Least Privilege Access - Each instance has minimal required permissions
+2. Network Isolation - EC2 instances cannot communicate directly
+3. Secure Channels - All data flows through HTTPS and IAM-controlled APIs
+4. Monitoring & Logging - CloudWatch and CloudTrail track all activities
+5. Defense in Depth - Multiple layers of security controls
+
+Files in this bucket are protected by IAM policies and can only be accessed
+through the API Gateway endpoint via the Storage Server instance.
+
+Last Updated: December 20, 2025
+Lab Deadline: December 31, 2025

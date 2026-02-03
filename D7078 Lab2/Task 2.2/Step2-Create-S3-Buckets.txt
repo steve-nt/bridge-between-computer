@@ -1,0 +1,295 @@
+===========================================================================
+TASK 2.2 - PART II: Using Storage Service
+===========================================================================
+
+STEP 2: Create Java Program to Create S3 Buckets in Three Regions
+===========================================================================
+
+Objective:
+Create a Java program that creates S3 buckets in three regions:
+1. eu-north-1 (Stockholm)
+2. eu-west-1 (Ireland)
+3. eu-central-1 (Frankfurt)
+
+===========================================================================
+File to Create: CreateS3Buckets.java
+Location: aws-s3-java-lab/src/main/java/com/group35/d7078/CreateS3Buckets.java
+===========================================================================
+
+DETAILED STEPS TO CREATE THE FILE:
+
+Step 1: Navigate to your project directory
+cd ~/aws-s3-java-lab
+
+Step 2: Create the directory path if it doesn't exist
+mkdir -p src/main/java/com/group35/d7078
+
+Step 3: Create the Java file using a text editor
+Using VS Code (which you opened):
+- Open the file: src/main/java/com/group35/d7078/CreateS3Buckets.java
+- OR use terminal:
+nano src/main/java/com/group35/d7078/CreateS3Buckets.java
+
+Step 4: Copy the complete code below into the file
+
+===========================================================================
+Here is the complete Java program:
+
+---START OF CODE---
+
+package com.group35.d7078;
+
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.CreateBucketConfiguration;
+import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+
+public class CreateS3Buckets {
+    
+    public static void main(String[] args) {
+        System.out.println("==================================================");
+        System.out.println("AWS S3 Bucket Creation - Multiple Regions");
+        System.out.println("==================================================\n");
+        
+        // Define the three regions
+        String[] regions = {"eu-north-1", "eu-west-1", "eu-central-1"};
+        String[] regionNames = {"Stockholm", "Ireland", "Frankfurt"};
+        
+        // Create buckets in each region
+        for (int i = 0; i < regions.length; i++) {
+            String region = regions[i];
+            String regionName = regionNames[i];
+            
+            System.out.println("Creating bucket in: " + regionName + " (" + region + ")");
+            createBucketInRegion(region, regionName);
+            System.out.println();
+        }
+        
+        System.out.println("==================================================");
+        System.out.println("All buckets created successfully!");
+        System.out.println("==================================================");
+    }
+    
+    public static void createBucketInRegion(String regionString, String regionName) {
+        // Convert string region to Region enum
+        Region region = Region.of(regionString);
+        
+        // Create bucket name (must be globally unique)
+        String bucketName = "group35-d7078-bucket-" + regionString.toLowerCase();
+        
+        try {
+            // Create S3 client for the specific region
+            S3Client s3Client = S3Client.builder()
+                .region(region)
+                .build();
+            
+            System.out.println("S3Client created for region: " + region);
+            System.out.println("Bucket Name: " + bucketName);
+            
+            // Create the CreateBucketRequest
+            CreateBucketRequest.Builder requestBuilder = CreateBucketRequest.builder()
+                .bucket(bucketName);
+            
+            // For regions other than us-east-1, we need to specify CreateBucketConfiguration
+            if (!regionString.equals("us-east-1")) {
+                CreateBucketConfiguration bucketConfig = CreateBucketConfiguration.builder()
+                    .locationConstraint(region.id())
+                    .build();
+                requestBuilder.createBucketConfiguration(bucketConfig);
+            }
+            
+            CreateBucketRequest createBucketRequest = requestBuilder.build();
+            
+            // Execute the create bucket request
+            CreateBucketResponse response = s3Client.createBucket(createBucketRequest);
+            
+            System.out.println("✓ Bucket created successfully!");
+            System.out.println("  Location: " + response.location());
+            System.out.println("  Response Code: " + response.sdkHttpResponse().statusCode());
+            
+            // Close the S3 client
+            s3Client.close();
+            System.out.println("  S3Client closed.");
+            
+        } catch (S3Exception e) {
+            // Handle bucket already exists error
+            if (e.awsErrorDetails().errorCode().equals("BucketAlreadyOwnedByYou")) {
+                System.out.println("✗ Bucket already exists (owned by you): " + bucketName);
+            } else if (e.awsErrorDetails().errorCode().equals("BucketAlreadyExists")) {
+                System.out.println("✗ Bucket name already taken by another user: " + bucketName);
+            } else {
+                System.out.println("✗ Error creating bucket: " + e.getMessage());
+                System.out.println("  Error Code: " + e.awsErrorDetails().errorCode());
+            }
+        } catch (Exception e) {
+            System.out.println("✗ Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+
+---END OF CODE---
+
+===========================================================================
+Step-by-Step Explanation:
+===========================================================================
+
+1. IMPORTS:
+   - Region: Enum for AWS regions
+   - S3Client: Main client for S3 operations
+   - CreateBucketRequest: Request object to create a bucket
+   - CreateBucketConfiguration: Configuration for bucket creation
+   - S3Exception: Exception handling for S3 errors
+
+2. MAIN METHOD:
+   - Defines three regions: eu-north-1, eu-west-1, eu-central-1
+   - Iterates through each region
+   - Calls createBucketInRegion() for each region
+
+3. createBucketInRegion() METHOD:
+   a) Convert region string to Region enum
+   b) Create globally unique bucket name
+   c) Create S3Client for specific region
+   d) Build CreateBucketRequest with:
+      - Bucket name
+      - CreateBucketConfiguration (for non-us-east-1 regions)
+   e) Execute request via s3Client.createBucket()
+   f) Handle responses and errors
+   g) Close S3Client
+
+4. ERROR HANDLING:
+   - BucketAlreadyOwnedByYou: Bucket exists and you own it
+   - BucketAlreadyExists: Bucket name taken by another account
+   - Other S3Exception errors
+   - General exception handling
+
+===========================================================================
+How S3 Clients are Created:
+===========================================================================
+
+The S3Client is created using the builder pattern:
+
+S3Client s3Client = S3Client.builder()
+    .region(region)
+    .build();
+
+Key Points:
+- Uses Region enum to specify AWS region
+- Builder pattern for flexible configuration
+- Each region gets its own S3Client instance
+- S3Client should be closed after use (releases resources)
+
+Packages Involved:
+- software.amazon.awssdk.regions.Region
+- software.amazon.awssdk.services.s3.S3Client
+- software.amazon.awssdk.services.s3.model.*
+
+Classes Involved:
+- Region: Represents AWS region
+- S3Client: Main client for S3 operations
+- CreateBucketRequest: Encapsulates bucket creation parameters
+- CreateBucketConfiguration: Regional configuration
+- CreateBucketResponse: Response from bucket creation
+
+===========================================================================
+Steps to Run the Program:
+===========================================================================
+
+Step 1: Build the project
+cd ~/aws-s3-java-lab
+mvn clean compile
+
+Expected output:
+[INFO] BUILD SUCCESS
+
+Step 2: Add Maven Exec Plugin to pom.xml (if not already there)
+
+If you want to run with mvn exec:java, add this to your pom.xml in the 
+<build><plugins> section:
+
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>exec-maven-plugin</artifactId>
+    <version>3.0.0</version>
+</plugin>
+
+Step 3: Run the program using Maven
+
+Option A - Using maven-exec-plugin:
+mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+
+Option B - Using java command directly:
+mvn package
+java -cp target/aws-s3-java-lab-1.0-SNAPSHOT.jar:~/.m2/repository/software/amazon/awssdk/s3/2.20.0/s3-2.20.0.jar:~/.m2/repository/software/amazon/awssdk/aws-core/2.20.0/aws-core-2.20.0.jar:~/.m2/repository/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar:~/.m2/repository/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar com.group35.d7078.CreateS3Buckets
+
+(Note: Option A is easier. Use mvn exec:java command)
+
+Step 4: Expected Output
+
+==================================================
+AWS S3 Bucket Creation - Multiple Regions
+==================================================
+
+Creating bucket in: Stockholm (eu-north-1)
+S3Client created for region: eu-north-1
+Bucket Name: group35-d7078-bucket-eu-north-1
+✓ Bucket created successfully!
+  Location: http://group35-d7078-bucket-eu-north-1.s3.amazonaws.com/
+  Response Code: 200
+  S3Client closed.
+
+Creating bucket in: Ireland (eu-west-1)
+S3Client created for region: eu-west-1
+Bucket Name: group35-d7078-bucket-eu-west-1
+✓ Bucket created successfully!
+  Location: http://group35-d7078-bucket-eu-west-1.s3.amazonaws.com/
+  Response Code: 200
+  S3Client closed.
+
+Creating bucket in: Frankfurt (eu-central-1)
+S3Client created for region: eu-central-1
+Bucket Name: group35-d7078-bucket-eu-central-1
+✓ Bucket created successfully!
+  Location: http://group35-d7078-bucket-eu-central-1.s3.amazonaws.com/
+  Response Code: 200
+  S3Client closed.
+
+==================================================
+All buckets created successfully!
+==================================================
+
+NOTE: If you see "BucketAlreadyOwnedByYou" error, it means the bucket 
+already exists (from Task 2.1), which is fine - you can ignore this.
+
+===========================================================================
+TROUBLESHOOTING:
+===========================================================================
+
+If you get compilation errors:
+
+Error: "Cannot find symbol: class S3Client"
+Solution: Make sure pom.xml has the AWS SDK dependency and run:
+mvn clean install
+
+Error: "No main class found"
+Solution: Make sure the class is named exactly: CreateS3Buckets
+And main method is: public static void main(String[] args)
+
+Error: "Maven exec plugin not found"
+Solution: Add the exec-maven-plugin to pom.xml <build><plugins> section
+
+===========================================================================
+ACTION CHECKLIST:
+===========================================================================
+
+[ ] Navigate to ~/aws-s3-java-lab
+[ ] Create directory: mkdir -p src/main/java/com/group35/d7078
+[ ] Create file: src/main/java/com/group35/d7078/CreateS3Buckets.java
+[ ] Copy the code from below into the file
+[ ] Save the file
+[ ] Run: mvn clean compile
+[ ] Run: mvn exec:java -Dexec.mainClass="com.group35.d7078.CreateS3Buckets"
+[ ] Share the output with me
+===========================================================================

@@ -1,0 +1,71 @@
+first-function
+available
+This exercise is not in the time scope anymore so it won't reward you any XP.
+Level 6
+required
+XP
+Files to submit
+Allowed functions
+0.00 B
+first-function.js
+—
+Mindful AI mode
+
+Context
+Your robot will need to start executing custom tasks, and to do that, you'll need to program its functions. Functions are like commands that tell the robot exactly what to do.
+
+You can create your own functions to give your robot unique abilities and make it more efficient!
+
+AI-Powered Learning Techniques
+Reflective Practice Technique: This type of prompt asks AI to help you think about what you've learned and connect new concepts to previous knowledge. Use this technique to deepen understanding by exploring how functions relate to other programming concepts you know.
+
+Find examples across the subject ;)
+
+Concepts
+Function Calls (Review)
+Remember calling built-in functions?
+
+console.log("Hello There!"); // Calling the console.log function
+Now we'll learn to create our own functions!
+
+Declaring a Function
+Create your own function using arrow function syntax:
+
+let myFirstFunction = () => {
+  console.log("Robot is now active!");
+};
+Breaking it down:
+
+let myFirstFunction - declares a variable to store the function
+
+= () => - arrow function syntax (empty parentheses for no arguments)
+
+{} - curly braces contain the function's instructions
+
+Calling Your Function
+Use parentheses to call your function:
+
+myFirstFunction(); // Output: "Robot is now active!"
+Functions with Instructions
+Put any code inside the function's curly braces:
+
+let greetRobot = () => {
+  console.log("Hello, I am a robot!");
+  console.log("Ready for commands!");
+};
+
+greetRobot(); // Runs both console.log statements
+Prompt example:
+"I just learned about creating functions in JavaScript. Help me reflect on how functions relate to variables and console.log statements I learned earlier. What are the benefits of putting code inside functions versus writing it directly?"
+
+Instructions
+Task 1:
+Create two functions that simulate a conversation between a robot and its creator:
+
+Declare a function named ask that logs the message: 'What is my purpose?'
+
+Declare a function named reply that logs the message: 'You pass butter.'
+
+Call the ask function
+
+Call the reply function

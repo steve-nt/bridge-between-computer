@@ -1,0 +1,220 @@
+================================================================================
+QUICK COPY-PASTE LOAD GENERATOR COMMANDS
+================================================================================
+
+Your ALB URL:
+http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+
+================================================================================
+PHASE 1: MODERATE LOAD (Test baseline)
+================================================================================
+
+Command (copy entire line and paste into PowerShell):
+
+python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 20 --rps 5 --duration 300
+
+Expected:
+- Total RPS: 20 × 5 = 100 RPS
+- Duration: 5 minutes
+- CPU should reach 30-50%
+- No scaling yet
+
+================================================================================
+PHASE 2: HIGH LOAD (Trigger scaling)
+================================================================================
+
+Command (copy entire line and paste into PowerShell):
+
+python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+
+Expected:
+- Total RPS: 50 × 10 = 500 RPS
+- Duration: 10 minutes
+- CPU should reach 80%+
+- cpu-high-alarm-80percent triggers
+- Instances scale: 1 → 2 → 3
+
+================================================================================
+PHASE 3: MAXIMUM LOAD (Stress test)
+================================================================================
+
+Command (copy entire line and paste into PowerShell):
+
+python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 100 --rps 20 --duration 900
+
+Expected:
+- Total RPS: 100 × 20 = 2000 RPS
+- Duration: 15 minutes
+- CPU will stay high
+- All 3 instances running at capacity
+- Maximum performance demonstration
+
+================================================================================
+STEP-BY-STEP EXECUTION
+================================================================================
+
+1. Open PowerShell on Windows
+
+2. Navigate to project folder:
+   cd C:\Users\snten\Desktop\bridge-between-computer\Mini\ D7078E
+
+3. Verify Python is installed:
+   python --version
+
+4. Install aiohttp (if not already):
+   pip install aiohttp
+
+5. OPEN DASHBOARD IN BROWSER:
+   - Go to AWS Console
+   - CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+   - Keep this open in another monitor/window
+
+6. RUN PHASE 1:
+   python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 20 --rps 5 --duration 300
+   
+   Wait for it to complete (5 minutes)
+   Watch dashboard: CPU should be 30-50%
+
+7. RUN PHASE 2:
+   python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 50 --rps 10 --duration 600
+   
+   While this runs (10 minutes):
+   - Watch HealthyHostCount: should increase 1 → 2 → 3
+   - Watch CPU: should hit 80%+
+   - Check CloudWatch Alarms: cpu-high-alarm-80percent should be IN_ALARM
+   - Check ASG Activity: should show scaling events
+   - Take screenshots at major events
+
+8. STOP LOADING (or wait for Phase 2 to complete)
+
+9. REDUCE LOAD TO TRIGGER SCALE-IN:
+   python agent.py --url http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/ --workers 1 --rps 1 --duration 600
+   
+   Wait 5+ minutes for scale-in:
+   - CPU drops below 30%
+   - cpu-low-alarm-30percent triggers
+   - HealthyHostCount decreases 3 → 2 → 1
+
+================================================================================
+DASHBOARD MONITORING CHECKLIST
+================================================================================
+
+Open in browser during load test:
+☐ CloudWatch > Dashboards > D7078E-Mini-Project-Dashboard
+
+Watch for:
+☐ CPU Utilization: 0% → 30% → 50% → 80%+
+☐ RequestCount: Increases steadily (hundreds per minute)
+☐ HealthyHostCount: 1 → 2 → 3 (as load triggers scaling)
+
+Take screenshots at:
+☐ Before load (baseline)
+☐ CPU at 50%
+☐ CPU at 80% (alarm trigger point)
+☐ After first instance launches (2 instances)
+☐ After second instance launches (3 instances)
+☐ Peak load (all metrics)
+
+================================================================================
+ADDITIONAL MONITORING
+================================================================================
+
+While load is running, also check:
+
+1. CloudWatch Alarms:
+   AWS Console → CloudWatch > Alarms
+   - Watch cpu-high-alarm-80percent transition OK → IN_ALARM
+   - When it triggers, new instances start launching
+
+2. ASG Activity:
+   AWS Console → EC2 > Auto Scaling Groups > D7078E-MINI-PROJECT-GROUP35-ASG
+   - Click "Activity" tab
+   - See real-time scaling events
+   - Note timestamps of each launch
+
+3. EC2 Instances:
+   AWS Console → EC2 > Instances
+   - Filter by tag or ASG
+   - Watch instance count increase 1 → 2 → 3
+   - Note instance IDs and launch times
+
+================================================================================
+EXPECTED TIMELINE
+================================================================================
+
+PHASE 1 (0-5 minutes):
+- Load starts: 100 RPS
+- CPU: 0% → 30-50%
+- HealthyHostCount: 1
+- No scaling
+
+PHASE 2 (5-15 minutes):
+- Load increases: 500 RPS
+- Minute 5-7: CPU rises 50% → 80%
+- Minute 7-9: cpu-high-alarm-80percent triggers
+  → Scaling event: 1 → 2 instances
+  → New instance boots (takes 1-2 min)
+- Minute 9-11: CPU drops as load distributes
+  → May trigger again: 2 → 3 instances
+- Minute 11-15: 3 instances handling load
+  → CPU stabilizes at ~40-60%
+
+PHASE 3 (scale-in, after load stops):
+- Load reduces: 2 RPS
+- CPU drops 80% → 30%
+- Takes 5 minutes of low CPU
+- cpu-low-alarm-30percent triggers
+  → Scaling event: 3 → 2 → 1 instances
+- Instances terminate gracefully
+
+================================================================================
+YOUR ALB DETAILS (for reference)
+================================================================================
+
+ALB DNS: D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com
+ALB URL: http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/
+
+ASG: D7078E-MINI-PROJECT-GROUP35-ASG
+Target Group: D7078E-MINI-PROJECT-GROUP35-TG
+Region: eu-north-1
+
+Current: 1 instance
+Min: 1, Max: 3
+
+================================================================================
+IF SOMETHING GOES WRONG
+================================================================================
+
+Load generator crashes:
+- Restart: Run the command again
+- Reduce workers or RPS if errors persist
+
+CPU doesn't reach 80%:
+- Increase workers: use 100 instead of 50
+- Increase RPS: use 20 instead of 10
+- Or both: --workers 150 --rps 20
+
+Instances don't scale:
+- Wait 2+ minutes (alarm evaluation period)
+- Check: CloudWatch > Alarms > cpu-high-alarm-80percent state
+- Verify ASG limits (max=3)
+
+Dashboard not updating:
+- Refresh browser
+- Wait 30-60 seconds (metrics batch updates)
+- Check dashboard exists: CloudWatch > Dashboards
+
+================================================================================
+READY TO RUN!
+================================================================================
+
+Next step: Copy Phase 1 command and paste into PowerShell!
+
+✓ Dashboard ready
+✓ ASG configured with scaling policies
+✓ Alarms set to trigger at 80% and 30%
+✓ Load generator ready to use
+
+START PHASE 1 NOW!
+
+================================================================================

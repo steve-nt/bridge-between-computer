@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  agent1:
+    build: .
+    command:
+      - "--url"
+      - "http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/"
+      - "--workers"
+      - "2"
+      - "--rps"
+      - "1"
+      - "--duration"
+      - "600"
