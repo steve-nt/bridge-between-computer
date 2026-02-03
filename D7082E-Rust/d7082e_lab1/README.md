@@ -2,12 +2,20 @@
 
 Covers lectures 1 and 2 (chapters 1-6 of the [Rust Book](https://doc.rust-lang.org/book/)).
 
+<<<<<<< HEAD
+You may collaborate with other students for solving the Tasks, but you will subimit review etc, individually.
+=======
 You may collaborate with other students for solving the Tasks, but you will submit review etc, individually.
+>>>>>>> d647e9da11e09cc6b2309f7e2400d11efe15fcde
 
 If you have collaborated with others. Change the below to match the way you collaborated. In this way, suspection of plagiarism can be avoided even if your repos turn out to be very similar.
 
 - [](), Mr X, came up with the idea of Y which I used in my code
+<<<<<<< HEAD
+- [](), Mrs Z, suggest using R, which turned ut great, so I used that as well.
+=======
 - [](), Mrs Z, suggest using R, which turned out great, so I used that as well.
+>>>>>>> d647e9da11e09cc6b2309f7e2400d11efe15fcde
 - Etc.
 
 ## Task 1 - Setting up Rust
@@ -23,6 +31,11 @@ If you have collaborated with others. Change the below to match the way you coll
 - Clone the repo to your local machine.
 
 Complete the [Programming a Guessing Game](https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html) tutorial. Notice, You should replace the provided `src/main.rs` with Your guessing game code, do not create a new Rust crate.
+<<<<<<< HEAD
+You should run the following command to add the rand crate
+cargo add rand 
+=======
+>>>>>>> d647e9da11e09cc6b2309f7e2400d11efe15fcde
 
 The program should/will compile and run but will generate a warning, You will fix that later.
 
@@ -79,6 +92,17 @@ Run:
 
 - Reflect in your own words what you have learned by doing this lab. Hint, compare your knowledge regarding Rust, tooling etc., before and after doing this lab.
 
+<<<<<<< HEAD
+D7082ELAB1 Reflection 1 
+
+D7082ELAB1 Reflection 2
+
+D7082ELAB1 Reflection 3
+
+D7082ELAB1 Reflection 4
+
+D7082ELAB1 Reflection 5
+=======
 - **D7082ELAB1 Reflection 1**: Installing Rust and verifing the installation is working correctly using the Rust compiler and Cargo package manager. Since, I have not worked before with Rust everything was new.
 
 - **D7082ELAB1 Reflection 2**: Understanding Immutability, I have not seen the concept of mutable and immutable variables in Rust and in other languages, since I do not develop software.
@@ -90,6 +114,7 @@ Run:
 - **D7082ELAB1 Reflection 5**: The use of external external Rust libraries (crates) and the concept of them, and the differences with other languages like python and golang
 
 - **D7082ELAB1 Reflection 6**: The different documentation standards, writing crate-level documentation using //! comments and function-level documentation using /// comments following Rust conventions. And creating documentation running the `cargo doc --open` command
+>>>>>>> d647e9da11e09cc6b2309f7e2400d11efe15fcde
 
 - In canvas assignment submit link to your final lab1 repository.
 
