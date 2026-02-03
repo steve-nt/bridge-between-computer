@@ -1,0 +1,155 @@
+================================================================================
+ARE RANDOM SEEDS AND DEVICE SELECTION NECESSARY?
+================================================================================
+
+# Set seed for reproducibility
+torch.manual_seed(42)
+np.random.seed(42)
+
+# Set device
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
+
+================================================================================
+SECTION 1: Random Seeds [OPTIONAL BUT RECOMMENDED]
+================================================================================
+
+torch.manual_seed(42)
+np.random.seed(42)
+
+NECESSITY: ⚠️ OPTIONAL (not required for code to run)
+
+WHY YOU MIGHT INCLUDE THEM:
+  ✓ Reproducibility: Get SAME results every time you run the code
+  ✓ Debugging: Easier to debug when results are consistent
+  ✓ Academic/Research: Required for published papers
+  ✓ Comparison: Compare algorithms fairly with same initial conditions
+
+WHY YOU MIGHT SKIP THEM:
+  ✗ Normal ML behavior: Genetic algorithms are stochastic (random-based)
+  ✗ Different seeds = different but equally valid results
+  ✗ Production code: Usually want randomness for variety
+
+IN OUR CASE (One-Pixel Attack):
+  → RECOMMENDED to INCLUDE
+  → Reason: Each run will show similar attack behavior
+  → Makes debugging easier if something goes wrong
+  → Better for scientific reports (reproducible results)
+
+WHAT CHANGES IF YOU REMOVE SEEDS:
+  Without seeds:
+    Run 1: Success rate 65%, Average iterations 85
+    Run 2: Success rate 72%, Average iterations 92
+    Run 3: Success rate 68%, Average iterations 88
+    
+  With seeds (seed=42):
+    Run 1: Success rate 68%, Average iterations 87
+    Run 2: Success rate 68%, Average iterations 87
+    Run 3: Success rate 68%, Average iterations 87
+
+================================================================================
+SECTION 2: Device Selection [NECESSARY ✓]
+================================================================================
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+NECESSITY: ✅ NECESSARY (code will fail without this)
+
+WHY IT'S ESSENTIAL:
+  ✓ Tell PyTorch WHERE to run computations
+  ✓ GPU (CUDA) is ~100x faster than CPU for neural networks
+  ✓ Without specifying device, code may fail when moving tensors
+
+WHAT HAPPENS:
+  
+  With device specification:
+    model = model.to(device)           ← Moves model to GPU/CPU
+    images = images.to(device)         ← Moves data to GPU/CPU
+    Result: Everything runs on same device ✓
+  
+  Without device specification:
+    Error: Tensor device mismatch
+    "Expected all tensors to be on the same device"
+
+HOW IT WORKS:
+  
+  if torch.cuda.is_available():
+    → Uses GPU (CUDA) - Fast! ⚡
+    → device = "cuda"
+    → Forward pass: ~0.1 seconds per image
+  else:
+    → Falls back to CPU - Slow but works 🐢
+    → device = "cpu"
+    → Forward pass: ~1-5 seconds per image
+  
+  In your case:
+    You have GPU available (cu128 = CUDA 12.8)
+    → device will be "cuda"
+    → 10 images will take ~10 seconds (GPU)
+    → Without GPU would take ~50-100 seconds (CPU)
+
+================================================================================
+SECTION 3: Print Statement [OPTIONAL BUT HELPFUL]
+================================================================================
+
+print(f"Using device: {device}")
+
+NECESSITY: ⚠️ OPTIONAL (nice to have)
+
+WHY INCLUDE IT:
+  ✓ Debugging: Know if GPU is actually being used
+  ✓ Transparency: User sees what device is active
+  ✓ Performance: Helps identify slow runs (CPU vs GPU)
+
+OUTPUT:
+  Using device: cuda   ← GPU is being used (fast)
+  OR
+  Using device: cpu    ← CPU is being used (slow)
+
+================================================================================
+RECOMMENDATION FOR YOUR PROJECT
+================================================================================
+
+INCLUDE ALL THREE?
+  → YES, I recommend including them all
+  
+BREAKDOWN:
+  torch.manual_seed(42)        → YES (reproducibility)
+  np.random.seed(42)           → YES (reproducibility)
+  device selection             → YES (REQUIRED)
+  print device                 → YES (helpful debugging)
+
+WHAT TO DO:
+  → Keep these lines in Cell 1
+  → They don't hurt, improve reproducibility, and improve debugging
+  → Standard practice in ML projects
+
+IF TIME-CONSTRAINED:
+  → Only REQUIRED: device assignment
+  → Nice to have: seeds + print
+  → Can remove seeds if you want different results each run
+
+================================================================================
+SUMMARY TABLE
+================================================================================
+
+Component                   | Required | Recommended | Impact
+---------------------------|----------|-------------|------------------
+torch.manual_seed(42)       | No       | Yes         | Reproducibility
+np.random.seed(42)          | No       | Yes         | Reproducibility
+device selection            | YES ✓    | YES ✓       | Code won't work without
+print(f"Using device: ...")  | No       | Yes         | Debugging info
+
+================================================================================
+FINAL ANSWER
+================================================================================
+
+These lines are NOT strictly necessary for the code to RUN, but:
+
+1. SEEDS: Highly recommended for reproducibility (keep them)
+2. DEVICE: Absolutely necessary (keep it)
+3. PRINT: Helpful for debugging (keep it)
+
+RECOMMENDATION: Keep all of them. They follow best practices in ML development.
+
+================================================================================

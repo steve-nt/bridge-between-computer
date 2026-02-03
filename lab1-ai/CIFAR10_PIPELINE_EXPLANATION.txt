@@ -1,0 +1,427 @@
+================================================================================
+STEP 3: SETUP CIFAR-10 DATA PIPELINE - DETAILED EXPLANATION
+================================================================================
+
+OUTPUT RECEIVED:
+  ✓ CIFAR-10 test set loaded: 10000 images
+  CIFAR-10 classes: ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+  
+  (Warning about NumPy deprecation - can be ignored)
+
+CODE:
+  transform = transforms.Compose([
+      transforms.ToTensor(),
+      transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                           std=[0.229, 0.224, 0.225])
+  ])
+
+  test_dataset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+  test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
+
+  print(f"✓ CIFAR-10 test set loaded: {len(test_dataset)} images")
+  print(f"CIFAR-10 classes: {test_dataset.classes}")
+
+================================================================================
+PART 1: transforms.Compose() - CREATE TRANSFORMATION PIPELINE
+================================================================================
+
+WHAT IT DOES:
+  Groups multiple image transformations into a single pipeline
+
+CODE BREAKDOWN:
+
+  transform = transforms.Compose([
+      transforms.ToTensor(),
+      transforms.Normalize(...)
+  ])
+
+EXPLANATION:
+
+  transforms.Compose([...])
+  ├─ Function that chains transformations
+  ├─ Applies transformations IN ORDER
+  ├─ Each image goes through all transformations
+  └─ Returns single transform object
+
+  Pipeline execution (for each image):
+    Raw PIL Image (32×32×3)
+         ↓
+    [Transform 1: ToTensor()] → Convert to tensor, scale [0, 1]
+         ↓
+    Tensor (3×32×32) with values [0, 1]
+         ↓
+    [Transform 2: Normalize(...)] → Subtract mean, divide by std
+         ↓
+    Normalized Tensor (3×32×32) with values [-2, 2]
+         ↓
+    Ready for model input
+
+WHY USE transforms.Compose?
+
+  ✓ Cleaner code: Define once, apply everywhere
+  ✓ Consistency: Every image gets same transformations
+  ✓ Reusable: Use same transform for train/val/test
+  ✓ Scalable: Easy to add more transformations
+
+ANALOGY:
+  Like an assembly line:
+    Raw material (PIL image)
+    → Machine 1 (ToTensor)
+    → Machine 2 (Normalize)
+    → Final product (model-ready tensor)
+
+================================================================================
+PART 2: transforms.ToTensor() - CONVERT IMAGE TO TENSOR
+================================================================================
+
+WHAT IT DOES:
+  Converts PIL image to PyTorch tensor and scales to [0, 1]
+
+BEFORE (Raw PIL Image):
+  Data type: PIL Image object
+  Format: (Height, Width, Channels) = (32, 32, 3)
+  Values: [0, 255] (standard image format)
+  Example pixel: RGB(255, 128, 64) → red=255, green=128, blue=64
+
+AFTER (PyTensor with ToTensor()):
+  Data type: torch.Tensor
+  Format: (Channels, Height, Width) = (3, 32, 32) ← channels first!
+  Values: [0.0, 1.0] ← normalized to [0, 1]
+  Example pixel: [1.0, 0.502, 0.251] ← same color, normalized
+
+CODE EFFECT:
+
+  # PIL image: 32×32×3, values [0-255]
+  PIL_image = Image.open("cifar_image.png")  # Shape (32, 32, 3), values [0-255]
+  
+  # After ToTensor()
+  tensor = transforms.ToTensor()(PIL_image)  # Shape (3, 32, 32), values [0-1]
+  
+  # Conversion formula:
+  tensor_value = pil_value / 255.0
+
+WHY THIS TRANSFORMATION?
+
+  ✓ PyTorch expects tensors, not PIL images
+  ✓ Channels-first format (3, H, W) required by CNNs
+  ✓ [0, 1] range is standard for neural networks
+  ✗ [0, 255] range causes gradient problems (too large)
+
+VISUALIZATION:
+
+  PIL Image Shape:           → Tensor Shape:
+    (H, W, C)               (C, H, W)
+    (32, 32, 3)             (3, 32, 32)
+    
+  RGB Channel Order:         → RGB Channel Order:
+    [R, G, B]               [R channel, G channel, B channel]
+    at each pixel           separated by channel
+  
+  Value Range:               → Value Range:
+    [0, 255]                [0.0, 1.0]
+
+EXAMPLE DATA:
+
+  PIL: pixel at (0,0) = RGB(100, 150, 200)
+  After ToTensor: tensor[0,0,0]=0.392, tensor[1,0,0]=0.588, tensor[2,0,0]=0.784
+  (100/255=0.392, 150/255=0.588, 200/255=0.784)
+
+================================================================================
+PART 3: transforms.Normalize() - STANDARDIZE VALUES
+================================================================================
+
+WHAT IT DOES:
+  Subtracts mean and divides by standard deviation for each channel
+
+CODE:
+  transforms.Normalize(
+      mean=[0.485, 0.456, 0.406],
+      std=[0.229, 0.224, 0.225]
+  )
+
+EXPLANATION:
+
+  Formula for each pixel channel:
+    normalized_value = (tensor_value - mean) / std
+
+  For Red channel:   normalized_R = (tensor_R - 0.485) / 0.229
+  For Green channel: normalized_G = (tensor_G - 0.456) / 0.224
+  For Blue channel:  normalized_B = (tensor_B - 0.426) / 0.225
+
+WHY THESE SPECIFIC VALUES (0.485, 0.456, 0.406)?
+
+  These are ImageNet dataset statistics:
+  ├─ Computed from 1.2 million ImageNet training images
+  ├─ Mean RGB values across entire dataset
+  ├─ Red channel: average = 0.485
+  ├─ Green channel: average = 0.456
+  ├─ Blue channel: average = 0.406
+  └─ Standard deviation for each channel
+
+  Why ImageNet stats?
+    ✓ ResNet-18 was trained on ImageNet
+    ✓ Model expects ImageNet-normalized inputs
+    ✓ CIFAR-10 images are normalized same way
+    ✓ Consistency: Train and test use same normalization
+
+BEFORE & AFTER EXAMPLE:
+
+  After ToTensor():  [0.5, 0.6, 0.7]  (tensor values in [0, 1])
+  
+  After Normalize():
+    R: (0.5 - 0.485) / 0.229 = 0.015 / 0.229 = 0.065
+    G: (0.6 - 0.456) / 0.224 = 0.144 / 0.224 = 0.643
+    B: (0.7 - 0.426) / 0.225 = 0.274 / 0.225 = 1.218
+    
+  Result: [0.065, 0.643, 1.218]
+  
+  Range: approximately [-2.5, 2.5] (zero-centered distribution)
+
+WHY NORMALIZE?
+
+  ✓ Zero-centered: Mean ≈ 0 across dataset
+  ✓ Unit variance: Std ≈ 1
+  ✓ Faster training: Gradients better behaved
+  ✓ Better convergence: Optimization works better
+  ✓ Consistency: Model expects normalized inputs
+
+BENEFIT ILLUSTRATION:
+
+  Without normalization:
+    Model tries to learn with values [0, 1] range
+    Gradients can be very large or very small
+    Training unstable, slow convergence
+  
+  With normalization:
+    Model learns with values [-2, 2] range
+    Gradients well-behaved
+    Training stable, faster convergence
+
+================================================================================
+PART 4: datasets.CIFAR10() - DOWNLOAD AND LOAD DATASET
+================================================================================
+
+CODE:
+  test_dataset = datasets.CIFAR10(
+      root='./data',                    # Where to store dataset
+      train=False,                      # Use test set (not training)
+      download=True,                    # Download if not present
+      transform=transform               # Apply transformations
+  )
+
+EXPLANATION:
+
+  datasets.CIFAR10()
+  ├─ Built-in dataset loader from torchvision
+  ├─ Automatically downloads CIFAR-10 if missing
+  ├─ Applies transformations on-the-fly
+  └─ Returns dataset object
+
+  root='./data'
+  ├─ Directory to store CIFAR-10 files
+  ├─ If not exists: creates directory
+  ├─ If exists: uses cached data
+  └─ Saves bandwidth (only download once)
+
+  train=False
+  ├─ Load TEST set (not training set)
+  ├─ Test set: 10,000 images
+  ├─ Training set: 50,000 images (if train=True)
+  └─ We use test set for our attack evaluation
+
+  download=True
+  ├─ Automatically download if needed
+  ├─ First run: Downloads ~170 MB
+  ├─ Subsequent runs: Uses cached data
+  └─ Safe: Won't re-download if already exists
+
+  transform=transform
+  ├─ Apply transformations when loading each image
+  ├─ Each image: PIL → ToTensor → Normalize
+  └─ Automatic: Happens every time image is accessed
+
+WHAT GETS DOWNLOADED (First Run Only):
+
+  ~/Desktop/lab1-ai/data/
+  ├── cifar-10-batches-py/
+  │   ├── data_batch_1
+  │   ├── data_batch_2
+  │   ├── data_batch_3
+  │   ├── data_batch_4
+  │   ├── data_batch_5
+  │   ├── test_batch          ← We use this
+  │   ├── batches.meta
+  │   └── [~170 MB total]
+  
+  (Only downloaded once, then cached)
+
+CIFAR-10 DATASET INFO:
+
+  Total images: 60,000
+  ├─ Training: 50,000
+  └─ Test: 10,000
+  
+  Image properties:
+  ├─ Size: 32×32 pixels
+  ├─ Channels: 3 (RGB)
+  ├─ Format: Colored photos
+  └─ Quality: Low resolution
+  
+  Classes: 10
+  ├─ airplane, automobile, bird, cat
+  ├─ deer, dog, frog, horse
+  ├─ ship, truck
+  └─ 1000 images per class (test set)
+
+================================================================================
+PART 5: torch.utils.data.DataLoader - CREATE BATCH LOADER
+================================================================================
+
+CODE:
+  test_loader = torch.utils.data.DataLoader(
+      test_dataset,           # Dataset to load
+      batch_size=32,          # Images per batch
+      shuffle=False           # Don't shuffle
+  )
+
+EXPLANATION:
+
+  DataLoader()
+  ├─ Wraps dataset for efficient batch loading
+  ├─ Handles batching automatically
+  ├─ Enables parallel loading
+  └─ Returns iterator over batches
+
+  test_dataset
+  ├─ The dataset we just created
+  ├─ 10,000 CIFAR-10 test images
+  └─ With transformations applied
+
+  batch_size=32
+  ├─ Load 32 images at a time
+  ├─ Why 32? Standard batch size, good GPU memory balance
+  ├─ Smaller batch: More batches, slower
+  ├─ Larger batch: Fewer batches, faster GPU usage
+  └─ Total batches: 10000 / 32 = 312.5 → 313 batches
+
+  shuffle=False
+  ├─ Don't randomize image order
+  ├─ Keep original order (deterministic)
+  ├─ Important for reproducibility
+  └─ We use False because we're doing attacks (not training)
+
+HOW DataLoader WORKS:
+
+  Iteration 1: Images [0:32]     (32 images)
+  Iteration 2: Images [32:64]    (32 images)
+  Iteration 3: Images [64:96]    (32 images)
+  ...
+  Iteration 312: Images [9984:10000] (16 images)
+  
+  Total: 313 iterations to get all 10,000 images
+
+USAGE IN LOOP:
+
+  for batch_images, batch_labels in test_loader:
+      # batch_images shape: (32, 3, 32, 32)
+      # batch_labels shape: (32,)
+      
+      # Process batch
+      outputs = model(batch_images)
+      # ...
+
+BENEFITS:
+
+  ✓ Automatic batching: Don't need to manually slice
+  ✓ Efficient loading: Load multiple images in parallel
+  ✓ GPU friendly: Transfer batches in one operation
+  ✓ Scalable: Works for any dataset size
+
+================================================================================
+PART 6: OUTPUT INTERPRETATION
+================================================================================
+
+OUTPUT LINE 1:
+  ✓ CIFAR-10 test set loaded: 10000 images
+
+MEANING:
+  ✓ Successfully downloaded/loaded CIFAR-10
+  ✓ Test set has exactly 10,000 images
+  ✓ Transformations are ready to apply
+  ✓ DataLoader created successfully
+
+OUTPUT LINE 2:
+  CIFAR-10 classes: ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+
+MEANING:
+  ✓ 10 classes in CIFAR-10
+  ✓ Indexed 0-9:
+    0 = airplane
+    1 = automobile
+    2 = bird
+    ... 
+    9 = truck
+  ✓ Model predicts one of these classes
+
+OUTPUT LINE 3 (Warning):
+  VisibleDeprecationWarning: dtype(): align should be passed as Python or NumPy boolean but got `align=0`.
+
+MEANING:
+  ⚠️ Minor warning from NumPy version compatibility
+  ✓ Can be safely ignored
+  ✓ Caused by: torchvision using older pickle format
+  ✓ Does not affect functionality
+  ✗ Will not happen in future NumPy versions
+
+================================================================================
+COMPLETE PIPELINE VISUALIZATION
+================================================================================
+
+Raw CIFAR-10 File (binary):
+         ↓
+    Dataset loads batch
+         ↓
+    10,000 PIL Images (32×32×3) with values [0-255]
+         ↓
+    [Transform 1: ToTensor]
+         ↓
+    10,000 Tensors (3×32×32) with values [0-1]
+         ↓
+    [Transform 2: Normalize]
+         ↓
+    10,000 Normalized Tensors (3×32×32) with values [-2, 2]
+         ↓
+    DataLoader batches them: 32 per batch
+         ↓
+    Model-ready: (batch_size, 3, 32, 32)
+         ↓
+    Ready for ResNet-18 inference!
+
+================================================================================
+VERIFICATION: IS THIS CORRECT?
+================================================================================
+
+CHECKLIST:
+  ✓ 10,000 test images loaded
+  ✓ 10 classes (0-9)
+  ✓ Transformations applied (ToTensor + Normalize)
+  ✓ DataLoader created with batch_size=32
+  ✓ No errors (warning is harmless)
+
+STATUS: ✅ SETUP CORRECT AND READY
+
+================================================================================
+NEXT STEP: RUN CELL 4
+================================================================================
+
+Continue with Cell 4: "Verify Baseline Accuracy on Clean Images"
+
+This will:
+  1. Iterate through DataLoader batches
+  2. Run model predictions on clean images
+  3. Calculate baseline accuracy
+  4. Show how many correct predictions before any attack
+
+Expected baseline accuracy: 50-70% (ResNet trained on ImageNet, tested on CIFAR-10)
+
+================================================================================

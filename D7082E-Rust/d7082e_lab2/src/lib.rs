@@ -10,7 +10,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-const SCORE_FILE: &str = "high_scores.json";
+const SCORE_FILE: &str = "high_scores.txt";
 
 /// Represents a single high score entry.
 ///
