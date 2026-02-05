@@ -3,4 +3,14 @@
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.tar.gz filter=lfs diff=lfs merge=lfs -text
+3LabD7078E/* filter=lfs diff=lfs merge=lfs -text
+4LabD7078E/ filter=lfs diff=lfs merge=lfs -text
+D7077[[:space:]]Assignment[[:space:]]2[[:space:]]-[[:space:]]Copy/ filter=lfs diff=lfs merge=lfs -text
+D7077[[:space:]]Assignment[[:space:]]2[[:space:]]-[[:space:]]Copy/* filter=lfs diff=lfs merge=lfs -text
+D7078E-Lab3/* filter=lfs diff=lfs merge=lfs -text
+d7082e_lab1/* filter=lfs diff=lfs merge=lfs -text
+D7082E-Rust/* filter=lfs diff=lfs merge=lfs -text
+lab1-ai/* filter=lfs diff=lfs merge=lfs -text
+LAB1-SecAI/* filter=lfs diff=lfs merge=lfs -text
+Mini[[:space:]]D7078E/* filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
