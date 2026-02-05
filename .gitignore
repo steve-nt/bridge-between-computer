@@ -1,0 +1,25 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node modules
+node_modules/
+
+# Large data files
+*.tar.gz
+*.zip
+*.iso
+*.mp4
+*.avi
+
+# IDE files
+.vscode/
+.idea/
