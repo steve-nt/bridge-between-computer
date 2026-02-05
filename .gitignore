@@ -23,3 +23,7 @@ node_modules/
 # IDE files
 .vscode/
 .idea/
+.venv/
+venv/
+*.pyc
+__pycache__/
