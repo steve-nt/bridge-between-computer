@@ -1,11 +1,3 @@
-\section{Introduction}
-
-Modern cloud environments require infrastructure that is not only scalable and flexible, but also resilient, observable, and capable of self-recovery from failures. Manual monitoring of cloud resources and reactive responses to infrastructure failures increases operational overhead, extends service downtime, and risks data loss. To address these challenges, organizations increasingly adopt automated scaling, health monitoring, and controlled failure testing (chaos engineering) to build reliable systems that can detect and recover from failures without manual intervention. This lab focuses on applying cloud reliability and security principles in Amazon Web Services (AWS) to design and deploy a resilient web infrastructure with auto-scaling capabilities, comprehensive monitoring, and automated failover mechanisms.
-
-\subsection{Purpose of the Lab}
-
-The purpose of this lab is to design, implement, and validate a resilient cloud infrastructure on AWS using auto-scaling, load balancing, and health-based recovery mechanisms. The lab aims to demonstrate how automated scaling policies can adjust infrastructure capacity in response to demand, how health checks can detect failing instances, and how auto-scaling groups can automatically replace unhealthy instances without service interruption. Additionally, the lab evaluates the effectiveness of controlled failure simulation (stress testing and CPU degradation) in validating system resilience, recovery procedures, and the reliability of monitoring and alerting systems.
-
-\subsection{Problem Statement}
-
-Cloud infrastructures that are deployed without proper auto-scaling, health monitoring, or failure recovery mechanisms are vulnerable to performance degradation, service unavailability, and poor user experience during traffic spikes or instance failures. Such weaknesses can lead to cascading failures, loss of availability, and inability to meet service level agreements (SLAs). The problem addressed in this lab is how to design and implement infrastructure that automatically scales to meet demand, continuously monitors the health of all components, and automatically replaces failed instances while maintaining service availability and data integrity. Additionally, the lab addresses how to safely simulate failures in a controlled manner to validate that recovery mechanisms work as intended before such failures occur in production.
+version https://git-lfs.github.com/spec/v1
+oid sha256:c47658508fd164ec45c8a72be3e423b1ca82a9b7ac78b02d34208c86c31eeb78
+size 2430

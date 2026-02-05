@@ -1,14 +1,3 @@
-version: '3.8'
-
-services:
-  agent1:
-    build: .
-    command:
-      - "--url"
-      - "http://D7078E-MINI-PROJECT-GROUP35-LB-8834940.eu-north-1.elb.amazonaws.com/"
-      - "--workers"
-      - "2"
-      - "--rps"
-      - "1"
-      - "--duration"
-      - "600"
+version https://git-lfs.github.com/spec/v1
+oid sha256:76bad69bb58512d0f7484651ebc479a383c064b1eb70d88b18d527e9bd89ee84
+size 259
