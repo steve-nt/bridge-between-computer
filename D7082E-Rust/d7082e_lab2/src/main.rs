@@ -105,7 +105,15 @@ fn play_round() -> u32 {
 /// Initializes the game loop, loads existing high scores, and manages player sessions.
 /// Players can play multiple rounds, and their scores are tracked and saved to disk.
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+<<<<<<< HEAD
     println!("I have selected a number between {} and {}.", SECRET_RANGE_START, SECRET_RANGE_END);
+=======
+    println!("\n╔════════════════════════════════════╗");
+    println!("║   Welcome to the Guessing Game!    ║");
+    println!("╚════════════════════════════════════╝\n");
+    println!("I have selected a number between {} and {}.", SECRET_RANGE_START, SECRET_RANGE_END);
+    println!("Can you guess what it is?");
+>>>>>>> 5aa402a546a7707f2cc5a517dfdfcc5968e19f10
     println!("Enter 0 at any time to quit.\n");
 
     // Load existing leaderboard or create a new one
