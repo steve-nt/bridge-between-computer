@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concat String Function</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .test-result {
+            background-color: #e8f4f8;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #0066cc;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Concat String Function Tests</h1>
+        <div id="results"></div>
+    </div>
+
+    <script src="concat-str.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        const tests = [
+            ['Hello', ' World'],
+            ['JavaScript', ' is fun!'],
+            ['Code', ''],
+            ['Hi ', 'there!'],
+            ['Total: ', '100']
+        ];
+
+        tests.forEach((test, index) => {
+            const result = concatStr(test[0], test[1]);
+            const div = document.createElement('div');
+            div.className = 'test-result';
+            div.innerHTML = `<strong>Test ${index + 1}:</strong> concatStr("${test[0]}", "${test[1]}") = "<strong>${result}</strong>"`;
+            results.appendChild(div);
+        });
+    </script>
+</body>
+</html>
